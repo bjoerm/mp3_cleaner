@@ -1,0 +1,231 @@
+
+# Possible extension: File name
+## .MP3 to .mp3
+## ..mp3 to .mp3
+
+
+# TODO First step should be a migration to id3v2.4 tags. Mutagen does this by default, when saving.
+## Source: https://mutagen.readthedocs.io/en/latest/user/id3.html
+## By default mutagen will:
+## Load the file
+## Upgrade any ID3v2.2 frames to their ID3v2.3/4 counterparts (TT2 to TIT2 for example)
+
+# TODO Remove Leading "The " from Artist field.
+
+# TODO tdrc should only contain the year.
+# TODO trck should either everywhere or nowhere feature a leading zero.
+
+
+# TODO
+# Check whether this works if there are no tags at all.
+## Solution for that: https://stackoverflow.com/questions/4040605/does-anyone-have-good-examples-of-using-mutagen-to-write-to-files
+
+
+# Switch to mutagen normal - not easyid3
+## http://www.blog.pythonlibrary.org/2010/04/22/parsing-id3-tags-from-mp3s-using-python/
+## Or https://thebuildingcoder.typepad.com/blog/2013/02/mp3-manipulation-using-python-mutagen-and-ffmpeg.html use normal id3 and not easyid3.
+## Should also be super easy see "4.   Declared ID3v2 frames" http://id3.org/id3v2.4.0-frames
+## https://stackoverflow.com/questions/4040605/does-anyone-have-good-examples-of-using-mutagen-to-write-to-files
+
+
+
+
+# Sources:
+## https://mutagen.readthedocs.io/en/latest/user/gettingstarted.html
+## https://mutagen.readthedocs.io/en/latest/api/id3.html
+
+
+# Console:
+## conda activate mp3_cleaner 
+
+
+
+
+
+import glob # For reading files and folders.
+import os # For file path check.
+import re # Regular expressions # TODO Do I need to write the dependency here again?
+import time
+from pathlib import Path # For getting the parentfolder of the found mp3.
+import shutil # For copying folders to create backups.
+
+
+# from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
+
+from string_capitalization import string_capitalization # From local function.
+
+# Options
+
+## Tags
+id3_fields = ["POPM", "TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"] # List of id3 fields to fetch. # TODO Move this into an options dictionary.
+
+id3_fields_with_strings = ["TALB", "TIT2", "TPE1", "TPE2"] # List of id3 fields that contain strings. Is used to identify the fields where string manipulation shall be applied. # TODO Move this into an options dictionary.
+
+## Folders
+
+original_folder = "untouched_input" # Folder that is not touched.
+working_folder = "input" # Folder where files are saved.
+
+
+# Setting up the workspace
+def setting_up_workspace(original_folder_input, working_folder_input):
+
+    ## Delete working folder, if it exists.
+    if os.path.exists(working_folder_input):
+        shutil.rmtree(working_folder_input)
+
+    time.sleep(2)
+
+    ## Copy files into a working folder so original files are not touched.
+    shutil.copytree(original_folder_input, working_folder_input)
+
+setting_up_workspace(original_folder_input = original_folder, working_folder_input = working_folder)
+
+time.sleep(4)
+
+## Convert file extension to lowercase
+def convert_file_extension_to_lower_case(working_folder_input):    
+    files = glob.glob(working_folder_input+"/**/*.[mM][pP]3", recursive = True)
+
+    for i in range(len(files)):
+        pre, ext = os.path.splitext(files[i])
+        
+        os.rename(files[i], pre + ".mp3") # Convert each file extention into lowercase.
+
+convert_file_extension_to_lower_case(working_folder_input = working_folder)
+
+
+
+
+
+# Define files that shall be edited.
+files = glob.glob(working_folder+"/**/*.[mM][pP]3", recursive = True) # glob itself seems to not care about whether file extension contain capital letters. Anyways, [mM][pP]3 is a bit safer than just mp3. # Recursive = True in combination with ** in the path will lead to a search in every folder and subfolder and subsubfolder and ...
+
+
+len(files)
+# print(files)
+files[0]
+
+
+for i in range(len(files)):    
+    print(i) # Return number of the current loop. # TODO Delete after debudding.
+
+    # Getting the folder name.
+    path = Path(files[i])
+    folder = print(path.parent)
+
+    # Read the whole id3 tag for the respective file.
+
+    try:
+        id3 = ID3(files[i])
+    except ID3NoHeaderError: # If there is no id3 tag in file, skip it.
+        continue
+
+    # Extract id3 fields
+    ## Storing the id3 fields in a dictionary.
+    id3_dictionary = {} # Create an empty dictionary.
+
+    for j in range(len(id3_fields)):
+        
+        # Fields with strings:
+        if id3_fields[j] in id3_fields_with_strings:
+
+            value = id3.get(id3_fields[j]) # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
+
+            # If the certain tag j defined in id3_fields[i] is not present in the mp3, then try the next tag (i+1).
+            if value is None:
+                continue # Skip to the next i in this loop.
+
+            value = value.text # Extract the text/string information.
+
+            value = value[0] # There can be multiple tags attached. We just take the first element. This also ensures that the value is a string (which can be used in the string manipulation).
+
+
+            # Do string manipulation.
+            if id3_fields[j] in id3_fields_with_strings:
+                value = string_capitalization((value)) 
+
+        # Ratings:
+        elif id3_fields[j] == "POPM":
+            value = id3.getall(id3_fields[j]) # .getall works with multiple entries like POPM or TXXX. .get did not.
+
+            # If the certain tag j defined in id3_fields[i] is not present in the mp3, then try the next tag (i+1).
+            if not value:
+                continue # Skip to the next i in this loop.
+
+            value = value[0].rating # Extract only the rating. (This is in id3v2 an integer. 0 = No Rating, 1-255 are the ratings.)
+
+        else: # Skip the tags that are not yet implemented. TODO Add "TRCK", "TDRC"
+            continue
+
+        # Adding the entry (both key and value) to the dictionary.
+        id3_dictionary[id3_fields[j]] = value
+
+    print(id3_dictionary)
+    # print(id3_dictionary["TPE1"]) # Just an example.
+    # print(id3_dictionary["POPM"]) # Just an example.
+
+    # TODO id3.add add Tag
+    ## Remove all tags (e.g. id3.delall) and then add them again with results from this dictionary.
+    ## audio.add(TALB(encoding = 3, text = u"An example")) # TODO What does the encoding=3 stand for? 3 = UTF8.
+    ## Ensure that this write id3v2.4 tags and does not keep any old id3 tag version.
+
+    id3.delete(delete_v1 = True, delete_v2 = True) # Delete all tags from the file.
+
+    # Adding the tag to the id3 python object.
+    id3.add(TPE1(encoding = 3, text = id3_dictionary["TPE1"])) # TODO Make this dynamic w.r.t. to the values in the dictionary.
+
+    
+    for key in id3_dictionary:
+        if key == "POPM": # TODO Add that again!
+            continue
+        
+        exec('id3.add('+key+'(encoding = 3, text = id3_dictionary["'+key+'"]))')
+    # prog = 'print("The sum of 5 and 10 is", (5+10))'
+    # exec(prog) 
+
+
+    # Writing the tag to the file.
+    id3.save()
+
+
+
+    # def store(self, mutagen_file, value):
+    #         frame = mutagen.id3.Frames[self.key](encoding=3, text=[value])
+    #         mutagen_file.tags.setall(self.key, [frame]) 
+
+
+
+
+
+
+
+# # TODO Best approach: 
+# ## Fetch Track Number, Disc Number, Date, Artist, Album Artist, Title, (maybe also rating, picture, loudness (should be one or both: TXXX RGAD) for existing files, TXXX enthält viel mehr als nur .text). (Maybe also PCNT Play counter)
+# ## Then delete all tags.
+# ## Write the earlier fetched information again into a fresh new id3 v2.4 tag which is also in UTF8. -> All other crappy information like Amazon Song Id, Genre, ... are gone. Also odd tag text formats are replaced by UTF8
+
+
+
+
+# audio.delete(delete_v1 = True, delete_v2 = False) # Only delete ID3 v1 tags. Note that this already writes into the files! 
+# print(audio)
+
+
+# audio.save(v1 = 0, v2_version = 4, v23_sep = '/', padding = None)
+
+
+
+
+# id3_dictionary = {
+#     "POPM": "Popularimeter" # Rating
+#     , "TPE1": "Lead performer(s)/Soloist(s)" # Track artist.
+#     , "TPE2": "Band/orchestra/accompaniment" # Album artist
+#     , "TALB": "Album/Movie/Show title" # Album
+#     , "TIT2": "Title/songname/content description" # Title
+#     , "TRCK": "Track number/Position in set" # Track number
+#     , "TDRC": "Recording time" # Recording date ideally yar.
+#     , "TPOS": "Disc number"
+# }
+
