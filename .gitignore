@@ -2,3 +2,7 @@ input/
 untouched_input/
 *.mp3
 *.code-workspace
+venv/
+.idea/
+.vscode/
+__pychache__/
