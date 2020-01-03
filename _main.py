@@ -48,9 +48,8 @@ from string_capitalization import string_capitalization  # From local function.
 
 ## Tags
 
-selected_id3_fields = {
-    # "POPM": "Rating"  # "Popularimeter" # Rating # TODO Remove as the key is constructed differently (see following line).
-    "POPM:no@email": "Rating"   # The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0)
+global_selected_id3_fields = {    
+    "POPM:no@email": "Rating"  # "Popularimeter" / Rating. The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0)
     , "TALB": "String"  # "Album/Movie/Show title" # Album
     , "TDRC": "Date"  # "Recording time" # Recording date ideally yar.
     , "TIT2": "String"  # "Title/songname/content description" # Title
@@ -203,19 +202,13 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
 
         
         
-        # Adding the entry (both key and value) to the dictionary.
+        # Adding the entry (both key and value) to the dictionary (which is returned from this function).
         ## None values to do not add any value and are omitted. # TODO Think whether an empty string "" should also be dropped. That could however also be done after the beautify string steps.
         if id3_field is not None: 
             id3_dictionary.update({key: id3_field})
         else:
             continue
 
-    # Show the initial tags
-    print(id3_fields_all)
-
-
-    # Show the collected tags
-    print(id3_dictionary) # TODO Remove this line.
 
     return(id3_dictionary) # TODO Do I need a check that returns None for empty dictionaries?
 
@@ -240,30 +233,68 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
 # WIP WIP WIP WIP WIP
 
 
-list_folders_with_mp3_files(folder=working_folder)
 
 
-# test_list = list_mp3_files_in_folder("input/deep/mp3")
-test_list = list_mp3_files_in_folder(folder=working_folder + "/Has MM Ratings Tags") # No slash at the beginning nor the end.
+
+# test_list = list_mp3_files_in_folder(folder=working_folder + "/Has MM Ratings Tags") # No slash at the beginning nor the end.
 
 
-test_read = read_all_tags_from_file(filepath=test_list["filepath"][0])
+# test_read = read_all_tags_from_file(filepath=test_list["filepath"][0])
 
-test_extract = extract_specified_tags(id3_fields_all=test_read, id3_fields_selected=selected_id3_fields)
+# test_extract = extract_specified_tags(id3_fields_all=test_read, id3_fields_selected=selected_id3_fields)
 
-print(test_extract)
+# print(test_extract)
 
-# for folder in unique_folders:
 
-#     files_in_folder = list_mp3_files_in_folder(folder=folder)
+def run_main(folder, global_selected_id3_fields):
+    unique_folders = list_folders_with_mp3_files(folder=folder)
 
-#     for file in files_in_folder:
-#         # Read id3 fields
-#         id3_all = read_all_tags_from_file(filepath=file)
-#         
-#         # Extract specified tags
-#         id3_selected_fields = extract_specified_tags(id3_fields_all=id3_all, id3_fields_selected=id3_fields) # This will return a dictionary for each file. # TODO Append this to a list with each dictionary from this unique_folder. Then analyse it further w.r.t. album artist, track number (leading zeros) and disc number (disc number only if that is anyhow possible). Or I just always write disc number = 1 for the cases where non is provided. (If so, then I should also delete any leading zeros for disc numbers in general.)
+    print(unique_folders)
 
+    for folder in unique_folders:
+        files_in_folder = list_mp3_files_in_folder(folder=folder)
+
+
+        for file in files_in_folder["filepath"]:
+            # Read id3 fields
+            id3_all_fields = read_all_tags_from_file(filepath=file) # This returns a mutagen id3 object
+                        
+            # Extract specified tags
+            id3_selected_fields = extract_specified_tags(id3_fields_all=id3_all_fields, id3_fields_selected=global_selected_id3_fields) # This will return a dictionary for each file. 
+            
+            # TODO Append this to a list with each dictionary from this unique_folder. Then analyse it further w.r.t. album artist, track number (leading zeros) and disc number (disc number only if that is anyhow possible). Or I just always write disc number = 1 for the cases where non is provided. (If so, then I should also delete any leading zeros for disc numbers in general.)
+
+
+            # Improve id3 tags (e.g. capitalization)
+            # TODO
+
+
+            # Update the mp3 file
+
+            ## Delete all existing tag information from the id3 object.
+            id3_all_fields.delete(delete_v1=True, delete_v2=True)
+
+
+            ## Write new id3 tags            
+            for key, value in id3_selected_fields.items():
+                print(key)
+                tag_type = global_selected_id3_fields.get(key)
+
+                if tag_type == "String":
+                    exec('id3_all_fields.add('+key+'(encoding = 3, text = id3_selected_fields["'+key+'"]))') # Executes the following string as Python command.
+
+                else:
+                    # TODO Add the other tag types defined in global_selected_id3_fields. All that can use "text" can be added in the String part above!
+                    continue
+
+
+            id3_all_fields.save(v1 = 0, v2_version = 4, v23_sep = '/', padding = None)
+
+
+
+run_main(folder=working_folder + "/easy_test_single_file", global_selected_id3_fields=global_selected_id3_fields)
+
+# run_main(folder=working_folder, selected_id3_fields=selected_id3_fields)
 
 # WIP WIP WIP WIP WIP
 
@@ -280,7 +311,7 @@ print(test_extract)
 
 #     # TODO id3.add add Tag
 #     ## Remove all tags (e.g. id3.delall) and then add them again with results from this dictionary.
-#     ## audio.add(TALB(encoding = 3, text = u"An example")) # TODO What does the encoding=3 stand for? 3 = UTF8.
+#     ## audio.add(TALB(encoding = 3, text = u"An example")) # TODO Encoding=3 stands for 3 = UTF8.
 #     ## Ensure that this write id3v2.4 tags and does not keep any old id3 tag version.
 #
 #     id3.delete(delete_v1 = True, delete_v2 = True) # Delete all tags from the file.
@@ -319,3 +350,9 @@ print(test_extract)
 #
 #
 # # audio.save(v1 = 0, v2_version = 4, v23_sep = '/', padding = None)
+
+
+
+
+
+# merged_dictionary_selected_fields = {k:([v, global_selected_id3_fields[k]] if k in global_selected_id3_fields else v) for k, v in id3_selected_fields.items()} # Joining two dictionaries.
