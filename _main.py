@@ -169,18 +169,12 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
 
     for key, value in id3_fields_selected.items():  # Check which of the specified id3_fields are available in the tags and read them in accordingly. # TODO Code improvement: Loop through the intersecting_keys and not all keys from id3_fields.
 
-        print(key)
-
         id3_field = None # Initialize / reset to an empty id3_field variable.
 
         # Check whether the defined id3_field exists in the file's tag information. If not, then skip this tag. # TODO The following would make this check chunk obsolete. Code improvement: Loop through the intersecting_keys and not all keys from id3_fields.
-        if key in id3_fields_all.keys():
-            print(key)
-        else:
-            print("Not present")
+        if key not in id3_fields_all.keys():
+            print(key + "not present")
             continue
-
-
 
         # Read the tags
         if value in ("Date", "Disc number", "String", "Track number"):
@@ -226,7 +220,20 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
     return(id3_dictionary) # TODO Do I need a check that returns None for empty dictionaries?
 
 
+
+
+
+
+
+
+
+
 # End of functions
+
+
+
+
+
 
 
 
@@ -237,7 +244,7 @@ list_folders_with_mp3_files(folder=working_folder)
 
 
 # test_list = list_mp3_files_in_folder("input/deep/mp3")
-test_list = list_mp3_files_in_folder(folder="input/Has MM Ratings Tags") # No slash at the beginning nor the end.
+test_list = list_mp3_files_in_folder(folder=working_folder + "/Has MM Ratings Tags") # No slash at the beginning nor the end.
 
 
 test_read = read_all_tags_from_file(filepath=test_list["filepath"][0])
