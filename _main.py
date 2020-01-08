@@ -170,9 +170,9 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
 
         id3_field = None # Initialize / reset to an empty id3_field variable.
 
-        # Check whether the defined id3_field exists in the file's tag information. If not, then skip this tag. # TODO The following would make this check chunk obsolete. Code improvement: Loop through the intersecting_keys and not all keys from id3_fields.
+        # Check whether the defined id3_field exists in the file's tag information. If not, then skip this tag. # TODO Possible code improvement: Loop through the intersecting_keys and not all keys from id3_fields for speed improvements.
         if key not in id3_fields_all.keys():
-            print(key + "not present")
+            # print(key + "not present") # Can be reenabled for debugging.
             continue
 
         # Read the tags
@@ -199,6 +199,7 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
         # Stop for tags that are not yet implemented. (Only works if the conditions above are chained via elif)
         else:
             continue
+            # TODO Should I have an error message / notification here?
 
         
         
@@ -217,33 +218,9 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
 
 
 
-
-
-
-
 # End of functions
 
 
-
-
-
-
-
-
-# WIP WIP WIP WIP WIP
-
-
-
-
-
-# test_list = list_mp3_files_in_folder(folder=working_folder + "/Has MM Ratings Tags") # No slash at the beginning nor the end.
-
-
-# test_read = read_all_tags_from_file(filepath=test_list["filepath"][0])
-
-# test_extract = extract_specified_tags(id3_fields_all=test_read, id3_fields_selected=selected_id3_fields)
-
-# print(test_extract)
 
 
 def run_main(folder, global_selected_id3_fields):
@@ -275,17 +252,21 @@ def run_main(folder, global_selected_id3_fields):
             id3_all_fields.delete(delete_v1=True, delete_v2=True)
 
 
-            ## Write new id3 tags            
+            ## Write new id3 tags
             for key, value in id3_selected_fields.items():
                 print(key)
                 tag_type = global_selected_id3_fields.get(key)
-
-                if tag_type == "String":
+                
+                if tag_type in ("Disc number", "String", "Track number"): # Note to self (2020-01-08): It is a bit odd, that in this loop the Date (like TDRC field) do not work, while applying text operation on them before further above worked.
                     exec('id3_all_fields.add('+key+'(encoding = 3, text = id3_selected_fields["'+key+'"]))') # Executes the following string as Python command.
+
+                # TODO elif tag_type == "Date": 
+                # TODO elif tag_type == "Rating":
 
                 else:
                     # TODO Add the other tag types defined in global_selected_id3_fields. All that can use "text" can be added in the String part above!
                     continue
+                    # TODO Should I have an error message / notification here?
 
 
             id3_all_fields.save(v1 = 0, v2_version = 4, v23_sep = '/', padding = None)
@@ -295,64 +276,3 @@ def run_main(folder, global_selected_id3_fields):
 run_main(folder=working_folder + "/easy_test_single_file", global_selected_id3_fields=global_selected_id3_fields)
 
 # run_main(folder=working_folder, selected_id3_fields=selected_id3_fields)
-
-# WIP WIP WIP WIP WIP
-
-
-
-
-
-
-
-
-
-
-
-
-#     # TODO id3.add add Tag
-#     ## Remove all tags (e.g. id3.delall) and then add them again with results from this dictionary.
-#     ## audio.add(TALB(encoding = 3, text = u"An example")) # TODO Encoding=3 stands for 3 = UTF8.
-#     ## Ensure that this write id3v2.4 tags and does not keep any old id3 tag version.
-#
-#     id3.delete(delete_v1 = True, delete_v2 = True) # Delete all tags from the file.
-#
-#     # Adding the tag to the id3 python object.
-#     id3.add(TPE1(encoding = 3, text = id3_dictionary["TPE1"])) # TODO Make this dynamic w.r.t. to the values in the dictionary.
-#
-#
-#     for key in id3_dictionary:
-#         if key == "POPM": # TODO Add that again!
-#             continue
-#
-#         exec('id3.add('+key+'(encoding = 3, text = id3_dictionary["'+key+'"]))') # Execute the following string as Python command.
-#     # prog = 'print("The sum of 5 and 10 is", (5+10))'
-#     # exec(prog)
-#
-#
-#     # Writing the tag to the file.
-#     id3.save()
-#
-#
-#
-#     # def store(self, mutagen_file, value):
-#     #         frame = mutagen.id3.Frames[self.key](encoding=3, text=[value])
-#     #         mutagen_file.tags.setall(self.key, [frame])
-#
-#
-# # # TODO Best approach:
-# # ## Fetch Track Number, Disc Number, Date, Artist, Album Artist, Title, (maybe also rating, picture, loudness (should be one or both: TXXX RGAD) for existing files, TXXX enthält viel mehr als nur .text). (Maybe also PCNT Play counter)
-# # ## Then delete all tags.
-# # ## Write the earlier fetched information again into a fresh new id3 v2.4 tag which is also in UTF8. -> All other crappy information like Amazon Song Id, Genre, ... are gone. Also odd tag text formats are replaced by UTF8
-#
-#
-# # audio.delete(delete_v1 = True, delete_v2 = False) # Only delete ID3 v1 tags. Note that this already writes into the files!
-# # print(audio)
-#
-#
-# # audio.save(v1 = 0, v2_version = 4, v23_sep = '/', padding = None)
-
-
-
-
-
-# merged_dictionary_selected_fields = {k:([v, global_selected_id3_fields[k]] if k in global_selected_id3_fields else v) for k, v in id3_selected_fields.items()} # Joining two dictionaries.
