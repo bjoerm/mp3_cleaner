@@ -1,4 +1,5 @@
-# Note to self: Never ever run a search/replace to switch code fully to ' or fully to " as some part like the exec commands use both.
+# Never ever bulk (!) search and replace the quotation marks as the exec command needs both " and ' at the same time.
+
 
 
 # TODO Remove Leading "The " from Artist field.
@@ -43,16 +44,16 @@ from string_capitalization import string_capitalization  # From local function.
 
 ## Tags
 
-global_selected_id3_fields = {    
-    "POPM:no@email": "Rating"  # "Popularimeter" / Rating. The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0)
-    , "TALB": "String"  # "Album/Movie/Show title" # Album
-    , "TDRC": "Date"  # "Recording time" # Recording date ideally yar.
-    , "TIT2": "String"  # "Title/songname/content description" # Title
+global_selected_id3_fields = {
+    "POPM:no@email": "Rating"  # "Popularimeter" / Rating. The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0).
+    , "TALB": "String"  # "Album/Movie/Show title" # Album.
+    , "TDRC": "Date"  # "Recording time" # Recording date ideally year.
+    , "TIT2": "String"  # "Title/songname/content description" # Title.
     , "TPE1": "String"  # "Lead performer(s)/Soloist(s)" # Track artist.
-    , "TPE2": "String"  # "Band/orchestra/accompaniment" # Album artist
-    , "TPOS": "Disc number"  # "Disc number"
-    , "TRCK": "Track number"  # "Track number/Position in set" # Track number
-}  # Key = Tag id and value = categorization within this script.
+    , "TPE2": "String"  # "Band/orchestra/accompaniment" # Album artist.
+    , "TPOS": "Disc number"  # "Disc number".
+    , "TRCK": "Track number"  # "Track number/Position in set" # Track number.    
+}  # Key = Tag id and value = categorization within this script. Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames
 
 ## Folders
 
@@ -67,7 +68,7 @@ def copy_files_to_working_folder(original_folder_input, working_folder_input):
     if os.path.exists(working_folder_input):
         shutil.rmtree(working_folder_input)
 
-    time.sleep(2) # Wait for stuff e.g. Dropbox in my debug example to catch up.
+    time.sleep(1) # Wait for stuff e.g. Dropbox in my debug example to catch up.
 
     ## Copy files into a working folder so original files are not touched.
     shutil.copytree(original_folder_input, working_folder_input)
@@ -75,7 +76,7 @@ def copy_files_to_working_folder(original_folder_input, working_folder_input):
 
 copy_files_to_working_folder(original_folder_input=original_folder, working_folder_input=working_folder)
 
-time.sleep(3) # Wait for stuff e.g. Dropbox in my debug example to catch up.
+time.sleep(1) # Wait for stuff e.g. Dropbox in my debug example to catch up.
 
 
 ## Convert file extension to lowercase for all mp3's in selected folder.
@@ -171,7 +172,7 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
             continue
 
         # Read the tags
-        if value in ("Date", "Disc number", "String", "Track number"):
+        if value in ("Date", "Disc number", "String", "Track number"): # All but rating, which does not have a text parameter. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
             id3_field = id3_fields_all.get(key)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
 
             # If the certain tag ("key") is defined in id3_fields is not present in the mp3, then try the next tag.
@@ -189,12 +190,10 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
             if id3_field is None:
                 continue  # Skip to the next i in this loop.
 
-
-
-        # Stop for tags that are not yet implemented. (Only works if the conditions above are chained via elif)
         else:
             continue
-            # TODO Should I have an error message / notification here?
+            # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
+                    # TODO Code this.
 
         
         
@@ -236,35 +235,52 @@ def run_main(folder, global_selected_id3_fields):
 
             # Improve id3 tags (e.g. capitalization)
             # TODO
+            # TODO Format TDRC (and potential other mutagen.id3.TimeStampTextFrame class tags) so that this is only a string, not a list (like it is read from the tag). Especially, as I only care for the year and not the exact relase day.
 
 
-            # Update the mp3 file
-
+            # Update the id3 tag object
             ## Delete all existing tag information from the id3 object.
             id3_all_fields.delete(delete_v1=True, delete_v2=True)
 
 
-            ## Write new id3 tags
+            ## Write new id3 tags from id3_selected_fields dictionary into the id3 object id3_all_fields
             for key, value in id3_selected_fields.items():
-                print(key)
+                # print(key) Renable for debugging.
                 tag_type = global_selected_id3_fields.get(key)
-                
-                if tag_type in ("Disc number", "String", "Track number"): # Note to self (2020-01-08): It is a bit odd, that in this loop the Date (like TDRC field) do not work, while applying text operation on them before further above worked.
-                    exec('id3_all_fields.add('+key+'(encoding = 3, text = id3_selected_fields["'+key+'"]))') # Executes the following string as Python command.
 
-                # TODO elif tag_type == "Date": 
-                # TODO elif tag_type == "Rating":
+
+                if tag_type in ("Date", "Disc number", "String", "Track number"): # All but rating, which does not have a text parameter. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
+
+                    exec(f'id3_all_fields.add({key}(encoding = 3, text = "{value}"))')
+                    # exec(f'id3_all_fields.add({key}(encoding = 3, text = str(id3_selected_fields["{key}"])))') # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
+                    # The str() in the text field ensures that the date field is saved correctly, as TDRC is a mutagen.id3.TimeStampTextFrame class https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames. "The 'text' attribute in that frame is a list of ID3TimeStamp objects, not a list of strings." # TODO The str() part can be removed once the read tags are improved (currently 2020-01-08) not done in the code.
+
+                elif tag_type == "Rating":
+                    exec(f'id3_all_fields.add({value})') # The structure for ratings is a bit different.                    
+
 
                 else:
-                    # TODO Add the other tag types defined in global_selected_id3_fields. All that can use "text" can be added in the String part above!
+                    # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
+                    # TODO Code this.
+
                     continue
                     # TODO Should I have an error message / notification here?
 
 
-            id3_all_fields.save(v1 = 0, v2_version = 4, v23_sep = '/', padding = None)
+            # Save id3 tag object to mp3 file.
+            id3_all_fields.save(v1 = 0, v2_version = 4) # Saving only as id3v2.4 tags.
+
+    return("End of script reached.")
 
 
 
-run_main(folder=working_folder + "/easy_test_single_file", global_selected_id3_fields=global_selected_id3_fields)
+# run_main(folder=working_folder + "/easy_test_single_file", global_selected_id3_fields=global_selected_id3_fields)
 
-# run_main(folder=working_folder, selected_id3_fields=selected_id3_fields)
+# Time tracking
+start = time.process_time()
+
+# Execute the script on the specified folder and for the specified id3 fields.
+run_main(folder=working_folder, global_selected_id3_fields=global_selected_id3_fields)
+
+# Print time tracking
+print(time.process_time() - start)
