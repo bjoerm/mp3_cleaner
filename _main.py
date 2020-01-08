@@ -1,8 +1,5 @@
-# TODO First step should be a migration to id3v2.4 tags. Mutagen does this by default, when saving.
-## Source: https://mutagen.readthedocs.io/en/latest/user/id3.html
-## By default mutagen will:
-## Load the file
-## Upgrade any ID3v2.2 frames to their ID3v2.3/4 counterparts (TT2 to TIT2 for example)
+# Note to self: Never ever run a search/replace to switch code fully to ' or fully to " as some part like the exec commands use both.
+
 
 # TODO Remove Leading "The " from Artist field.
 
@@ -27,8 +24,6 @@
 ## https://mutagen.readthedocs.io/en/latest/api/id3.html
 
 
-# Console:
-## conda activate mp3_cleaner
 
 
 import glob  # For reading files and folders.
@@ -67,7 +62,7 @@ working_folder = "input"  # Folder where files are saved.
 
 # Setting up the workspace
 ## Restoring test workspace from last test.
-def setting_up_workspace(original_folder_input, working_folder_input):
+def copy_files_to_working_folder(original_folder_input, working_folder_input):
     ## Delete working folder, if it exists.
     if os.path.exists(working_folder_input):
         shutil.rmtree(working_folder_input)
@@ -78,7 +73,7 @@ def setting_up_workspace(original_folder_input, working_folder_input):
     shutil.copytree(original_folder_input, working_folder_input)
 
 
-setting_up_workspace(original_folder_input=original_folder, working_folder_input=working_folder)
+copy_files_to_working_folder(original_folder_input=original_folder, working_folder_input=working_folder)
 
 time.sleep(3) # Wait for stuff e.g. Dropbox in my debug example to catch up.
 
@@ -212,9 +207,6 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
 
 
     return(id3_dictionary) # TODO Do I need a check that returns None for empty dictionaries?
-
-
-
 
 
 
