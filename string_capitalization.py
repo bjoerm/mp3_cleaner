@@ -1,5 +1,5 @@
 
-
+# TODO Convert backslash into slash and deal with question marks and such
 
 import re # Regular expressions
 
@@ -26,8 +26,8 @@ def string_capitalization(text):
     text_beautified = re.sub("´", "'", text_beautified) # Remove any whitespace at the end.
 
     ## Colons
-    text_beautified = re.sub("(?<=[a-zA-Z0-9]): (?=.+)", " - ", text_beautified) # Colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
-    text_beautified = re.sub("(?<=[a-zA-Z0-9]):[^ ](?=.+)", "-", text_beautified) # Colon followed by non-whitespace. E.g.: Deus:EX -> Deus-Ex or 12:34 -> 12-34.
+    text_beautified = re.sub("(?<=[a-zA-Z0-9]): (?=.+)", " - ", text_beautified) # Case of colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
+    text_beautified = re.sub("(?<=[a-zA-Z0-9]):[^ ](?=.+)", "-", text_beautified) # Case of colon followed by non-whitespace. E.g.: Deus:EX -> Deus-Ex or 12:34 -> 12-34.
 
     ## Semicolons
     text_beautified = text_beautified.replace(";", ",") # Transform semicolons into commas.
@@ -75,6 +75,7 @@ def string_capitalization(text):
 # Some tests
 ## string_capitalization function
 assert string_capitalization("Test's test's test`s test´s test'S") == "Test's Test's Test's Test's test's", "Test x"
-assert string_capitalization("Ac/Dc AC/DC ac/dc guns 'n' roses") == "Ac/Dc AC/DC Ac/Dc Guns 'n' Roses", "Test x"
-assert string_capitalization("  lost in      space Lost in Space") == "Lost In Space Lost In Space", "Test spaces"
+assert string_capitalization("Ac/Dc AC/DC ac/dc guns 'n' roses") == "Ac/Dc AC/DC Ac/Dc Guns 'n' Roses", "Test x" # TODO Souldn't this return more ACDC?
+assert string_capitalization("  lost in      space Lost in Space ") == "Lost In Space Lost In Space", "Test spaces"
+# TODO Add test for colons, Accents, ...
 
