@@ -168,32 +168,24 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
 
         # Check whether the defined id3_field exists in the file's tag information. If not, then skip this tag. # TODO Possible code improvement: Loop through the intersecting_keys and not all keys from id3_fields for speed improvements.
         if key not in id3_fields_all.keys():
-            # print(key + "not present") # Can be reenabled for debugging.
             continue
 
         # Read the tags
-        if value in ("Date", "Disc number", "String", "Track number"): # All but rating, which does not have a text parameter. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
-            id3_field = id3_fields_all.get(key)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
+        id3_field = id3_fields_all.get(key)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
 
-            # If the certain tag ("key") is defined in id3_fields is not present in the mp3, then try the next tag.
-            if id3_field is None:
-                continue  # Skip to the next i in this loop.
+        ## If the certain tag ("key") is defined in id3_fields is not present in the mp3, then try the next tag.
+        if id3_field is None:
+            continue  # Skip to the next i in this loop.
 
+        if value in ("Date", "Disc number", "String", "Track number"): # These fields (all but rating), have a text parameter which is extracted here. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
             id3_field = id3_field.text  # Extract the text/string information.
 
             id3_field = id3_field[0]  # There can be multiple tags attached. We just take the first element. This also ensures that the value is a string (which can be used in the string manipulation).
 
-        elif value == "Rating":
-            id3_field = id3_fields_all.get(key)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
-
-            # If the certain tag ("key") is defined in id3_fields is not present in the mp3, then try the next tag.
-            if id3_field is None:
-                continue  # Skip to the next i in this loop.
-
         else:
             continue
             # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
-                    # TODO Code this.
+                # TODO Code this.
 
         
         
