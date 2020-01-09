@@ -1,0 +1,2 @@
+    # Reduce desired id3_fields to the ones that are present in the actual file. # Was part of extract_specified_tags()
+    dict_id3_fields_selected = {key: value for key, value in dict_id3_fields_selected.items() if key in intersecting_keys} # Dictionary comprehension. Only keep the key values for keys that are members of intersecting_keys.
