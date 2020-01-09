@@ -44,7 +44,7 @@ from string_capitalization import string_capitalization  # From local function.
 
 ## Tags
 
-global_selected_id3_fields = {
+global_selected_id3_fields = { # TODO Check whether the information from the fields are used somewhere (e.g. for tag beautification) in the end. If not, remove them.
     "POPM:no@email": "Rating"  # "Popularimeter" / Rating. The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0).
     , "TALB": "String"  # "Album/Movie/Show title" # Album.
     , "TDRC": "Date"  # "Recording time" # Recording date ideally year.
@@ -67,7 +67,7 @@ def copy_files_to_working_folder(original_folder_input, working_folder_input):
     if os.path.exists(working_folder_input):
         shutil.rmtree(working_folder_input)
 
-    time.sleep(1) # Wait for stuff e.g. Dropbox in my debug example to catch up.
+    time.sleep(0) # Wait for stuff e.g. Dropbox in my debug example to catch up. # TODO Remove?
 
     ## Copy files into a working folder so original files are not touched.
     shutil.copytree(original_folder_input, working_folder_input)
@@ -75,7 +75,7 @@ def copy_files_to_working_folder(original_folder_input, working_folder_input):
 
 copy_files_to_working_folder(original_folder_input=original_folder, working_folder_input=working_folder)
 
-time.sleep(1) # Wait for stuff e.g. Dropbox in my debug example to catch up.
+time.sleep(0) # Wait for stuff e.g. Dropbox in my debug example to catch up. # TODO Remove?
 
 
 ## Convert file extension to lowercase for all mp3's in selected folder.
@@ -135,74 +135,83 @@ def read_all_tags_from_file(filepath):
 
     return(id3) # Returns an ID3 object.
 
+# TODO Have the following checks in the reading parts / or (partly) after the intersection check:
+    # # TODO Is the case if id3 being a None object possible? If so, code an exception. Or better have that exception in the main function and not in this check here.
+
+    # # If there are no tags, return None. # TODO The case of tags, but none of the ones that we are looking for should also be coded.
+    # if len(id3_object.keys()) == 0:
+    #     return None
+
+    # if(len(intersecting_keys) == 0):
+    # return None # If there are non of the desired tags availabe, return None.
+
+    # intersecting_keys.sort()
 
 
+def look_for_available_specified_tags(id3_object, dict_id3_fields_selected):
+    # Checking the number of desired keys present in the id3 object
+    available_specified_tags = list(id3_object.keys() & dict_id3_fields_selected.keys())
 
-def extract_specified_tags(id3_object, dict_id3_fields_selected):
+    # Sorting the list
+    available_specified_tags.sort()
 
-    # TODO Is the case if id3 being a None object possible? If so, code an exception.
-
-    # If there are no tags, return None. # TODO The case of tags, but none of the ones that we are looking for should also be coded.
-    if len(id3_object.keys()) == 0:
-        return None
-    
-    # Checking the number of desired keys present in the file
-    intersecting_keys = list(id3_object.keys() & dict_id3_fields_selected.keys())
-
-    if(len(intersecting_keys) == 0):
-        return None # If there are non tags, return None.
-
-    # Reduce desired id3_fields to the ones that are present in the actual file.
-    dict_id3_fields_selected = {key: value for key, value in dict_id3_fields_selected.items() if key in intersecting_keys} # Dictionary comprehension. Only keep the key values for keys that are members of intersecting_keys.
-    
+    return(available_specified_tags)
 
 
-    # Storing the desired id3 information in a dictionary.
-    output_dict_id3 = {}  # Create an empty dictionary.
+def extract_available_specified_tags(id3_object, available_specified_tags):
 
+    # Storing the extracted id3 information in a dictionary.
+    extracted_tags = {}  # Initialize / reset to an empty dictionary.
 
-    for key, value in dict_id3_fields_selected.items():  # Check which of the specified id3_fields are available in the tags and read them in accordingly. # TODO Code improvement: Loop through the intersecting_keys and not all keys from id3_fields.
-
-        id3_field = None # Initialize / reset to an empty id3_field variable.
-
-        # Check whether the defined id3_field exists in the file's tag information. If not, then skip this tag. # TODO Possible code improvement: Loop through the intersecting_keys and not all keys from id3_fields for speed improvements.
-        if key not in id3_object.keys():
-            continue
+    for tag in available_specified_tags:
+        id3_field = None # Initialize / reset to an empty variable.
 
         # Read the tags
-        id3_field = id3_object.get(key)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
+        id3_field = id3_object.get(tag)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
 
-        ## If the certain tag ("key") is defined in id3_fields is not present in the mp3, then try the next tag.
-        if id3_field is None:
-            continue  # Skip to the next i in this loop.
+        ## Special filter for tags with a text fields (could also have been done in a seperate function). # TODO Think about putting this into a seperate function for less complexity per function.
+        if tag == "POPM:no@email": # Does not have a text field. So no further operation is required before it will be saved below.
+            pass
 
-        if value in ("Date", "Disc number", "String", "Track number"): # These fields (all but rating), have a text parameter which is extracted here. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
+        elif tag in ("TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"): # These fields (all but rating), have a text parameter which is extracted here. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
             id3_field = id3_field.text  # Extract the text/string information.
 
             id3_field = id3_field[0]  # There can be multiple tags attached. We just take the first element. This also ensures that the value is a string (which can be used in the string manipulation).
 
         else:
-            continue
-            # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
-                # TODO Code this.
-
-        
+            continue # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
+            # TODO Code this.
         
         # Adding the entry (both key and value) to the dictionary (which is returned from this function).
         ## None values to do not add any value and are omitted. # TODO Think whether an empty string "" should also be dropped. That could however also be done after the beautify string steps.
-        if id3_field is not None: 
-            output_dict_id3.update({key: id3_field})
+        if (id3_field is not None) & (id3_field != ""): 
+            extracted_tags.update({tag: id3_field})
         else:
             continue
 
-
-    return(output_dict_id3) # TODO Do I need a check that returns None for empty dictionaries?
-
+    return(extracted_tags) # TODO Do I need a check that returns None for empty dictionaries?
 
 
-# End of functions
+
+def write_tags_into_id3_object(id3_object, clean_tags):
+
+    for key, value in clean_tags.items():
+
+        if key == "POPM:no@email": # Does not have a text field and thus a bit different structure.
+            exec(f'id3_object.add({value})') # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
+
+        elif key in ("TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"): # These fields (all but rating), have a text parameter which can be added the same way.
+            exec(f'id3_object.add({key}(encoding = 3, text = "{value}"))') 
+
+        else:
+            # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
+            # TODO Code this.
+            continue
+
+    return(id3_object)
 
 
+# End of functions # TODO Put them in a seperate file and/or pack everything up within a class.
 
 
 def run_main(folder, global_selected_id3_fields):
@@ -211,52 +220,40 @@ def run_main(folder, global_selected_id3_fields):
     print(unique_folders)
 
     for folder in unique_folders:
+        files_in_folder = None # Initialize / reset to an empty variable.
         files_in_folder = list_mp3_files_in_folder(folder=folder)
 
 
         for file in files_in_folder["filepath"]:
-            # Read id3 fields
+            # Read id3 information from mp3 file
+            id3_object = None # Initialize / reset to an empty variable.
             id3_object = read_all_tags_from_file(filepath=file) # This returns a mutagen id3 object
             
-            # Extract specified tags
-            dict_selected_fields = extract_specified_tags(id3_object=id3_object, dict_id3_fields_selected=global_selected_id3_fields) # This will return a dictionary for each file. 
+            # Look_for_available_specified_tags
+            available_specified_tags = None # Initialize / reset to an empty variable.
+            available_specified_tags = look_for_available_specified_tags(id3_object=id3_object, dict_id3_fields_selected=global_selected_id3_fields)
+
+            # TODO Have a function at this point that does some checks like len(available_specified_tags > 0) (see commented out code chunks above in the functions part)
+
+            # Extract tags
+            extracted_tags = None # Initialize / reset to an empty variable.
+            extracted_tags = extract_available_specified_tags(id3_object=id3_object, available_specified_tags=available_specified_tags)
             
-            # TODO Append this to a list with each dictionary from this unique_folder. Then analyse it further w.r.t. album artist, track number (leading zeros) and disc number (disc number only if that is anyhow possible). Or I just always write disc number = 1 for the cases where non is provided. (If so, then I should also delete any leading zeros for disc numbers in general.)
+            # TODO Append this to a list with each dictionary from this unique_folder. Then analyse it further w.r.t. album artist, track number (leading zeros) and disc number (disc number only if that is anyhow possible). Alternative: Or I just always write disc number = 1 for the cases where non is provided. (If so, then I should also delete any leading zeros for disc numbers in general.)
 
 
             # Improve id3 tags (e.g. capitalization)
-            # TODO
             # TODO Format TDRC (and potential other mutagen.id3.TimeStampTextFrame class tags) so that this is only a string, not a list (like it is read from the tag). Especially, as I only care for the year and not the exact relase day.
-
+            clean_tags = None
+            clean_tags = extracted_tags # TODO This is just a placeholder so that variable name already exists and is later in the function used.
 
             # Update the id3 tag object
             ## Delete all existing tag information from the id3 object.
             id3_object.delete(delete_v1=True, delete_v2=True)
+            id3_object.unknown_frames = [] # TODO ReplayGain (RGAD) and other possible tags are that way also deleted from the id3 object. TODO Check whether unknown_frames list always exists, even when there are no unknown tags in the file. If this is not the case, the not only enter here in this line an empty list but delete that list from the id3 object.
 
-            def write_tags_into_id3_object(parameter_list):
-                pass
-
-
-            ## Write new id3 tags from id3_selected_fields dictionary into the id3 object
-            for key, value in dict_selected_fields.items():
-                # print(key) Renable for debugging.
-                tag_type = global_selected_id3_fields.get(key)
-
-
-                if tag_type in ("Date", "Disc number", "String", "Track number"): # All but rating, which does not have a text parameter. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
-
-                    exec(f'id3_object.add({key}(encoding = 3, text = "{value}"))') # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
-
-                elif tag_type == "Rating":
-                    exec(f'id3_object.add({value})') # The structure for ratings is a bit different.                    
-
-
-                else:
-                    # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
-                    # TODO Code this.
-
-                    continue
-                    # TODO Should I have an error message / notification here?
+            ## Write_tags_into_id3_object
+            id3_object = write_tags_into_id3_object(id3_object = id3_object, clean_tags = clean_tags)
 
 
             # Save id3 tag object to mp3 file.
@@ -266,13 +263,14 @@ def run_main(folder, global_selected_id3_fields):
 
 
 
-# run_main(folder=working_folder + "/easy_test_single_file", global_selected_id3_fields=global_selected_id3_fields)
+
 
 # Time tracking
 start = time.process_time()
 
 # Execute the script on the specified folder and for the specified id3 fields.
-run_main(folder=working_folder, global_selected_id3_fields=global_selected_id3_fields)
+# run_main(folder=working_folder, global_selected_id3_fields=global_selected_id3_fields)
+run_main(folder=working_folder + "/Has MM Ratings Tags", global_selected_id3_fields=global_selected_id3_fields)
 
 # Print time tracking
 print(time.process_time() - start)
