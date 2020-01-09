@@ -6,3 +6,4 @@ venv/
 .idea/
 .vscode/
 __pycache__/
+__pycache__/string_capitalization.cpython-37.pyc
