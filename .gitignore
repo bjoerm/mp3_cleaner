@@ -5,4 +5,4 @@ untouched_input/
 venv/
 .idea/
 .vscode/
-
+__pycache__/
