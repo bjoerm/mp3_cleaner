@@ -62,7 +62,6 @@ working_folder = "input"  # Folder where files are saved.
 
 
 # Setting up the workspace
-## Restoring test workspace from last test.
 def copy_files_to_working_folder(original_folder_input, working_folder_input):
     ## Delete working folder, if it exists.
     if os.path.exists(working_folder_input):
@@ -139,39 +138,39 @@ def read_all_tags_from_file(filepath):
 
 
 
-def extract_specified_tags(id3_fields_all, id3_fields_selected):
+def extract_specified_tags(id3_object, dict_id3_fields_selected):
 
     # TODO Is the case if id3 being a None object possible? If so, code an exception.
 
     # If there are no tags, return None. # TODO The case of tags, but none of the ones that we are looking for should also be coded.
-    if len(id3_fields_all.keys()) == 0:
+    if len(id3_object.keys()) == 0:
         return None
     
     # Checking the number of desired keys present in the file
-    intersecting_keys = list(id3_fields_all.keys() & id3_fields_selected.keys())
+    intersecting_keys = list(id3_object.keys() & dict_id3_fields_selected.keys())
 
     if(len(intersecting_keys) == 0):
         return None # If there are non tags, return None.
 
     # Reduce desired id3_fields to the ones that are present in the actual file.
-    id3_fields_selected = {key: value for key, value in id3_fields_selected.items() if key in intersecting_keys} # Dictionary comprehension. Only keep the key values for keys that are members of intersecting_keys.
+    dict_id3_fields_selected = {key: value for key, value in dict_id3_fields_selected.items() if key in intersecting_keys} # Dictionary comprehension. Only keep the key values for keys that are members of intersecting_keys.
     
 
 
     # Storing the desired id3 information in a dictionary.
-    id3_dictionary = {}  # Create an empty dictionary.
+    output_dict_id3 = {}  # Create an empty dictionary.
 
 
-    for key, value in id3_fields_selected.items():  # Check which of the specified id3_fields are available in the tags and read them in accordingly. # TODO Code improvement: Loop through the intersecting_keys and not all keys from id3_fields.
+    for key, value in dict_id3_fields_selected.items():  # Check which of the specified id3_fields are available in the tags and read them in accordingly. # TODO Code improvement: Loop through the intersecting_keys and not all keys from id3_fields.
 
         id3_field = None # Initialize / reset to an empty id3_field variable.
 
         # Check whether the defined id3_field exists in the file's tag information. If not, then skip this tag. # TODO Possible code improvement: Loop through the intersecting_keys and not all keys from id3_fields for speed improvements.
-        if key not in id3_fields_all.keys():
+        if key not in id3_object.keys():
             continue
 
         # Read the tags
-        id3_field = id3_fields_all.get(key)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
+        id3_field = id3_object.get(key)  # Fetching the information for the respective id3 field from the id3 tag. Get returns a string (or None) while getall returns a list!
 
         ## If the certain tag ("key") is defined in id3_fields is not present in the mp3, then try the next tag.
         if id3_field is None:
@@ -192,12 +191,12 @@ def extract_specified_tags(id3_fields_all, id3_fields_selected):
         # Adding the entry (both key and value) to the dictionary (which is returned from this function).
         ## None values to do not add any value and are omitted. # TODO Think whether an empty string "" should also be dropped. That could however also be done after the beautify string steps.
         if id3_field is not None: 
-            id3_dictionary.update({key: id3_field})
+            output_dict_id3.update({key: id3_field})
         else:
             continue
 
 
-    return(id3_dictionary) # TODO Do I need a check that returns None for empty dictionaries?
+    return(output_dict_id3) # TODO Do I need a check that returns None for empty dictionaries?
 
 
 
@@ -217,10 +216,10 @@ def run_main(folder, global_selected_id3_fields):
 
         for file in files_in_folder["filepath"]:
             # Read id3 fields
-            id3_all_fields = read_all_tags_from_file(filepath=file) # This returns a mutagen id3 object
-                        
+            id3_object = read_all_tags_from_file(filepath=file) # This returns a mutagen id3 object
+            
             # Extract specified tags
-            id3_selected_fields = extract_specified_tags(id3_fields_all=id3_all_fields, id3_fields_selected=global_selected_id3_fields) # This will return a dictionary for each file. 
+            dict_selected_fields = extract_specified_tags(id3_object=id3_object, dict_id3_fields_selected=global_selected_id3_fields) # This will return a dictionary for each file. 
             
             # TODO Append this to a list with each dictionary from this unique_folder. Then analyse it further w.r.t. album artist, track number (leading zeros) and disc number (disc number only if that is anyhow possible). Or I just always write disc number = 1 for the cases where non is provided. (If so, then I should also delete any leading zeros for disc numbers in general.)
 
@@ -232,23 +231,24 @@ def run_main(folder, global_selected_id3_fields):
 
             # Update the id3 tag object
             ## Delete all existing tag information from the id3 object.
-            id3_all_fields.delete(delete_v1=True, delete_v2=True)
+            id3_object.delete(delete_v1=True, delete_v2=True)
+
+            def write_tags_into_id3_object(parameter_list):
+                pass
 
 
-            ## Write new id3 tags from id3_selected_fields dictionary into the id3 object id3_all_fields
-            for key, value in id3_selected_fields.items():
+            ## Write new id3 tags from id3_selected_fields dictionary into the id3 object
+            for key, value in dict_selected_fields.items():
                 # print(key) Renable for debugging.
                 tag_type = global_selected_id3_fields.get(key)
 
 
                 if tag_type in ("Date", "Disc number", "String", "Track number"): # All but rating, which does not have a text parameter. See https://mutagen.readthedocs.io/en/latest/api/id3_frames.html.
 
-                    exec(f'id3_all_fields.add({key}(encoding = 3, text = "{value}"))')
-                    # exec(f'id3_all_fields.add({key}(encoding = 3, text = str(id3_selected_fields["{key}"])))') # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
-                    # The str() in the text field ensures that the date field is saved correctly, as TDRC is a mutagen.id3.TimeStampTextFrame class https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames. "The 'text' attribute in that frame is a list of ID3TimeStamp objects, not a list of strings." # TODO The str() part can be removed once the read tags are improved (currently 2020-01-08) not done in the code.
+                    exec(f'id3_object.add({key}(encoding = 3, text = "{value}"))') # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
 
                 elif tag_type == "Rating":
-                    exec(f'id3_all_fields.add({value})') # The structure for ratings is a bit different.                    
+                    exec(f'id3_object.add({value})') # The structure for ratings is a bit different.                    
 
 
                 else:
@@ -260,7 +260,7 @@ def run_main(folder, global_selected_id3_fields):
 
 
             # Save id3 tag object to mp3 file.
-            id3_all_fields.save(v1 = 0, v2_version = 4) # Saving only as id3v2.4 tags.
+            id3_object.save(v1 = 0, v2_version = 4) # Saving only as id3v2.4 tags.
 
     return("End of script reached.")
 
