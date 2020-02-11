@@ -33,6 +33,7 @@ import re  # Regular expressions # TODO Do I need to write the dependency here a
 import time
 from pathlib import Path  # For getting the parentfolder of the found mp3.
 import shutil  # For copying folders to create backups.
+import typing
 
 import pandas as pd
 
@@ -43,7 +44,7 @@ from string_capitalization import string_capitalization  # From local function.
 # Options
 
 ## Tags
-
+### TODO Volker said to put options like this into a toml file (see https://pypi.org/project/toml/).
 global_selected_id3_fields = { # TODO Check whether the information from the fields are used somewhere (e.g. for tag beautification) in the end. If not, remove them.
     "POPM:no@email": "Rating"  # "Popularimeter" / Rating. The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0).
     , "TALB": "String"  # "Album/Movie/Show title" # Album.
@@ -97,7 +98,7 @@ def list_folders_with_mp3_files(folder):
     # This is currently a bit dirty by first searching for all .mp3s in the provided folder and its subfolders and then reduces this to only return the unique folders.
     # Grabs all mp3 files in the defined folder.
     files_list = glob.glob(
-        folder + "/**/*.[mM][pP]3"  # glob itself seems to not care about whether file extension contain capital letters. Anyways, [mM][pP]3 is a bit safer than just mp3. # TODO double check that this does not perceive .mp3a as .mp3. Or if a folder contains the name .mp3 somewhere.
+        folder + "/**/*.[mM][pP]3"  # glob itself seems to not care about whether file extension contain capital letters. Anyways, [mM][pP]3 is a bit safer than just mp3. This does not perceive .mp3a as .mp3. TODO Check whether it has problems with folders that contains the .mp3 somewhere.
         , recursive=True)  # Recursive = True in combination with ** in the path will lead to a search in every folder and subfolder and subsubfolder and ...
 
     # Getting and attaching the folder path
