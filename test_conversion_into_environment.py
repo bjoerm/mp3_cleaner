@@ -31,8 +31,7 @@ class environment:
         shutil.copytree(self._input_path, self._wip_path)
 
 
-    def get_mp3_files_and_folders(self) -> pd.DataFrame:
-        
+    def get_mp3_files_and_folders(self):        
         """ This function will return a two column data frame with all mp3 files and the folder that contains the .mp3 file. """
         
         # Grabs all mp3 files in the defined folder.
@@ -45,20 +44,25 @@ class environment:
         files['file'] = files['file'].apply(Path)  # Getting the path, so the "parent" method can be used in the following line.
         files['folder'] = files['file'].apply(lambda x: x.parent) # Getting the folder of that respective file.
 
-        return(files)
+        self._files_and_folders = files # Updating the self data frame.
 
-    def get_unique_mp3_folders(self) -> List:
+
+    def get_unique_mp3_folders(self):
         """ Get list of unique folders with mp3 files in it. """
+
+        self.get_mp3_files_and_folders() # Ensure that this self data frame is updated.
+
         unique_mp3_folders = self._files_and_folders.folder.unique()
         unique_mp3_folders = list(unique_mp3_folders)
 
-        return(unique_mp3_folders)
+        self._unique_mp3_folders = unique_mp3_folders  # Updating the self list.
 
 
     def convert_file_extension_to_lowercase(self):
         """ Convert file extension to lowercase for all mp3's in working folder. """
 
-        # Have a look at the other functions that use glob.glob. There is a more extensive explanation of what is going on and what recursive.
+        self.get_mp3_files_and_folders() # Ensure that this self data frame is updated.
+        
         files = list(self._files_and_folders['file'])
 
         for i in range(len(files)):
@@ -73,15 +77,11 @@ def main(env: environment):
 
     env.copy_files_to_working_folder()
 
-    env._files_and_folders = env.get_mp3_files_and_folders() # TODO Does it make sense to not have this in "main" but in the environment itself?
+    # env._files_and_folders = env.get_mp3_files_and_folders() # No longer needed as I put the execution of this also in the unique_mp3_folders function as well as the 
 
     env._unique_mp3_folders = env.get_unique_mp3_folders() # TODO Does it make sense to not have this in "main" but in the environment itself?
 
-    # env.get_mp3_files_and_folders()
-
-    # env.convert_file_extension_to_lowercase()
-
-    env.convert_file_extension_to_lowercase_self()
+    env.convert_file_extension_to_lowercase()
 
     print(env._files_and_folders)
 
