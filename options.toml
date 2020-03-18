@@ -1,0 +1,14 @@
+# This is a TOML document.
+
+# Tags
+[selected_id3_fields]
+"POPM:no@email" = "Rating"  # "Popularimeter" / Rating. The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0).
+"TALB" = "String"  # "Album/Movie/Show title" # Album.
+"TDRC" = "Date"  # "Recording time" # Recording date ideally year.
+"TIT2" = "String"  # "Title/songname/content description" # Title.
+"TPE1" = "String"  # "Lead performer(s)/Soloist(s)" # Track artist.
+"TPE2" = "String"  # "Band/orchestra/accompaniment" # Album artist.
+"TPOS" = "Disc number"  # "Disc number".
+"TRCK" = "Track number"  # "Track number/Position in set" # Track number.
+# Key = Tag id and value = categorization within this script. Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames
+

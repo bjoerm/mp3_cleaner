@@ -8,7 +8,9 @@ import typing
 
 import pandas as pd
 
-class environment:
+import toml
+
+class Environment:
 
     def __init__(self, input_path: str, wip_path: str):
 
@@ -73,7 +75,7 @@ class environment:
 
 
 
-def main(env: environment):
+def main(env: Environment):
 
     env.copy_files_to_working_folder()
 
@@ -88,5 +90,5 @@ def main(env: environment):
 
 if __name__ == '__main__':
 
-    main(environment(input_path='untouched_input', wip_path="input"))
+    main(Environment(input_path='untouched_input', wip_path="input"))
 

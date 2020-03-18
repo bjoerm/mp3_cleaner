@@ -53,7 +53,7 @@ global_selected_id3_fields = { # TODO Check whether the information from the fie
     , "TPE1": "String"  # "Lead performer(s)/Soloist(s)" # Track artist.
     , "TPE2": "String"  # "Band/orchestra/accompaniment" # Album artist.
     , "TPOS": "Disc number"  # "Disc number".
-    , "TRCK": "Track number"  # "Track number/Position in set" # Track number.    
+    , "TRCK": "Track number"  # "Track number/Position in set" # Track number.
 }  # Key = Tag id and value = categorization within this script. Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames
 
 ## Folders
