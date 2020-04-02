@@ -30,7 +30,7 @@ def string_cap(file):
 
  
 
-def main(env: Environment): # Giving an environment as input. Wow, that's nice. :-)
+def main(env: Environment): # Giving an environment as input.
 
     env.process_files(string_cap) # This executes the process_files command and passes the string_cap function to it as an input.
 
