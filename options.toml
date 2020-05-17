@@ -1,4 +1,8 @@
-# This is a TOML document.
+"input_path" = "untouched_input" # TODO This could be an argument.
+"wip_path" = "input" # TODO This could be an argument.
+
+
+
 
 # Tags
 [selected_id3_fields]
