@@ -5,7 +5,7 @@
 
 
 # Tags
-[selected_id3_fields]
+[selected_id3_fields] # This creates a dictionary.
 "POPM:no@email" = "Rating"  # "Popularimeter" / Rating. The tag is structered like: 'POPM:no@email': POPM(email='no@email', rating=242, count=0).
 "TALB" = "String"  # "Album/Movie/Show title" # Album.
 "TDRC" = "Date"  # "Recording time" # Recording date ideally year.
