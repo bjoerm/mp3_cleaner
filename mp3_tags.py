@@ -31,11 +31,11 @@ class Mp3Tags:
             df_iteration = self.select_tags(df_iteration=df_iteration)
             df_iteration = self.fill_selected_tags(df_iteration=df_iteration)
             
-
+            # TODO Get rid of the encoding part and only keep the "text", so it will later be unifiedly be saved as UTF8 and not e.g. LATIN1. So changing 'TALB(encoding=<Encoding.LATIN1: 0>, text=['Stellaris : Ancient Relics'])' into 'TALB: 'Stellaris : Ancient Relics')
             
             # TODO Next step is to have a loop/list comprehension that goes through each row's tags and compares with self.selected_id3_fields to pass it to different methods. E.g. a string method, a Date number method, ...
             
-            
+            [print(i) for i in df_iteration["selected_tag"].keys()]
             pass
             
     
@@ -85,9 +85,11 @@ class Mp3Tags:
     def fill_selected_tags(self, df_iteration) -> pd.DataFrame:
         """Copying/filling the original tag information (but only) for the selected tag fields."""
         
-        df_iteration["selected_tag"] = [dict.fromkeys(i, None) for i in df_iteration.selected_tag] # Converting list to dict (with empty values).
+        selected_tag = [dict((k, df_iteration["untouched_tag"][i].get(k)) for k in df_iteration["selected_tag"][i] if k in df_iteration["untouched_tag"][i]) for i in df_iteration.index] # Nested list comprehension adaptation of https://stackoverflow.com/questions/6827834/how-to-filter-a-dict-to-contain-only-keys-in-a-given-list.
         
-        [df_iteration["selected_tag"][i].update(df_iteration["untouched_tag"][i]) for i in df_iteration.index] # Filling the selected tags with the untouched values. At this stage, this column contains the untouched, original tags - but only for the selected tag fields.
+        # Updating the column with the selected tag.
+        df_iteration["selected_tag"] = selected_tag
+        
         
         return(df_iteration)
     
@@ -97,6 +99,8 @@ class Mp3Tags:
     @staticmethod
     def _attach_column_to_df_iteration(data_for_series, series_name: str, df_iteration: pd.DataFrame) -> pd.DataFrame:
         """Helper function for adding an object (e.g. list, series, ...) as column to a pd.DataFrame."""
+        
+        # TODO This function is really not that good as it would not overwrite existing columns with the same name. Maybe go back to good old 'df_iteration["selected_tag"] = selected_tag'?
         
         series = pd.Series(data_for_series, name=series_name)
         
