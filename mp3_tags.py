@@ -55,7 +55,7 @@ class Mp3Tags:
             [df_iteration["id3"][i].delete() for i in df_iteration.index]
 
 
-            df_iteration["id3"] = [self.save_tags_to_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index]
+            df_iteration["id3"] = [self._save_tags_to_single_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index]
         
 
             
@@ -93,8 +93,6 @@ class Mp3Tags:
             return None
 
         return(id3) # Returns an ID3 object.
-    
-    
     
     
     
@@ -138,7 +136,7 @@ class Mp3Tags:
     
     
     
-    def save_tags_to_id3_object(self, id3, beautified_tag):
+    def _save_tags_to_single_id3_object(self, id3, beautified_tag):
         """Save beautified tags to id3 object. This function takes only on row from df_iteration at a time."""
 
         for key, value in beautified_tag.items():
