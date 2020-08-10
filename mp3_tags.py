@@ -18,6 +18,7 @@ class Mp3Tags:
         
         # Work from folder to folder.
         for i in self.unique_mp3_folders:
+            print(i)
             
             df_iteration = None # Cleaning the iteration df at the start of each loop.
             
@@ -27,16 +28,39 @@ class Mp3Tags:
             df_iteration = self.read_id3_tags_in_folder(df_iteration = df_iteration)
             
             
-            # Select only specified tag fields.
+            
+            # Select and copy specified tag fields.
             df_iteration = self.select_tags(df_iteration=df_iteration)
-            df_iteration = self.fill_selected_tags(df_iteration=df_iteration)
+            df_iteration = self.copy_selected_tags(df_iteration=df_iteration)
             
-            # TODO Get rid of the encoding part and only keep the "text", so it will later be unifiedly be saved as UTF8 and not e.g. LATIN1. So changing 'TALB(encoding=<Encoding.LATIN1: 0>, text=['Stellaris : Ancient Relics'])' into 'TALB: 'Stellaris : Ancient Relics')
             
-            # TODO Next step is to have a loop/list comprehension that goes through each row's tags and compares with self.selected_id3_fields to pass it to different methods. E.g. a string method, a Date number method, ...
+            # Remove encoding information and only keep the text.
+            df_iteration = self.remove_string_encoding_information(df_iteration=df_iteration)
             
-            [print(i) for i in df_iteration["selected_tag"].keys()]
-            pass
+            
+            
+            # TODO START Pass tag on to a beautifier function/class.
+            df_iteration["beautified_tag"] = df_iteration["unchanged_tag"].copy() # TODO This is only a placeholder.
+            
+            test_string = [
+                {k:v.upper() if k not in ["POPM:no@email", "TDRC"] else v for (k, v) in df_iteration["beautified_tag"][i].items()} # Omitting date (TDRC) and rating.
+                for i in df_iteration.index]
+            
+            df_iteration["beautified_tag"] = test_string
+            # TODO END Pass tag on to a beautifier function/class.
+            
+            
+            
+            # Delete all existing tags from the ID3 object.
+            [df_iteration["id3"][i].delete() for i in df_iteration.index]
+
+
+            df_iteration["id3"] = [self.save_tags_to_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index]
+        
+
+            
+            # Write beautified tag to file.
+            [df_iteration["id3"][i].save(v1 = 0, v2_version = 4) for i in df_iteration.index] # Saving only as id3v2.4 tags.
             
     
     
@@ -51,10 +75,10 @@ class Mp3Tags:
     def read_id3_tags_in_folder(self, df_iteration: pd.DataFrame) -> pd.DataFrame: 
         """Read the whole id3 tags for all provided files."""
 
-        untouched_tag = [self._read_id3_tag_from_single_file(i) for i in df_iteration["file"]] # Read all tags.
+        id3 = [self._read_id3_tag_from_single_file(i) for i in df_iteration["file"]] # Read all tags.
         
         # Attaching a column with the read tag.
-        df_iteration = self._attach_column_to_df_iteration(data_for_series=untouched_tag, series_name="untouched_tag", df_iteration=df_iteration)
+        df_iteration = self._attach_column_to_df_iteration(data_for_series=id3, series_name="id3", df_iteration=df_iteration)
         
         return(df_iteration)
 
@@ -71,29 +95,66 @@ class Mp3Tags:
         return(id3) # Returns an ID3 object.
     
     
+    
+    
+    
+    
     def select_tags(self, df_iteration) -> pd.DataFrame:
         """Select the specified tag fields."""
         
-        selected_tag = [list(i.keys() & self.selected_id3_fields.keys()) for i in df_iteration["untouched_tag"]]
+        unchanged_tag = [list(i.keys() & self.selected_id3_fields.keys()) for i in df_iteration["id3"]]
         
         # Attaching a column with the selected tag.
-        df_iteration = self._attach_column_to_df_iteration(data_for_series=selected_tag, series_name="selected_tag", df_iteration=df_iteration)
+        df_iteration = self._attach_column_to_df_iteration(data_for_series=unchanged_tag, series_name="unchanged_tag", df_iteration=df_iteration)
         
         return(df_iteration)
     
     
-    def fill_selected_tags(self, df_iteration) -> pd.DataFrame:
+    def copy_selected_tags(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
         """Copying/filling the original tag information (but only) for the selected tag fields."""
         
-        selected_tag = [dict((k, df_iteration["untouched_tag"][i].get(k)) for k in df_iteration["selected_tag"][i] if k in df_iteration["untouched_tag"][i]) for i in df_iteration.index] # Nested list comprehension adaptation of https://stackoverflow.com/questions/6827834/how-to-filter-a-dict-to-contain-only-keys-in-a-given-list.
+        unchanged_tag = [dict(
+            (k, df_iteration["id3"][i].get(k)) for k in df_iteration["unchanged_tag"][i] if k in df_iteration["id3"][i]
+            ) for i in df_iteration.index] # Nested list comprehension adaptation of https://stackoverflow.com/questions/6827834/how-to-filter-a-dict-to-contain-only-keys-in-a-given-list.
         
         # Updating the column with the selected tag.
-        df_iteration["selected_tag"] = selected_tag
+        df_iteration["unchanged_tag"] = unchanged_tag
         
         
         return(df_iteration)
     
     
+    def remove_string_encoding_information(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
+        """Getting rid of the encoding part and only keeping the "text", so it will later be unifiedly be saved as UTF8 and not e.g. LATIN1. So changing 'TALB(encoding=<Encoding.LATIN1: 0>, text=['Stellaris : Ancient Relics'])' into 'TALB: 'Stellaris : Ancient Relics'). Not touching the rating field ("POPM:no@email") which does not contain a "text" element."""
+        
+        unchanged_tag = [dict(
+            (k, df_iteration["unchanged_tag"][i].get(k).text[0] if k != "POPM:no@email" else df_iteration["unchanged_tag"][i].get(k)) for k in df_iteration["unchanged_tag"][i]
+            ) for i in df_iteration.index] # There can be multiple tags attached. The [0] from .text[0] ensures that only the first element is taken. Without it, the text element would also be a list of strings and not a string (yet).
+        
+        # Updating the column with the selected tag.
+        df_iteration["unchanged_tag"] = unchanged_tag
+        
+        return(df_iteration)
+    
+    
+    
+    def save_tags_to_id3_object(self, id3, beautified_tag):
+        """Save beautified tags to id3 object. This function takes only on row from df_iteration at a time."""
+
+        for key, value in beautified_tag.items():
+
+            if key == "POPM:no@email": # Does not have a text field and thus a bit different structure.
+                exec(f'id3.add({value})') # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
+
+            elif key in ("TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"): # These fields (all but rating), have a text parameter which can be added the same way.
+                exec(f'id3.add({key}(encoding = 3, text = "{value}"))') # encoding = 3 = UTF8
+
+            else:
+                # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
+                # TODO Code this.
+                continue
+        
+        return(id3)
     
     
     @staticmethod
