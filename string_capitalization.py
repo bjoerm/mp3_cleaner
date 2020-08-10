@@ -5,7 +5,7 @@ import re # Regular expressions
 
 
 
-def string_capitalization(text):
+def string_capitalization(text: str) -> str:
     # TODO Expand this here to prevent I'am from being turned into I'Am.
     # TODO Should I leave meE mEgA untouched? Aka. if there is any capital letter don't do anything? (If so, don't forget to still deal with brandon's)
 
@@ -19,15 +19,15 @@ def string_capitalization(text):
     text_beautified = re.sub(" +$", "", text_beautified) # Remove any whitespace at the end.
 
     ## Quotation marks
-    text_beautified = re.sub("\"", "'", text_beautified) # Remove double quotation marks. That helps as " is not liked in filenames.
+    text_beautified = re.sub("\"", "'", text_beautified) # Convert double (") quotation marks from string into single quotation marks ('). That helps as " is not wanted in filenames.
 
     ## Accents
-    text_beautified = re.sub("`", "'", text_beautified) # Remove any whitespace at the end.
-    text_beautified = re.sub("´", "'", text_beautified) # Remove any whitespace at the end.
+    text_beautified = re.sub("`", "'", text_beautified) # Unify accents.
+    text_beautified = re.sub("´", "'", text_beautified) # Unify accents.
 
     ## Colons
     text_beautified = re.sub("(?<=[a-zA-Z0-9]): (?=.+)", " - ", text_beautified) # Case of colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
-    text_beautified = re.sub("(?<=[a-zA-Z0-9]):[^ ](?=.+)", "-", text_beautified) # Case of colon followed by non-whitespace. E.g.: Deus:EX -> Deus-Ex or 12:34 -> 12-34.
+    text_beautified = re.sub("(?<=[a-zA-Z0-9]):[^ ](?=.+)", "-", text_beautified) # Case of colon followed by non-whitespace. E.g.: Deus:EX -> Deus-Ex or 12:34 -> 12-34. # TODO Do I really want "Deus:EX -> Deus-Ex"? This might screw up some other cases.
 
     ## Semicolons
     text_beautified = text_beautified.replace(";", ",") # Transform semicolons into commas.
