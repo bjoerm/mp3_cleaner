@@ -5,9 +5,7 @@ import re # Regular expressions
 
 
 
-def string_capitalization(text: str) -> str:
-    # TODO Expand this here to prevent I'am from being turned into I'Am.
-    # TODO Should I leave meE mEgA untouched? Aka. if there is any capital letter don't do anything? (If so, don't forget to still deal with brandon's)
+def string_beautification(text: str, remove_leading_the: bool) -> str:
 
     text_beautified = str(text) # Creating a copy of the input which is used, so the original input is kept for comparisons.
 
@@ -22,19 +20,30 @@ def string_capitalization(text: str) -> str:
     text_beautified = re.sub("\"", "'", text_beautified) # Convert double (") quotation marks from string into single quotation marks ('). That helps as " is not wanted in filenames.
 
     ## Accents
-    text_beautified = re.sub("`", "'", text_beautified) # Unify accents.
-    text_beautified = re.sub("´", "'", text_beautified) # Unify accents.
+    text_beautified = re.sub("`", "'", text_beautified)
+    text_beautified = re.sub("´", "'", text_beautified)
 
     ## Colons
     text_beautified = re.sub("(?<=[a-zA-Z0-9]): (?=.+)", " - ", text_beautified) # Case of colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
-    text_beautified = re.sub("(?<=[a-zA-Z0-9]):[^ ](?=.+)", "-", text_beautified) # Case of colon followed by non-whitespace. E.g.: Deus:EX -> Deus-Ex or 12:34 -> 12-34. # TODO Do I really want "Deus:EX -> Deus-Ex"? This might screw up some other cases.
+    text_beautified = re.sub("(?<=[a-zA-Z0-9]):[^ ](?=.+)", "-", text_beautified) # Case of colon followed by non-whitespace. E.g.: Deus:EX -> Deus-Ex or 12:34 -> 12-34.
 
     ## Semicolons
-    text_beautified = text_beautified.replace(";", ",") # Transform semicolons into commas.
+    text_beautified = text_beautified.replace(";", ",")
+    
+    ## Slashes
+    text_beautified = text_beautified.replace("\\", "-")
+    text_beautified = text_beautified.replace("/", "-")
+    
+    ## Question marks
+    text_beautified = text_beautified.replace("?", "")
 
     ## Missing space after comma
-    text_beautified = re.sub("(?<=[a-zA-Z0-9]),[^ ](?=.+)", ", ", text_beautified)
+    text_beautified = re.sub("(?<=[a-zA-Z0-9]),[^ ](?=.+)", ", ", text_beautified) # TODO Change this so it is not triggered when , is a decimal separator "10,1 km".
 
+    ## Leading "The"
+    if remove_leading_the == True:
+        text_beautified = re.sub("^([T|t][H|h][E|e]\s)", "", text_beautified)
+    
     ## Special cases
     text_beautified = re.sub(" [F|f]eaturing ", " Feat. ", text_beautified)
     text_beautified = re.sub(" [P|p]t. ", " Part ", text_beautified)
@@ -64,18 +73,11 @@ def string_capitalization(text: str) -> str:
     ## Special cases
     ### Bands
     text_improved_list = text_improved_list.replace(" 'N' ", " 'n' ")
-    text_improved_list = text_improved_list.replace("'Ac/Dc'", "ACDC")
+    text_improved_list = re.sub("[A|a][C|c]-[D|d][C|c]", "ACDC", text_improved_list) # AC/DC
 
     # # Debugging
     # print("Original: " + text)
     # print("Improved: " + text_improved_list)
 
     return(text_improved_list)
-
-# Some tests
-## string_capitalization function
-assert string_capitalization("Test's test's test`s test´s test'S") == "Test's Test's Test's Test's test's", "Test x"
-assert string_capitalization("Ac/Dc AC/DC ac/dc guns 'n' roses") == "Ac/Dc AC/DC Ac/Dc Guns 'n' Roses", "Test x" # TODO Souldn't this return more ACDC?
-assert string_capitalization("  lost in      space Lost in Space ") == "Lost In Space Lost In Space", "Test spaces"
-# TODO Add test for colons, Accents, ...
 
