@@ -1,6 +1,11 @@
+
+# TODO Tags regarding track number can have entries like "2-16" to indicate how many tracks are on the album. (See Linkin Park Live.)
+
+
 import glob  # For reading files and folders.
 from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 import pandas as pd
+from string_beautification import string_beautification
 
 class Mp3Tags:
     
@@ -43,7 +48,7 @@ class Mp3Tags:
             df_iteration["beautified_tag"] = df_iteration["unchanged_tag"].copy() # TODO This is only a placeholder.
             
             test_string = [
-                {k:v.upper() if k not in ["POPM:no@email", "TDRC"] else v for (k, v) in df_iteration["beautified_tag"][i].items()} # Omitting date (TDRC) and rating.
+                {k:string_beautification(v) if k not in ["POPM:no@email", "TDRC"] else v for (k, v) in df_iteration["beautified_tag"][i].items()} # Omitting date (TDRC) and rating.
                 for i in df_iteration.index]
             
             df_iteration["beautified_tag"] = test_string
