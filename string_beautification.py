@@ -1,14 +1,17 @@
 
-# TODO Convert backslash into slash and deal with question marks and such
+# TODO Maybe pause script and ask user (if that is easily possible), otherwise just halt in case when there are special characters like % and $
+# TODO Unify hyphens into - (might need the unicode for the longer hyphens for that).
+# TODO Expand the a-zA-Z for German umlaute: [^\x00-\x7F(?:\u00c4, \u00e4,\u00d6,\u00f6,\u00dc,\u00fc,\u00df)] https://stackoverflow.com/questions/22017723/regex-for-umlaut
+# TODO Rectangular brackets into round brackets. [] into ()
+
 
 import re # Regular expressions
 
 
 
-def string_beautification(text: str, remove_leading_the: bool) -> str:
+def string_beautification(text: str, remove_leading_the: bool=False) -> str:
 
     text_beautified = str(text) # Creating a copy of the input which is used, so the original input is kept for comparisons.
-
 
     # Beautify the input
     ## Whitespaces
@@ -26,6 +29,7 @@ def string_beautification(text: str, remove_leading_the: bool) -> str:
     ## Colons
     text_beautified = re.sub("(?<=[a-zA-Z0-9]): (?=.+)", " - ", text_beautified) # Case of colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
     text_beautified = re.sub("(?<=[a-zA-Z0-9]):[^ ](?=.+)", "-", text_beautified) # Case of colon followed by non-whitespace. E.g.: Deus:EX -> Deus-Ex or 12:34 -> 12-34.
+    text_beautified = re.sub(" : ", " - ", text_beautified) # Case of colon surrounded by whitespace. E.g.: Deus Ex : Human Revolution -> Deus Ex - Human Revolution
 
     ## Semicolons
     text_beautified = text_beautified.replace(";", ",")
@@ -36,10 +40,13 @@ def string_beautification(text: str, remove_leading_the: bool) -> str:
     
     ## Question marks
     text_beautified = text_beautified.replace("?", "")
+    
+    ## Ampersand (&)
+    text_beautified = text_beautified.replace("&", "+")
 
-    ## Missing space after comma
-    text_beautified = re.sub("(?<=[a-zA-Z0-9]),[^ ](?=.+)", ", ", text_beautified) # TODO Change this so it is not triggered when , is a decimal separator "10,1 km".
-
+    ## Missing space after comma - as long as it is not followed by digits.
+    text_beautified = re.sub("(?<=[a-zA-Z0-9]),(?=[a-zA-Z])", ", ", text_beautified) # [a-zA-Z] does not contain German umlaute.
+    
     ## Leading "The"
     if remove_leading_the == True:
         text_beautified = re.sub("^([T|t][H|h][E|e]\s)", "", text_beautified)
@@ -67,11 +74,11 @@ def string_beautification(text: str, remove_leading_the: bool) -> str:
 
     # Additional beautification after capitalization    
     ## 's
-    text_improved_list = re.sub("(?<=\w')S(?=\s+|$)", "s", text_improved_list) # Transforms Bjoern'S (capital S) into Bjoern's
+    text_improved_list = re.sub("(?<=\w')S(?=\s+|$)", "s", text_improved_list) # Transforms Bernd'S (capital S) into Bernd's
 
     
     ## Special cases
-    ### Bands
+    ### Special band names
     text_improved_list = text_improved_list.replace(" 'N' ", " 'n' ")
     text_improved_list = re.sub("[A|a][C|c]-[D|d][C|c]", "ACDC", text_improved_list) # AC/DC
 
