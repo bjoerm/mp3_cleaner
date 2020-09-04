@@ -48,11 +48,13 @@ def string_beautification(text: str, remove_leading_the: bool=False) -> str:
     
     ## Leading "The"
     if remove_leading_the == True:
-        text_beautified = re.sub("^([T|t][H|h][E|e]\s)", "", text_beautified)
+        text_beautified = re.sub("^(the\s)", "", text_beautified, flags=re.IGNORECASE)
     
     ## Special cases
-    text_beautified = re.sub(" [F|f]eaturing ", " Feat. ", text_beautified)
-    text_beautified = re.sub(" [P|p]t. ", " Part ", text_beautified)
+    text_beautified = re.sub(" Featuring ", " Feat. ", text_beautified, flags=re.IGNORECASE)
+    text_beautified = re.sub(" Pt. ", " Part ", text_beautified, flags=re.IGNORECASE)
+    text_beautified = re.sub("(?<= |\()remix(?=\)|$| )", "Remix", text_beautified, flags=re.IGNORECASE) # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
+    text_beautified = re.sub("(?<= |\()live(?=\)|$| )", "Live", text_beautified, flags=re.IGNORECASE) # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
 
 
     # Break the string into pieces (into a list).
@@ -79,7 +81,7 @@ def string_beautification(text: str, remove_leading_the: bool=False) -> str:
     ## Special cases
     ### Special band names
     text_improved_list = text_improved_list.replace(" 'N' ", " 'n' ")
-    text_improved_list = re.sub("[A|a][C|c]-[D|d][C|c]", "ACDC", text_improved_list) # AC/DC
+    text_improved_list = re.sub("ac-dc", "ACDC", text_improved_list, flags=re.IGNORECASE) # AC/DC
 
     # # Debugging
     # print("Original: " + text)

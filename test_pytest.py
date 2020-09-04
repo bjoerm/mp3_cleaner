@@ -15,7 +15,10 @@ def test_string_beautification(): # Switch this to True to easily test it also f
     assert string_beautification("baum,stamm 10,5 Gerd,10 10,Gerd") == "Baum, Stamm 10,5 Gerd,10 10, Gerd", "Test comma and space"
     assert string_beautification(" ") == "", "Test empty 1"
     assert string_beautification("") == "", "Test empty 2"
-
+    assert string_beautification("Nice Track REMIX") == "Nice Track Remix", "Test Remix suffix 1"
+    assert string_beautification("Nice Track (REMIX)") == "Nice Track (Remix)", "Test Remix suffix 2"
+    assert string_beautification("Nice Track LIVE") == "Nice Track Live", "Test Live suffix 1"
+    assert string_beautification("Nice Track (LIVE)") == "Nice Track (Live)", "Test Live suffix 2"
 
 
 def test_string_beautification_leading_the(input=True): # Switch this to True to easily test it also for that case.
