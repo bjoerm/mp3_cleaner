@@ -8,10 +8,9 @@
 import re # Regular expressions
 
 
-
 def string_beautification(text: str, remove_leading_the: bool=False) -> str:
 
-    text_beautified = str(text) # Creating a copy of the input which is used, so the original input is kept for comparisons.
+    text_beautified = str(text) # Creating a copy of the input which is used, so the original input is kept for comparisons. And ensuring that the text is a string.
 
     # Beautify the input
     ## Whitespaces
