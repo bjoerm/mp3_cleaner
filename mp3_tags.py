@@ -51,9 +51,12 @@ class Mp3Tags:
             # Pass tag on to a beautifier function/class.
             df_iteration["beautified_tag"] = df_iteration["unchanged_tag"].copy()
             
-            ## Beautify strings
+            # Beautify strings
             df_iteration = self.beautify_strings(df_iteration=df_iteration)
             
+            
+            # Remove album artist if same as track artist
+            df_iteration = self.check_obsolescence_of_album_artist(df_iteration=df_iteration)
             
             # Beautifying the track number (fill with correct number of leading zeros)
             df_iteration = self.beautify_track_number(df_iteration=df_iteration) # TODO Add check to only execute this if there is a track number and 
@@ -61,7 +64,7 @@ class Mp3Tags:
             
             # TODO For disc number I could use the logic: If there are multiple disc numbers in the same folder, keep them. Else if there is only one - which is also disc 1, then remove it.
             
-            # TODO For album artist: Delete it, if it is the same as the track artist.
+            # TODO Beautify the date.
             
             
             # TODO Add part to delete beautified keys which are after the beautification empty!
@@ -167,6 +170,22 @@ class Mp3Tags:
             for i in output.index]
     
         return(output)
+    
+    
+    
+    @staticmethod
+    def check_obsolescence_of_album_artist(df_iteration: pd.DataFrame) -> pd.DataFrame:
+        """Remove album artist if same as track artist."""
+        output = df_iteration
+        
+        track_artist = [output["beautified_tag"][i].get("TPE1") for i in output.index]
+        album_artist = [output["beautified_tag"][i].get("TPE2") for i in output.index]
+        
+        if track_artist == album_artist:
+            [output["beautified_tag"][i].pop("TPE2", None) for i in output.index] # Remove the TPE2 tag.
+        
+        return(output)
+    
     
     
     @staticmethod
