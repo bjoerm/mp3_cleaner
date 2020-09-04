@@ -2,10 +2,15 @@
 # TODO Tags regarding track number can have entries like "2-16" to indicate how many tracks are on the album. (See Linkin Park Live.)
 
 
-import glob  # For reading files and folders.
+import glob
+from typing import List  # For reading files and folders.
 from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 import pandas as pd
+import re
+
 from string_beautification import string_beautification
+from track_number_beautification import track_number_beautification
+
 
 class Mp3Tags:
     
@@ -43,16 +48,23 @@ class Mp3Tags:
             df_iteration = self.remove_string_encoding_information(df_iteration=df_iteration)
             
             
+            # Pass tag on to a beautifier function/class.
+            df_iteration["beautified_tag"] = df_iteration["unchanged_tag"].copy()
             
-            # TODO START Pass tag on to a beautifier function/class.
-            df_iteration["beautified_tag"] = df_iteration["unchanged_tag"].copy() # TODO This is only a placeholder.
+            ## Beautify strings
+            df_iteration = self.beautify_strings(df_iteration=df_iteration)
             
-            test_string = [
-                {k:string_beautification(v) if k not in ["POPM:no@email", "TDRC"] else v for (k, v) in df_iteration["beautified_tag"][i].items()} # Omitting date (TDRC) and rating.
-                for i in df_iteration.index]
             
-            df_iteration["beautified_tag"] = test_string
-            # TODO END Pass tag on to a beautifier function/class.
+            # Beautifying the track number (fill with correct number of leading zeros)
+            df_iteration = self.beautify_track_number(df_iteration=df_iteration) # TODO Add check to only execute this if there is a track number and 
+
+            
+            # TODO For disc number I could use the logic: If there are multiple disc numbers in the same folder, keep them. Else if there is only one - which is also disc 1, then remove it.
+            
+            # TODO For album artist: Delete it, if it is the same as the track artist.
+            
+            
+            # TODO Add part to delete beautified keys which are after the beautification empty!
             
             
             
@@ -138,6 +150,50 @@ class Mp3Tags:
         df_iteration["unchanged_tag"] = unchanged_tag
         
         return(df_iteration)
+    
+    
+    @staticmethod
+    def beautify_strings(df_iteration: pd.DataFrame) -> pd.DataFrame:
+        output = df_iteration
+        
+        # Beautifying the album and song title.
+        output["beautified_tag"] = [
+            {k:string_beautification(v) if k in ["TALB", "TIT2"] else v for (k, v) in output["beautified_tag"][i].items()} # Beautifying the album and song title.
+            for i in output.index]
+        
+        # Beautifying the album and song artist.
+        output["beautified_tag"] = [
+            {k:string_beautification(v, remove_leading_the=True) if k in ["TPE1", "TPE2"] else v for (k, v) in output["beautified_tag"][i].items()} # Beautifying the album and song title.
+            for i in output.index]
+    
+        return(output)
+    
+    
+    @staticmethod
+    def beautify_track_number(df_iteration: pd.DataFrame) -> pd.DataFrame:
+        """Beautifying the track number by adding leading zeros."""
+
+        output = df_iteration
+        
+        # Helper for number of tracks.
+        
+        helper_length_max = [
+            int(
+                re.sub("(?<=\d)\/\d+", "", output["beautified_tag"][i].get("TRCK")) # re.sub part: "01/16" will be transformed into "01". This will then be transformed into an integer.
+                ) for i in output.index
+            ]
+        
+        helper_length_max = max(helper_length_max) # Checking for the highest track number. Works also if multiple discs are present in the same folder.
+        helper_length_max = len(str(helper_length_max)) # Converting into the number if digits.
+        
+        
+        # TODO Deal with the case where no album name is present. Then do not do anything with the track numbers but keep them as they are. E.g. passing None as helper_length_max into the function already takes care of that.
+        
+        output["beautified_tag"] = [
+            {k:track_number_beautification(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output["beautified_tag"][i].items()} # Beautifying the track number.
+            for i in output.index]
+        
+        return(output)
     
     
     
