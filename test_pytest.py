@@ -94,8 +94,8 @@ def test_mp3_tags_extract_year():
     assert tags._extract_year("11.11.2020") == "2020"
     assert tags._extract_year("11.11.11") == "11.11.11"
     assert tags._extract_year("11-11-11") == "11-11-11"
-    assert tags._extract_year(2020) == 2020 # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
-    assert tags._extract_year(1980) == 1980 # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert tags._extract_year(2020) == "2020" # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert tags._extract_year(1980) == "1980" # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
     assert tags._extract_year(None) == None
 
 
@@ -110,6 +110,6 @@ def test_mp3_extract_track_number_from_slash_format():
     assert tags._extract_track_number_from_slash_format("1") == "1"
     assert tags._extract_track_number_from_slash_format("1/") == "1"
     assert tags._extract_track_number_from_slash_format("1/16") == "1"
-    assert tags._extract_track_number_from_slash_format(1) == 1 # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert tags._extract_track_number_from_slash_format(1) == "1" # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
     assert tags._extract_track_number_from_slash_format(None) == None
 
