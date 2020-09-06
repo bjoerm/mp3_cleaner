@@ -1,5 +1,5 @@
 input/
-untouched_input/
+output/
 *.mp3
 *.code-workspace
 venv/
