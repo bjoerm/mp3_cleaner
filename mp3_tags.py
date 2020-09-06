@@ -48,7 +48,7 @@ class Mp3Tags:
             # Pass tag on to a beautifier function/class.
             df_iteration["beautified_tag"] = df_iteration["unchanged_tag"].copy()
             
-            # Beautify strings
+            # Beautify strings # TODO Think about moving all these beautification methods into another utility class for better code structure by having this class shorter.
             df_iteration = self.beautify_strings(df_iteration=df_iteration)
             
             
@@ -59,23 +59,18 @@ class Mp3Tags:
             df_iteration = self.beautify_track_number(df_iteration=df_iteration) # TODO Add check to only execute this if there is a track number.
 
             # Beautifying the disc number
-            df_iteration = self.beautfiy_disc_number(df_iteration=df_iteration)
+            df_iteration = self.beautify_disc_number(df_iteration=df_iteration)
             
+            # Beautify the date (tag)
+            df_iteration = self.beautify_date(df_iteration=df_iteration)
             
-            # TODO Beautify the date.
-            
-            
-            
-            # TODO Add part to delete beautified keys which are empty after the beautification!
-            
-            
+            # TODO Add part to delete beautified keys which are empty strings (but not yet a None) after the beautification!
             
             # Delete all existing tags from the ID3 object.
             [df_iteration["id3"][i].delete() for i in df_iteration.index]
 
 
             df_iteration["id3"] = [self._save_tags_to_single_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index]
-        
 
             
             # Write beautified tag to file.
@@ -187,8 +182,8 @@ class Mp3Tags:
     
     
     
-    @staticmethod
-    def beautify_track_number(df_iteration: pd.DataFrame) -> pd.DataFrame:
+    
+    def beautify_track_number(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
         """Beautifying the track number by adding/correcting leading zeros."""
         
         # Be aware that there are cases, where the first track number from cd 2 is not a 1 but continues the counting from disc 1.
@@ -198,9 +193,10 @@ class Mp3Tags:
         
         # Helper for number of tracks.
         
+        ## Transforming "01/16" or "01/" into "01". This will then be transformed into an integer.
         helper_length_max = [
             int(
-                re.sub("(?<=\d)\/\d+", "", output["beautified_tag"][i].get("TRCK")) # re.sub part: "01/16" will be transformed into "01". This will then be transformed into an integer.
+                self._extract_track_number_from_slash_format(output["beautified_tag"][i].get("TRCK"))
                 ) for i in output.index
             ]
         
@@ -218,7 +214,25 @@ class Mp3Tags:
     
     
     @staticmethod
-    def beautfiy_disc_number(df_iteration: pd.DataFrame) -> pd.DataFrame:
+    def _extract_track_number_from_slash_format(string: str) -> str:
+        """Replace any slash (and if there integers) after an initial interger.
+        For dealing with cases like "01/16" or "1/"."""
+        
+        output = string
+        
+        if output is not None: # Dealing with the special of None - which is not converted into a string.
+            output = str(output)
+        
+        
+        try:
+            output = re.sub("(?<=\d)\/\d*", "", output)
+        except:
+            pass # If for example None is entered, return None untouched.
+        
+        return(output)
+    
+    
+    def beautify_disc_number(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
         """Beautifying the disc number by removing it, when it is disc number = 1 unless a) there are multiple disc numbers in the same folder OR b) the file path has "CD 1" (or similar) in it. In these two cases, keep it. If disc number > 1, also keep it."""
         # TODO Nice to have expansion: Delete leading zeros from the disc number.
         
@@ -242,7 +256,7 @@ class Mp3Tags:
             
             helper_folder_contains_cd_string = str(output["folder"][0])
             
-            helper_folder_contains_cd_string = bool(re.search("(^| |-|\()cd( \d|-\d|\d)", helper_folder_contains_cd_string, flags=re.IGNORECASE)) # Look for the string " cd" in the folder name. Could also look in the file name instead, but went for folder to have a folder-wide handling. # TODO Expand this to handle the case of "2CD"
+            helper_folder_contains_cd_string = self._has_cd_string_in_folder_name(helper_folder_contains_cd_string)
             
             if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
                 pass
@@ -253,10 +267,46 @@ class Mp3Tags:
             
         
         return(output)
+    
+    
+    @staticmethod
+    def _has_cd_string_in_folder_name(string: str) -> bool:
+        """Look for the strings related to the number of discs. E.g. " cd" or "2cd" in the folder name. Could have also looked in the file name instead, but went for folder to have a folder-wide unique handling."""
         
+        output = bool(re.search("(^|\W|_)cd(\d{1,2}|\W{1,2}\d{1,2})([^a-zA-Z0-9]|$)|(^|\W|_)(\d{1,2}|\d{1,2}\W{1,2})cd([^a-zA-Z0-9]|$)", str(string), flags=re.IGNORECASE)) # Rather complex regex... Thus, put this into a separate function, so it is easier to include in unittests.
+        
+        return(output)
 
     
+
+    def beautify_date(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
+        """Shorten any YYYY-MM-DD values into YYYY."""
+        
+        output = df_iteration
+        
+        output["beautified_tag"] = [
+            {k: self._extract_year(v) if k in ["TDRC"] else v for (k, v) in output["beautified_tag"][i].items()} # Shorten to YYYY.
+            for i in output.index]
     
+        return(output)
+    
+    
+    
+    @staticmethod
+    def _extract_year(string: str) -> str:
+        """Helper function for beautifying the date. Extracts YYYY dates."""
+        
+        output = string
+        
+        if output is not None: # Dealing with the special of None - which is not converted into a string.
+            output = str(output)
+        
+        try:
+            output = re.search("(19|20|21)\d{2}", output).group(0) # Look for 19xx, 20xx or 21xx. First found entry will be taken.
+        except:
+            pass # If no YYYY string can be extracted, e.g. data provided is "01-01-20", then return untouched string.
+        
+        return(output)
     
     
     
