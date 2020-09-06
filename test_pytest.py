@@ -1,5 +1,6 @@
 from string_beautification import string_beautification
 from track_number_beautification import track_number_beautification
+from mp3_tags import Mp3Tags
 
 def test_string_beautification(): # Switch this to True to easily test it also for that case.
     assert string_beautification("Test's test's test`s test´s test'S") == "Test's Test's Test's Test's test's", "Test hyphens"
@@ -42,4 +43,73 @@ def test_track_number_beautification():
     assert track_number_beautification(track_number="", helper_length_max=3, minimum_length=2) == "", "Test existing leading zero 2"
     # assert track_number_beautification(track_number="01", helper_length_max=1) == "1", "Test removing existing leading zero"
 
+
+def test_mp3_tags_has_cd_string_in_folder_name():
+    """Testing the complex regex."""
+    
+    tags = Mp3Tags(selected_id3_fields="", files_and_folders="") # Initialize empty class.
+    
+    assert tags._has_cd_string_in_folder_name("cd 1") == True
+    assert tags._has_cd_string_in_folder_name("cd3") == True
+    assert tags._has_cd_string_in_folder_name("cd  2asd") == False
+    assert tags._has_cd_string_in_folder_name("cd  2 asd") == True
+    assert tags._has_cd_string_in_folder_name("cd2aasdfsd") == False
+    assert tags._has_cd_string_in_folder_name("12_cd2aasdfsd") == False
+    assert tags._has_cd_string_in_folder_name("asd cd2") == True
+    assert tags._has_cd_string_in_folder_name("2cd") == True
+    assert tags._has_cd_string_in_folder_name("2013-2CD-2013-C4") == True
+    assert tags._has_cd_string_in_folder_name("_cd2") == True
+    assert tags._has_cd_string_in_folder_name(",cd2 ") == True
+    assert tags._has_cd_string_in_folder_name("-23") == False
+    assert tags._has_cd_string_in_folder_name("192cd2 ") == False
+    assert tags._has_cd_string_in_folder_name("-cd23") == True
+    assert tags._has_cd_string_in_folder_name("-1cd-") == True
+    assert tags._has_cd_string_in_folder_name("- 1 cd -") == True
+    assert tags._has_cd_string_in_folder_name(" cd 2 ") == True
+    assert tags._has_cd_string_in_folder_name("_1 cd_") == True
+    assert tags._has_cd_string_in_folder_name("2cdaasdf") == False
+    assert tags._has_cd_string_in_folder_name("cd123455") == False
+    assert tags._has_cd_string_in_folder_name(None) == False
+    assert tags._has_cd_string_in_folder_name(50) == False
+
+
+def test_mp3_tags_extract_year():
+    """Testing the regex that extract year (YYYY)."""
+    
+    tags = Mp3Tags(selected_id3_fields="", files_and_folders="") # Initialize empty class.
+    
+    assert tags._extract_year("1999-12-12") == "1999"
+    assert tags._extract_year("1999") == "1999"
+    assert tags._extract_year("20-12-1999") == "1999"
+    assert tags._extract_year("1999-10") == "1999"
+    assert tags._extract_year("1999-October") == "1999"
+    assert tags._extract_year("1999-H1") == "1999"
+    assert tags._extract_year("11.11.1999") == "1999"
+    assert tags._extract_year("2020-12-12") == "2020"
+    assert tags._extract_year("2020") == "2020"
+    assert tags._extract_year("20-12-2020") == "2020"
+    assert tags._extract_year("2020-10") == "2020"
+    assert tags._extract_year("2020-October") == "2020"
+    assert tags._extract_year("2020-H1") == "2020"
+    assert tags._extract_year("11.11.2020") == "2020"
+    assert tags._extract_year("11.11.11") == "11.11.11"
+    assert tags._extract_year("11-11-11") == "11-11-11"
+    assert tags._extract_year(2020) == 2020 # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert tags._extract_year(1980) == 1980 # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert tags._extract_year(None) == None
+
+
+def test_mp3_extract_track_number_from_slash_format():
+    """Testing the regex that extracts the track number from potential 'slash format'."""
+    
+    tags = Mp3Tags(selected_id3_fields="", files_and_folders="") # Initialize empty class.
+    
+    assert tags._extract_track_number_from_slash_format("01") == "01"
+    assert tags._extract_track_number_from_slash_format("01/") == "01"
+    assert tags._extract_track_number_from_slash_format("01/16") == "01"
+    assert tags._extract_track_number_from_slash_format("1") == "1"
+    assert tags._extract_track_number_from_slash_format("1/") == "1"
+    assert tags._extract_track_number_from_slash_format("1/16") == "1"
+    assert tags._extract_track_number_from_slash_format(1) == 1 # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert tags._extract_track_number_from_slash_format(None) == None
 
