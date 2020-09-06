@@ -1,4 +1,4 @@
-
+# TODO Check special character case.
 # TODO Tags regarding track number can have entries like "2-16" to indicate how many tracks are on the album. (See Linkin Park Live.)
 
 
@@ -58,16 +58,18 @@ class Mp3Tags:
             # Remove album artist if same as track artist
             df_iteration = self.check_obsolescence_of_album_artist(df_iteration=df_iteration)
             
-            # Beautifying the track number (fill with correct number of leading zeros)
-            df_iteration = self.beautify_track_number(df_iteration=df_iteration) # TODO Add check to only execute this if there is a track number and 
+            # Beautifying the track number
+            df_iteration = self.beautify_track_number(df_iteration=df_iteration) # TODO Add check to only execute this if there is a track number.
 
+            # Beautifying the disc number
+            df_iteration = self.beautfiy_disc_number(df_iteration=df_iteration)
             
-            # TODO For disc number I could use the logic: If there are multiple disc numbers in the same folder, keep them. Else if there is only one - which is also disc 1, then remove it.
             
             # TODO Beautify the date.
             
             
-            # TODO Add part to delete beautified keys which are after the beautification empty!
+            
+            # TODO Add part to delete beautified keys which are empty after the beautification!
             
             
             
@@ -182,7 +184,7 @@ class Mp3Tags:
         album_artist = [output["beautified_tag"][i].get("TPE2") for i in output.index]
         
         if track_artist == album_artist:
-            [output["beautified_tag"][i].pop("TPE2", None) for i in output.index] # Remove the TPE2 tag.
+            [output["beautified_tag"][i].pop("TPE2", None) for i in output.index] # Remove the tag.
         
         return(output)
     
@@ -190,8 +192,11 @@ class Mp3Tags:
     
     @staticmethod
     def beautify_track_number(df_iteration: pd.DataFrame) -> pd.DataFrame:
-        """Beautifying the track number by adding leading zeros."""
-
+        """Beautifying the track number by adding/correcting leading zeros."""
+        
+        # Be aware that there are cases, where the first track number from cd 2 is not a 1 but continues the counting from disc 1.
+        
+        
         output = df_iteration
         
         # Helper for number of tracks.
@@ -213,6 +218,48 @@ class Mp3Tags:
             for i in output.index]
         
         return(output)
+    
+    
+    @staticmethod
+    def beautfiy_disc_number(df_iteration: pd.DataFrame) -> pd.DataFrame:
+        """Beautifying the disc number by removing it, when it is disc number = 1 unless a) there are multiple disc numbers in the same folder OR b) the file path has "CD 1" (or similar) in it. In these two cases, keep it. If disc number > 1, also keep it."""
+        # TODO Nice to have expansion: Delete leading zeros from the disc number.
+        
+        output = df_iteration
+        
+        # Check for different disc numbers in same folder.
+        helper_different_disc_number = [output["beautified_tag"][i].get("TPOS") for i in output.index]
+        
+        helper_different_disc_number = list(set(helper_different_disc_number))
+
+        if helper_different_disc_number is None: # There is no disc number tag.
+            pass
+        
+        elif len(helper_different_disc_number) > 1: # There are multiple disc numbers in the same folder.
+            pass
+        
+        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] != "1": # There is only one disc number and that is not disc number 1.
+            pass
+        
+        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1": # There is only one disc number and that is disc number 1.
+            
+            helper_folder_contains_cd_string = str(output["folder"][0])
+            
+            helper_folder_contains_cd_string = bool(re.search("(^| |-|\()cd( \d|-\d|\d)", helper_folder_contains_cd_string, flags=re.IGNORECASE)) # Look for the string " cd" in the folder name. Could also look in the file name instead, but went for folder to have a folder-wide handling. # TODO Expand this to handle the case of "2CD"
+            
+            if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
+                pass
+            
+            
+            if helper_folder_contains_cd_string == False: # If there is no a " cd" string in the folder name, remove the disc number.
+                [output["beautified_tag"][i].pop("TPOS", None) for i in output.index] # Remove the tag.
+            
+        
+        return(output)
+        
+
+    
+    
     
     
     
