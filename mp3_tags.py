@@ -1,9 +1,6 @@
 # TODO Check special character case.
-# TODO Tags regarding track number can have entries like "2-16" to indicate how many tracks are on the album. (See Linkin Park Live.)
 
 
-import glob
-from typing import List  # For reading files and folders.
 from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 import pandas as pd
 import re
