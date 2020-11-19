@@ -1,13 +1,10 @@
 # TODO Add log files with tags prior and after change.
+# TODO Add progress in percent calculated based on the share of finished folders.
 
-# import re  # Regular expressions
-# import time
-# import typing
 import toml
 
 from environment import Environment
 from mp3_tags import Mp3Tags
-
 
 
 
