@@ -35,7 +35,6 @@ class Mp3Tags:
             df_iteration = self.read_id3_tags_in_folder(df_iteration = df_iteration)
             
             
-            
             # Select and copy specified tag fields.
             df_iteration = self.select_tags(df_iteration=df_iteration)
             df_iteration = self.copy_selected_tags(df_iteration=df_iteration)
@@ -166,28 +165,32 @@ class Mp3Tags:
         return(output)
     
     
-    
     @staticmethod
     def check_obsolescence_of_album_artist(df_iteration: pd.DataFrame) -> pd.DataFrame:
         """Remove album artist if same as track artist."""
         output = df_iteration
         
-        track_artist = [output["beautified_tag"][i].get("TPE1") for i in output.index]
+        track_artist = [output["beautified_tag"][i].get("TPE1") for i in output.index] # This is a list with an entry for each file/tag.
         album_artist = [output["beautified_tag"][i].get("TPE2") for i in output.index]
         
+        # Remove the album artist when it is identical with track artist.
         if track_artist == album_artist:
-            [output["beautified_tag"][i].pop("TPE2", None) for i in output.index] # Remove the tag.
+            [output["beautified_tag"][i].pop("TPE2", None) for i in output.index] # Remove the TPE2 tag.
+        
+        # Move album artist to track artist, if track artist is not available.
+        if all(x is not None for x in album_artist) and all(x is None for x in track_artist):
+            # Copy tag from TPE2 to TPE1
+            output["beautified_tag"] = [
+                {k:output["beautified_tag"][i].get("TPE2") if k in ["TPE1"] else v for (k, v) in output["beautified_tag"][i].items()}
+                for i in output.index]
+            
+            [output["beautified_tag"][i].pop("TPE2", None) for i in output.index] # Remove the TPE2 tag.
         
         return(output)
     
     
-    
-    
     def beautify_track_number(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
-        """Beautifying the track number by adding/correcting leading zeros."""
-        
-        # Be aware that there are cases, where the first track number from cd 2 is not a 1 but continues the counting from disc 1.
-        
+        """Beautifying the track number by adding/correcting leading zeros.""" # Be aware that there are cases, where the first track number from cd 2 is not a 1 but continues the counting from disc 1.
         
         output = df_iteration
         
