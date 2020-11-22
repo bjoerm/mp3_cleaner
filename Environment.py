@@ -6,7 +6,7 @@ from pathlib import Path  # For getting the parentfolder of the found mp3.
 import shutil  # For copying folders to create backups.
 
 
-class Environment: # TODO Find a more fitting name. # TODO Should this be better a static class?
+class Environment: # TODO Find a more fitting name.
 
     def __init__(self, input_path: str, wip_path: str):
 
@@ -24,7 +24,9 @@ class Environment: # TODO Find a more fitting name. # TODO Should this be better
 
 
     def _copy_files_to_working_folder(self):
-        """ Setting up the workspace. """
+        """
+        Setting up the workspace.
+        """
         
         # Delete previously existing working folder, if it exists.
         if os.path.exists(self.wip_path):
@@ -35,7 +37,9 @@ class Environment: # TODO Find a more fitting name. # TODO Should this be better
 
 
     def get_files_and_folders(self):
-        """ This function will return a two column data frame with all mp3 files and the folder that contains the .mp3 file. """
+        """
+        This function will return a two column data frame with all mp3 files and the folder that contains the .mp3 file.
+        """
         
         # Grabs all mp3 files in the defined folder.
         files_list = glob.glob(
@@ -50,11 +54,10 @@ class Environment: # TODO Find a more fitting name. # TODO Should this be better
         self.files_and_folders = files # Updating the self data frame.
 
 
-
-
-
     def convert_file_extension_to_lowercase(self):
-        """ Convert file extension to lowercase for all mp3's in working folder. """
+        """
+        Convert file extension to lowercase for all mp3's in working folder.
+        """
 
         self.get_files_and_folders() # Ensure that this self data frame is updated.
         

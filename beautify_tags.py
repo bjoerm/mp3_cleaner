@@ -17,9 +17,9 @@ class TagBeautifier:
     """
     
     @classmethod
-    def beautify_tags(cls, tags: pd.Series) -> pd.Series:
+    def beautify_tags(cls, tags: pd.Series, path: str) -> pd.Series:
         """
-        This is the main function that is called for beautifying id3 tags. It takes the id3 tags from a folder (as a pd.Series) and beautifies them. It returns a pd.Series again.
+        This is the main function that is called for beautifying id3 tags. It takes the id3 tags from a folder (as a pd.Series) and beautifies them. The path is used to look for additional information, like about the possible disc number. The method returns a pd.Series again.
         """
         
         untouched_tag = tags.copy()
@@ -29,7 +29,7 @@ class TagBeautifier:
         tags = cls._beautify_strings(tags=tags)
         tags = cls._check_obsolescence_of_album_artist(tags=tags)
         tags = cls._beautify_track_number(tags=tags)
-        tags = cls._beautify_disc_number(tags=tags)
+        tags = cls._beautify_disc_number(tags=tags, path=path)
         tags = cls._beautify_date(tags=tags)
         
         tags = pd.Series(tags) # Converting back into a pd.Series.
@@ -117,7 +117,7 @@ class TagBeautifier:
         return(output)
     
     @staticmethod
-    def _beautify_disc_number(tags: list) -> list:
+    def _beautify_disc_number(tags: list, path: str=None) -> list:
         """
         Beautifying the disc number by removing it, when it is disc number = 1 unless a) there are tags showing multiple disc numbers in the same folder OR b) the file path has "CD 1" (or similar) in it. In these two cases, keep it. If disc number > 1, also keep it.
         """
@@ -133,25 +133,23 @@ class TagBeautifier:
         if helper_different_disc_number is None: # There is no disc number tag.
             pass
         
-        elif len(helper_different_disc_number) > 1: # There are multiple disc numbers in the same folder.
+        elif len(helper_different_disc_number) > 1: # There are multiple different disc numbers in the same folder.
             pass
         
         elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] != "1": # There is only one disc number and that is not disc number 1.
             pass
         
-        # TODO The following part needs to be restored! Checking the file path for a "cd xy" string.
-        # elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1": # There is only one disc number and that is disc number 1.
+        
+        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1": # There is only one disc number and that is disc number 1.
             
-        #     helper_folder_contains_cd_string = str(output["folder"][0])
+            helper_folder_contains_cd_string = has_cd_string_in_folder_name(path)
             
-        #     helper_folder_contains_cd_string = self._has_cd_string_in_folder_name(helper_folder_contains_cd_string)
-            
-        #     if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
-        #         pass
+            if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
+                pass
             
             
-        #     if helper_folder_contains_cd_string == False: # If there is no a " cd" string in the folder name, remove the disc number.
-        #         [output[i].pop("TPOS", None) for i in range(len(output))] # Remove the tag.
+            if helper_folder_contains_cd_string == False: # If there is no a " cd" string in the folder name, remove the disc number.
+                [output[i].pop("TPOS", None) for i in range(len(output))] # Remove the tag.
             
         
         return(output)

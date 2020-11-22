@@ -21,7 +21,7 @@ class ProcessMp3:
         
         # Work from folder to folder.
         for i in self.unique_mp3_folders:
-            print(i)
+            print("Processing: " + str(i))
             
             df_iteration = None # Cleaning the iteration df at the start of each loop.
             
@@ -37,11 +37,11 @@ class ProcessMp3:
             
             
             # Remove encoding information and only keep the text.
-            df_iteration = self.remove_string_encoding_information(df_iteration=df_iteration)
+            df_iteration = self.remove_string_encoding_information(tags=df_iteration["unchanged_tag"].copy())
             
             
             # Pass tag on to the beautifier utility class.
-            df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy())
+            df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy(), path = str(i)) # str(i) refers to the currently processed folder.
             
             
             # Delete all existing tags from the ID3 object.
@@ -124,20 +124,28 @@ class ProcessMp3:
     
     
     
-    # TODO What to do with this part? Move it to string_beautification? But might need to adapt code then to make it work with only pd.Series and not whole DataFrame as input.
-    def remove_string_encoding_information(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
+    @staticmethod
+    def remove_string_encoding_information(tags: pd.Series) -> pd.Series:
         """
-        Getting rid of the encoding part and only keeping the "text", so it will later be unifiedly be saved as UTF8 and not e.g. LATIN1. So changing 'TALB(encoding=<Encoding.LATIN1: 0>, text=['Stellaris : Ancient Relics'])' into 'TALB: 'Stellaris : Ancient Relics'). Not touching the rating field ("POPM:no@email") which does not contain a "text" element.
+        Getting rid of the encoding part and only keeping the "text", so it will later be unifiedly be saved as UTF8 and not e.g. LATIN1. So changing 'TALB(encoding=<Encoding.LATIN1: 0>, text=['Stellaris : Ancient Relics'])' into a simple dictionary 'TALB: 'Stellaris : Ancient Relics'). 
         """
+        output = tags.copy()
         
-        unchanged_tag = [dict(
-            (k, df_iteration["unchanged_tag"][i].get(k).text[0] if k != "POPM:no@email" else df_iteration["unchanged_tag"][i].get(k)) for k in df_iteration["unchanged_tag"][i]
-            ) for i in df_iteration.index] # There can be multiple tags attached. The [0] from .text[0] ensures that only the first element is taken. Without it, the text element would also be a list of strings and not a string (yet).
+        output = [
+            dict(
+                    (
+                        k
+                        , output[i].get(k).text[0] if k != "POPM:no@email" # Not touching the rating field ("POPM:no@email") which does not contain a "text" element.
+                        else output[i].get(k)
+                    ) for k in output[i]
+                ) for i in range(len(output))
+            ]
         
-        # Updating the column with the selected tag.
-        df_iteration["unchanged_tag"] = unchanged_tag
+        output = pd.Series(output) # Converting back into a pd.Series.
         
-        return(df_iteration)
+        assert len(output) == len(tags), "Test for not loosing tags."
+        
+        return(output)
 
     
     

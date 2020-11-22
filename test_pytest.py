@@ -1,6 +1,7 @@
 from beautify_string import string_beautification
 from beautify_disc_and_track_number import track_number_beautification
 from beautify_disc_and_track_number import extract_track_number_from_slash_format
+from beautify_disc_and_track_number import has_cd_string_in_folder_name
 from beautify_date import extract_year
 from tag_management import ProcessMp3
 
@@ -42,37 +43,36 @@ def test_track_number_beautification():
     assert track_number_beautification(track_number="01/16", helper_length_max=2, minimum_length=2) == "01", "Test track number slash tracks on disc 2"
     assert track_number_beautification(track_number="01", helper_length_max=2, minimum_length=2) == "01", "Test existing leading zero 1"
     assert track_number_beautification(track_number="01", helper_length_max=3, minimum_length=2) == "001", "Test existing leading zero 2"
-    assert track_number_beautification(track_number="", helper_length_max=3, minimum_length=2) == "", "Test existing leading zero 2"
-    # assert track_number_beautification(track_number="01", helper_length_max=1) == "1", "Test removing existing leading zero"
+    assert track_number_beautification(track_number="", helper_length_max=3, minimum_length=2) == "", "Test empty input"
+    assert track_number_beautification(track_number="01", helper_length_max=1) == "1", "Test removing existing leading zero 1"
+    assert track_number_beautification(track_number="001", helper_length_max=2) == "01", "Test removing existing leading zeros 2"
 
 
 def test_mp3_tags_has_cd_string_in_folder_name():
     """Testing the complex regex."""
     
-    tags = ProcessMp3(selected_id3_fields="", files_and_folders="") # Initialize empty class.
-    
-    assert tags._has_cd_string_in_folder_name("cd 1") == True
-    assert tags._has_cd_string_in_folder_name("cd3") == True
-    assert tags._has_cd_string_in_folder_name("cd  2asd") == False
-    assert tags._has_cd_string_in_folder_name("cd  2 asd") == True
-    assert tags._has_cd_string_in_folder_name("cd2aasdfsd") == False
-    assert tags._has_cd_string_in_folder_name("12_cd2aasdfsd") == False
-    assert tags._has_cd_string_in_folder_name("asd cd2") == True
-    assert tags._has_cd_string_in_folder_name("2cd") == True
-    assert tags._has_cd_string_in_folder_name("2013-2CD-2013-C4") == True
-    assert tags._has_cd_string_in_folder_name("_cd2") == True
-    assert tags._has_cd_string_in_folder_name(",cd2 ") == True
-    assert tags._has_cd_string_in_folder_name("-23") == False
-    assert tags._has_cd_string_in_folder_name("192cd2 ") == False
-    assert tags._has_cd_string_in_folder_name("-cd23") == True
-    assert tags._has_cd_string_in_folder_name("-1cd-") == True
-    assert tags._has_cd_string_in_folder_name("- 1 cd -") == True
-    assert tags._has_cd_string_in_folder_name(" cd 2 ") == True
-    assert tags._has_cd_string_in_folder_name("_1 cd_") == True
-    assert tags._has_cd_string_in_folder_name("2cdaasdf") == False
-    assert tags._has_cd_string_in_folder_name("cd123455") == False
-    assert tags._has_cd_string_in_folder_name(None) == False
-    assert tags._has_cd_string_in_folder_name(50) == False
+    assert has_cd_string_in_folder_name("cd 1") == True
+    assert has_cd_string_in_folder_name("cd3") == True
+    assert has_cd_string_in_folder_name("cd  2asd") == False
+    assert has_cd_string_in_folder_name("cd  2 asd") == True
+    assert has_cd_string_in_folder_name("cd2aasdfsd") == False
+    assert has_cd_string_in_folder_name("12_cd2aasdfsd") == False
+    assert has_cd_string_in_folder_name("asd cd2") == True
+    assert has_cd_string_in_folder_name("2cd") == True
+    assert has_cd_string_in_folder_name("2013-2CD-2013-C4") == True
+    assert has_cd_string_in_folder_name("_cd2") == True
+    assert has_cd_string_in_folder_name(",cd2 ") == True
+    assert has_cd_string_in_folder_name("-23") == False
+    assert has_cd_string_in_folder_name("192cd2 ") == False
+    assert has_cd_string_in_folder_name("-cd23") == True
+    assert has_cd_string_in_folder_name("-1cd-") == True
+    assert has_cd_string_in_folder_name("- 1 cd -") == True
+    assert has_cd_string_in_folder_name(" cd 2 ") == True
+    assert has_cd_string_in_folder_name("_1 cd_") == True
+    assert has_cd_string_in_folder_name("2cdaasdf") == False
+    assert has_cd_string_in_folder_name("cd123455") == False
+    assert has_cd_string_in_folder_name(None) == False
+    assert has_cd_string_in_folder_name(50) == False
 
 
 def test_mp3_tags_extract_year():
@@ -94,8 +94,8 @@ def test_mp3_tags_extract_year():
     assert extract_year("11.11.2020") == "2020"
     assert extract_year("11.11.11") == "11.11.11"
     assert extract_year("11-11-11") == "11-11-11"
-    assert extract_year(2020) == "2020" # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
-    assert extract_year(1980) == "1980" # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert extract_year(2020) == "2020"
+    assert extract_year(1980) == "1980"
     assert extract_year(None) == None
 
 
@@ -108,6 +108,6 @@ def test_mp3_extract_track_number_from_slash_format():
     assert extract_track_number_from_slash_format("1") == "1"
     assert extract_track_number_from_slash_format("1/") == "1"
     assert extract_track_number_from_slash_format("1/16") == "1"
-    assert extract_track_number_from_slash_format(1) == "1" # TODO Nice to have to have a solution for this. However, this should normally not be a possible case.
+    assert extract_track_number_from_slash_format(1) == "1"
     assert extract_track_number_from_slash_format(None) == None
 

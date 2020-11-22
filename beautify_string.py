@@ -1,4 +1,4 @@
-# TODO This should be a utility class! With many different methods so they are test-able on their on...
+# TODO This should be a utility class! With many different methods so they are test-able on their on!!!
 
 
 # TODO Check case of having special characters (Umlaute etc.).
