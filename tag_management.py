@@ -37,7 +37,7 @@ class ProcessMp3:
             
             
             # Remove encoding information and only keep the text.
-            df_iteration = self.remove_string_encoding_information(tags=df_iteration["unchanged_tag"].copy())
+            df_iteration["unchanged_tag"] = self.remove_string_encoding_information(tags=df_iteration["unchanged_tag"].copy())
             
             
             # Pass tag on to the beautifier utility class.
