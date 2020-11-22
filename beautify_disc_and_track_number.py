@@ -1,5 +1,7 @@
 import re
 
+# TODO Shouldn't this be a utility class?
+
 def track_number_beautification(track_number: str, helper_length_max: int, minimum_length: int = 2) -> str:
     """
     Beautifying the track numbers.
@@ -28,3 +30,35 @@ def track_number_beautification(track_number: str, helper_length_max: int, minim
     # TODO Add case to remove too many leading zeros!
     
     return(track_number_beautified)
+
+
+
+def extract_track_number_from_slash_format(string: str) -> str:
+    """
+    Replace any slash (and if there integers) after an initial interger.
+    For dealing with cases like "01/16" or "1/" for the track number.
+    """
+    
+    output = string
+    
+    if output is not None: # Dealing with the special of None - which is not converted into a string.
+        output = str(output)
+    
+    
+    try:
+        output = re.sub("(?<=\d)\/\d*", "", output)
+    except:
+        pass # If for example None is entered, return None untouched.
+    
+    return(output)
+
+
+
+def has_cd_string_in_folder_name(string: str) -> bool:
+    """
+    Look for the strings related to the number of discs. E.g. " cd" or "2cd" in the folder name. Could have also looked in the file name instead, but went for folder to have a folder-wide unique handling.
+    """
+    
+    output = bool(re.search("(^|\W|_)cd(\d{1,2}|\W{1,2}\d{1,2})([^a-zA-Z0-9]|$)|(^|\W|_)(\d{1,2}|\d{1,2}\W{1,2})cd([^a-zA-Z0-9]|$)", str(string), flags=re.IGNORECASE)) # Rather complex regex... Thus, put this into a separate function, so it is easier to include in unittests.
+    
+    return(output)

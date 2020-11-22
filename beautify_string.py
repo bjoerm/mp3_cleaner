@@ -1,8 +1,13 @@
+# TODO This should be a utility class! With many different methods so they are test-able on their on...
+
+
+# TODO Check case of having special characters (Umlaute etc.).
+
 
 # TODO Maybe pause script and ask user (if that is easily possible), otherwise just halt in case when there are special characters like % and $
 # TODO Unify hyphens into - (might need the unicode for the longer hyphens for that).
 # TODO Expand the a-zA-Z for German umlaute: [^\x00-\x7F(?:\u00c4, \u00e4,\u00d6,\u00f6,\u00dc,\u00fc,\u00df)] https://stackoverflow.com/questions/22017723/regex-for-umlaut
-# TODO Rectangular brackets into round brackets. [] into ()
+# TODO Turn rectangular brackets (in tags) into round brackets. [] into ()
 
 
 import re # Regular expressions
