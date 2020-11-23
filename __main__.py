@@ -24,9 +24,7 @@ def main():
     tags.improve_tags()
 
 
-    # print(env.files_and_folders)
-
 if __name__ == "__main__":
     main()
 
-    print("Finished")
+    print("Script finished")
