@@ -2,11 +2,9 @@
 
 
 
-from beautify_string import string_beautification
-from beautify_disc_and_track_number import extract_track_number_from_slash_format
-from beautify_disc_and_track_number import track_number_beautification
-from beautify_disc_and_track_number import has_cd_string_in_folder_name
-from beautify_date import extract_year
+from beautify_string import beautify_string
+from beautify_disc_and_track_number import beautify_disc_and_track_number
+from beautify_date import beautify_date
 
 import pandas as pd
 
@@ -49,12 +47,12 @@ class TagBeautifier:
         
         # Beautifying the album and song title.
         output = [
-            {k:string_beautification(v) if k in ["TALB", "TIT2"] else v for (k, v) in output[i].items()} # Beautifying the album and song title.
+            {k:beautify_string.beautify_string(v) if k in ["TALB", "TIT2"] else v for (k, v) in output[i].items()} # Beautifying the album and song title.
             for i in range(len(output))]
         
         # Beautifying the album artist and song artist. Difference here is that any leading "The" is cut.
         output = [
-            {k:string_beautification(v, remove_leading_the=True) if k in ["TPE1", "TPE2"] else v for (k, v) in output[i].items()}
+            {k:beautify_string.beautify_string(v, remove_leading_the=True) if k in ["TPE1", "TPE2"] else v for (k, v) in output[i].items()}
             for i in range(len(output))]
     
         return(output)
@@ -100,7 +98,7 @@ class TagBeautifier:
         ## Transforming "01/16" or "01/" into "01". This will then be transformed into an integer. # TODO Move this as part with the max into a method in track_number_beautification.
         helper_length_max = [
             int(
-                extract_track_number_from_slash_format(output[i].get("TRCK"))
+                beautify_disc_and_track_number.extract_track_number_from_slash_format(output[i].get("TRCK"))
                 ) for i in range(len(output))
             ]
         
@@ -111,7 +109,7 @@ class TagBeautifier:
         # TODO Deal with the case where no album name is present. Then do not do anything with the track numbers but keep them as they are. E.g. passing None as helper_length_max into the function already takes care of that.
         
         output = [
-            {k:track_number_beautification(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} # Beautifying the track number.
+            {k:beautify_disc_and_track_number.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} # Beautifying the track number.
             for i in range(len(output))]
         
         return(output)
@@ -142,7 +140,7 @@ class TagBeautifier:
         
         elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1": # There is only one disc number and that is disc number 1.
             
-            helper_folder_contains_cd_string = has_cd_string_in_folder_name(path)
+            helper_folder_contains_cd_string = beautify_disc_and_track_number.has_cd_string_in_folder_name(path)
             
             if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
                 pass
@@ -164,7 +162,7 @@ class TagBeautifier:
         output = tags
         
         output = [
-            {k: extract_year(v) if k in ["TDRC"] else v for (k, v) in output[i].items()} # Shorten to YYYY.
+            {k: beautify_date.extract_year(v) if k in ["TDRC"] else v for (k, v) in output[i].items()} # Shorten to YYYY.
             for i in range(len(output))]
     
         return(output)
