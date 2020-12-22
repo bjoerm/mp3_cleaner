@@ -119,7 +119,7 @@ class TagBeautifier:
         """
         Beautifying the disc number by removing it, when it is disc number = 1 unless a) there are tags showing multiple disc numbers in the same folder OR b) the file path has "CD 1" (or similar) in it. In these two cases, keep it. If disc number > 1, also keep it.
         """
-        # TODO Nice to have expansion: Delete leading zeros from the disc number.
+        # TODO Nice to have expansion: Delete leading zeros from the disc number. Or always have two digit long cd number.
         
         output = tags
         
