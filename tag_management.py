@@ -3,41 +3,35 @@ import pandas as pd
 from beautify_tags import TagBeautifier
 
 
-class ProcessMp3:
+class TagManager:
     """
     This class gets the folder list from the Environment class as input. It then goes iteratively through each folder, reads the tags from all MP3 files in that folder, beautifies the tags from these files and overwrites them afterwards.
     """
-    
-    
-    def __init__(self, selected_id3_fields, files_and_folders):
-        self.files_and_folders = files_and_folders
-        self.unique_mp3_folders = []
-        self.selected_id3_fields = selected_id3_fields # A dictionary that has as key the name of the tag (e.g. TALB) and as value what kind of data that tag contains (e.g. "String").
-    
-    
-    
-    def improve_tags(self):
-        self._get_unique_mp3_folders()
+
+
+    @classmethod
+    def improve_tags(cls, selected_id3_fields: list, files_and_folders: list):
+        unique_mp3_folders = cls._get_unique_mp3_folders(files_and_folders=files_and_folders)
         
         # Work from folder to folder.
-        for i in self.unique_mp3_folders:
+        for i in unique_mp3_folders:
             print("Processing: " + str(i))
             
             df_iteration = None # Cleaning the iteration df at the start of each loop.
             
-            df_iteration = self.files_and_folders[(self.files_and_folders.folder == i)]
+            df_iteration = files_and_folders[(files_and_folders.folder == i)] # Selecting the files in the i'th unique folder. # TODO Should this be done via .loc?
             
             # Read all tags in folder
-            df_iteration = self.read_id3_tags_in_folder(df_iteration = df_iteration)
+            df_iteration = cls.read_id3_tags_in_folder(df_iteration = df_iteration)
             
             
             # Select and copy specified tag fields.
-            df_iteration = self.select_tags(df_iteration=df_iteration)
-            df_iteration = self.copy_selected_tags(df_iteration=df_iteration)
+            df_iteration = cls.select_tags(df_iteration=df_iteration, selected_id3_fields=selected_id3_fields)
+            df_iteration = cls.copy_selected_tags(df_iteration=df_iteration)
             
             
             # Remove encoding information and only keep the text.
-            df_iteration["unchanged_tag"] = self.remove_string_encoding_information(tags=df_iteration["unchanged_tag"].copy())
+            df_iteration["unchanged_tag"] = cls.remove_string_encoding_information(tags=df_iteration["unchanged_tag"].copy())
             
             
             # Pass tag on to the beautifier utility class.
@@ -48,38 +42,42 @@ class ProcessMp3:
             [df_iteration["id3"][i].delete() for i in df_iteration.index]
 
 
-            df_iteration["id3"] = [self._save_tags_to_single_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index]
+            df_iteration["id3"] = [cls._save_tags_to_single_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index]
 
             
             # Write beautified tag to file.
             [df_iteration["id3"][i].save(v1 = 0, v2_version = 4) for i in df_iteration.index] # Saving only as id3v2.4 tags and not as id3v1 at all.
     
     
-    def _get_unique_mp3_folders(self):
+    @staticmethod
+    def _get_unique_mp3_folders(files_and_folders: list) -> list:
         """
         Get list of unique folders with mp3 files in it. This will be a helper for a following loop.
         """
 
-        self.unique_mp3_folders = self.files_and_folders.folder.unique()
-        self.unique_mp3_folders = list(self.unique_mp3_folders).copy()
+        unique_mp3_folders = files_and_folders.copy()
+        unique_mp3_folders = unique_mp3_folders.folder.unique()
+        unique_mp3_folders = list(unique_mp3_folders)
+        
+        return(unique_mp3_folders)
 
     
-    
-    def read_id3_tags_in_folder(self, df_iteration: pd.DataFrame) -> pd.DataFrame: 
+    @classmethod
+    def read_id3_tags_in_folder(cls, df_iteration: pd.DataFrame) -> pd.DataFrame: # TODO Could get rid of the cls, once _attach_column_to_df_iteration is removed/replaced.
         """
         Read the whole id3 tags for all provided files.
         """
 
-        id3 = [self._read_id3_tag_from_single_file(i) for i in df_iteration["file"]] # Read all tags.
+        id3 = [cls._read_id3_tag_from_single_file(i) for i in df_iteration["file"]] # Read all tags.
         
-        # Attaching a column with the read tag.
-        df_iteration = self._attach_column_to_df_iteration(data_for_series=id3, series_name="id3", df_iteration=df_iteration)
+        # Attaching a column with the tag that was read.
+        df_iteration = cls._attach_column_to_df_iteration(data_for_series=id3, series_name="id3", df_iteration=df_iteration)
         
         return(df_iteration)
 
     
-    
-    def _read_id3_tag_from_single_file(self, filepath): 
+    @staticmethod
+    def _read_id3_tag_from_single_file(filepath): 
         """
         Read the whole id3 tag for a single file.
         """
@@ -93,28 +91,33 @@ class ProcessMp3:
     
     
     
-    
-    def select_tags(self, df_iteration) -> pd.DataFrame:
+    @classmethod
+    def select_tags(cls, df_iteration: pd.DataFrame, selected_id3_fields: list) -> pd.DataFrame: # TODO Could get rid of the cls, once _attach_column_to_df_iteration is removed/replaced.
         """
         Select the specified tag fields.
         """
         
-        unchanged_tag = [list(i.keys() & self.selected_id3_fields.keys()) for i in df_iteration["id3"]]
+        unchanged_tag = [list(i.keys() & selected_id3_fields.keys()) for i in df_iteration["id3"]]
         
         # Attaching a column with the selected tag.
-        df_iteration = self._attach_column_to_df_iteration(data_for_series=unchanged_tag, series_name="unchanged_tag", df_iteration=df_iteration)
+        df_iteration = cls._attach_column_to_df_iteration(data_for_series=unchanged_tag, series_name="unchanged_tag", df_iteration=df_iteration)
         
         return(df_iteration)
     
     
-    def copy_selected_tags(self, df_iteration: pd.DataFrame) -> pd.DataFrame:
+    @staticmethod
+    def copy_selected_tags(df_iteration: pd.DataFrame) -> pd.DataFrame:
         """
         Copying/filling the original tag information (but only) for the selected tag fields.
         """
         
-        unchanged_tag = [dict(
-            (k, df_iteration["id3"][i].get(k)) for k in df_iteration["unchanged_tag"][i] if k in df_iteration["id3"][i]
-            ) for i in df_iteration.index] # Nested list comprehension adaptation of https://stackoverflow.com/questions/6827834/how-to-filter-a-dict-to-contain-only-keys-in-a-given-list.
+        unchanged_tag = [
+            dict(
+                (
+                    k
+                    , df_iteration["id3"][i].get(k)) for k in df_iteration["unchanged_tag"][i] if k in df_iteration["id3"][i]
+                ) for i in df_iteration.index
+            ] # Nested list comprehension adaptation of https://stackoverflow.com/questions/6827834/how-to-filter-a-dict-to-contain-only-keys-in-a-given-list.
         
         # Updating the column with the selected tag.
         df_iteration["unchanged_tag"] = unchanged_tag
@@ -129,6 +132,7 @@ class ProcessMp3:
         """
         Getting rid of the encoding part and only keeping the "text", so it will later be unifiedly be saved as UTF8 and not e.g. LATIN1. So changing 'TALB(encoding=<Encoding.LATIN1: 0>, text=['Stellaris : Ancient Relics'])' into a simple dictionary 'TALB: 'Stellaris : Ancient Relics'). 
         """
+        
         output = tags.copy()
         
         output = [
@@ -148,8 +152,8 @@ class ProcessMp3:
         return(output)
 
     
-    
-    def _save_tags_to_single_id3_object(self, id3, beautified_tag):
+    @staticmethod
+    def _save_tags_to_single_id3_object(id3, beautified_tag):
         """
         Save beautified tags to id3 object. This function takes only on row from df_iteration at a time.
         """
