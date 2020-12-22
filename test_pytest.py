@@ -1,7 +1,7 @@
 from beautify_string import beautify_string
 from beautify_disc_and_track_number import beautify_disc_and_track_number
 from beautify_date import beautify_date
-from tag_management import ProcessMp3
+from tag_management import TagManager
 
 def test_string_beautification():
     assert beautify_string.beautify_string("Test's test's test`s test´s test'S") == "Test's Test's Test's Test's test's", "Test hyphens"
