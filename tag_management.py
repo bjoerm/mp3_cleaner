@@ -4,13 +4,15 @@ from beautify_tags import TagBeautifier
 
 
 class TagManager:
-    """
-    This class gets the folder list from the Environment class as input. It then goes iteratively through each folder, reads the tags from all MP3 files in that folder, beautifies the tags from these files and overwrites them afterwards.
-    """
-
 
     @classmethod
     def improve_tags(cls, selected_id3_fields: list, files_and_folders: pd.DataFrame):
+        """
+        This method gets the folder list from the Environment class as input. It then goes iteratively through each folder and reads the tags from all MP3 files in that folder. The read tags are saved as mutagen ID3 objects. These tags are then beautified. The beautified tags then replace the originally read mutagen ID3 objects. Finally these are used to overwrite the tags in the mp3 files.
+        """
+
+        
+        
         unique_mp3_folders = cls._get_unique_mp3_folders(files_and_folders=files_and_folders)
         
         # Work from folder to folder.
@@ -23,7 +25,7 @@ class TagManager:
 
             
             # Read all tags in folder
-            df_iteration = cls._read_id3_tags_in_folder(df_iteration=df_iteration)
+            df_iteration["id3"] = cls._read_id3_tags_in_folder(paths_to_files=df_iteration["file"])
             
             
             # Keep only selected tags
@@ -38,18 +40,13 @@ class TagManager:
             df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy(), path = str(i)) # str(i) refers to the currently processed folder.
             
             
-            # Delete all existing tags from the ID3 object.
-            [df_iteration["id3"][i].delete() for i in df_iteration.index]
-
-            # Create new ID3 object from beautified tag.
-            df_iteration["id3"] = [cls._save_tags_to_single_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index] # This will pass each i (file's ID3 tag) to the save function.
-
+            df_iteration["id3"] = cls._overwrite_tags_in_id3_object(id3_column=df_iteration["id3"], beautified_tag=df_iteration["beautified_tag"])
             
             # Write beautified tag to file.
-            [df_iteration["id3"][i].save(v1 = 0, v2_version = 4) for i in df_iteration.index] # Saving only as id3v2.4 tags and not as id3v1 at all.
-    
-    
-    
+            cls._write_beautified_tag_to_files(id3_column=df_iteration["id3"])
+        
+
+
     @staticmethod
     def _get_unique_mp3_folders(files_and_folders: list) -> list:
         """
@@ -76,18 +73,17 @@ class TagManager:
         return(df_iteration)
 
 
-    
     @classmethod
-    def _read_id3_tags_in_folder(cls, df_iteration: pd.DataFrame) -> pd.DataFrame:
+    def _read_id3_tags_in_folder(cls, paths_to_files: pd.Series) -> pd.Series:
         """
         Read the whole id3 tags for all provided files.
         """
 
-        df_iteration["id3"] = [cls._read_id3_tag_from_single_file(i) for i in df_iteration["file"]] # Read all tags.
+        id3 = [cls._read_id3_tag_from_single_file(i) for i in paths_to_files] # Read all tags.
         
-        return(df_iteration)
+        return(id3)
 
-    
+
     @staticmethod
     def _read_id3_tag_from_single_file(filepath): 
         """
@@ -102,7 +98,6 @@ class TagManager:
         return(id3) # Returns an ID3 object.
 
 
-    
     @staticmethod
     def _keep_only_selected_tags(id3_column: pd.Series, selected_id3_fields: list) -> pd.DataFrame:
         """
@@ -148,12 +143,29 @@ class TagManager:
         
         return(output)
 
+
+    @classmethod
+    def _overwrite_tags_in_id3_object(cls, id3_column: pd.Series, beautified_tag: pd.Series) -> pd.Series:
+        """
+        Overwrite existing tags from the ID3 object that is saved in the id3 column of the df_iteration.
+        """
+        # Delete all existing tags from the ID3 object.
+        [id3_column[i].delete() for i in id3_column.index]
+        
+        # Create new ID3 object from beautified tag.
+        id3_column = [cls._save_tags_to_single_id3_object(id3=id3_column[i], beautified_tag=beautified_tag[i]) for i in id3_column.index] # This will pass each i (file's ID3 tag) to the save function.
+        
+        return(id3_column)
+
+
     
     @staticmethod
     def _save_tags_to_single_id3_object(id3, beautified_tag):
         """
         Save beautified tags to id3 object. This function takes only on row from df_iteration at a time.
         """
+        
+        # TODO Should this be done as list comprehension?
 
         for key, value in beautified_tag.items():
 
@@ -169,4 +181,14 @@ class TagManager:
                 continue
         
         return(id3)
-    
+
+
+    @staticmethod
+    def _write_beautified_tag_to_files(id3_column: pd.Series):
+        """
+        Write the beautified tag from the id3 object to the respective files.
+        """
+        
+        # TODO Have some checks to ensure that the correct file is gets the correct tag.
+        
+        [id3_column[i].save(v1 = 0, v2_version = 4) for i in id3_column.index] # Saving only as id3v2.4 tags and not as id3v1 at all.
