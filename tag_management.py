@@ -27,8 +27,8 @@ class TagManager:
             
             
             # Keep only selected tags
-            df_iteration = cls._keep_only_selected_tags(df_iteration=df_iteration, selected_id3_fields=selected_id3_fields)
-            
+            # df_iteration = cls._keep_only_selected_tags(df_iteration=df_iteration, selected_id3_fields=selected_id3_fields) # TODO Remove
+            df_iteration["unchanged_tag"] = cls._keep_only_selected_tags(id3_column=df_iteration["id3"], selected_id3_fields=selected_id3_fields)
             
             # Remove encoding information and only keep the text.
             df_iteration["unchanged_tag"] = cls._remove_string_encoding_information(tags=df_iteration["unchanged_tag"])
@@ -42,7 +42,7 @@ class TagManager:
             [df_iteration["id3"][i].delete() for i in df_iteration.index]
 
             # Create new ID3 object from beautified tag.
-            df_iteration["id3"] = [cls._save_tags_to_single_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index]
+            df_iteration["id3"] = [cls._save_tags_to_single_id3_object(id3=df_iteration["id3"][i], beautified_tag=df_iteration["beautified_tag"][i]) for i in df_iteration.index] # This will pass each i (file's ID3 tag) to the save function.
 
             
             # Write beautified tag to file.
@@ -78,7 +78,7 @@ class TagManager:
 
     
     @classmethod
-    def _read_id3_tags_in_folder(cls, df_iteration: pd.DataFrame) -> pd.DataFrame: # TODO Could get rid of the cls, once _attach_column_to_df_iteration is removed/replaced.
+    def _read_id3_tags_in_folder(cls, df_iteration: pd.DataFrame) -> pd.DataFrame:
         """
         Read the whole id3 tags for all provided files.
         """
@@ -104,23 +104,23 @@ class TagManager:
 
     
     @staticmethod
-    def _keep_only_selected_tags(df_iteration: pd.DataFrame, selected_id3_fields: list) -> pd.DataFrame:
+    def _keep_only_selected_tags(id3_column: pd.Series, selected_id3_fields: list) -> pd.DataFrame:
         """
-        Creating a copy of the original tag information (but only) for the selected tag fields.
+        Filtering of the original tag information to only keep the defined tag fields.
         """
         
         # TODO This should be refactored to have only the id3 column (pd.Series), where every entry is a dictionary per file, as input and return an pd.Series of the same shape.
         
+        pass
+        
         unchanged_tag = [
             {
-                k:v for (k, v) in df_iteration["id3"][i].items() if k in selected_id3_fields
+                k:v for (k, v) in id3_column[i].items() if k in selected_id3_fields
             } # Selecting only the tags that are specified in selected_id3_fields
-            for i in df_iteration.index
+            for i in id3_column.index
             ]
         
-        df_iteration["unchanged_tag"] = unchanged_tag
-        
-        return(df_iteration)
+        return(unchanged_tag)
     
     
     
@@ -139,7 +139,7 @@ class TagManager:
                         , output[i].get(k).text[0] if k != "POPM:no@email" # Not touching the rating field ("POPM:no@email") which does not contain a "text" element.
                         else output[i].get(k)
                     ) for k in output[i]
-                ) for i in range(len(output))
+                ) for i in output.index
             ]
         
         output = pd.Series(output) # Converting back into a pd.Series.
@@ -170,18 +170,3 @@ class TagManager:
         
         return(id3)
     
-    
-    @staticmethod
-    def _attach_column_to_df_iteration(data_for_series, series_name: str, df_iteration: pd.DataFrame) -> pd.DataFrame:
-        """
-        Helper function for adding an object (e.g. list, series, ...) as column to a pd.DataFrame.
-        """
-        
-        # TODO This function is really not that good as it would not overwrite existing columns with the same name. Maybe go back to good old 'df_iteration["selected_tag"] = selected_tag'?
-        
-        series = pd.Series(data_for_series, name=series_name)
-        
-        df_iteration = df_iteration.reset_index(drop=True) # Required to match the following concat correctly.
-        df_iteration = pd.concat([df_iteration, series], axis=1, sort=False) # Used this instead of files.loc[:, "x"] = x to prevent SettingWithCopyWarning from happening.
-        
-        return(df_iteration)
