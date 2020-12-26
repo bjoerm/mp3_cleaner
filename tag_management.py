@@ -10,8 +10,6 @@ class TagManager:
         """
         This method gets the folder list from the Environment class as input. It then goes iteratively through each folder and reads the tags from all MP3 files in that folder. The read tags are saved as mutagen ID3 objects. These tags are then beautified. The beautified tags then replace the originally read mutagen ID3 objects. Finally these are used to overwrite the tags in the mp3 files.
         """
-
-        
         
         unique_mp3_folders = cls._get_unique_mp3_folders(files_and_folders=files_and_folders)
         
@@ -116,9 +114,8 @@ class TagManager:
             ]
         
         return(unchanged_tag)
-    
-    
-    
+
+
     @staticmethod
     def _remove_string_encoding_information(tags: pd.Series) -> pd.Series:
         """
