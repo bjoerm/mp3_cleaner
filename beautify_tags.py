@@ -48,12 +48,14 @@ class TagBeautifier:
         # Beautifying the album and song title.
         output = [
             {k:beautify_string.beautify_string(v) if k in ["TALB", "TIT2"] else v for (k, v) in output[i].items()} # Beautifying the album and song title.
-            for i in range(len(output))]
+            for i in range(len(output))
+            ]
         
         # Beautifying the album artist and song artist. Difference here is that any leading "The" is cut.
         output = [
             {k:beautify_string.beautify_string(v, remove_leading_the=True) if k in ["TPE1", "TPE2"] else v for (k, v) in output[i].items()}
-            for i in range(len(output))]
+            for i in range(len(output))
+            ]
     
         return(output)
     
@@ -110,7 +112,8 @@ class TagBeautifier:
         
         output = [
             {k:beautify_disc_and_track_number.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} # Beautifying the track number.
-            for i in range(len(output))]
+            for i in range(len(output))
+            ]
         
         return(output)
     
