@@ -1,4 +1,6 @@
 
+# TODO Should this be a utility function?
+
 import glob  # For reading files and folders.
 import os  # For file path check.
 import pandas as pd
