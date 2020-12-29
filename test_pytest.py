@@ -1,7 +1,7 @@
 from beautify_string import beautify_string
 from beautify_disc_and_track_number import beautify_disc_and_track_number
 from beautify_date import beautify_date
-from tag_management import TagManager
+
 
 def test_string_beautification():
     """
@@ -155,7 +155,6 @@ def test_track_number_beautification():
     """
     This tests the main/public method for beautifying track numbers. It contains all the (private) methods related to track numbers.
     """
-    assert beautify_disc_and_track_number.beautify_track_number(track_number="01", helper_length_max=1, minimum_length=1) == "1", "Test removing existing leading zero 1"
     assert beautify_disc_and_track_number.beautify_track_number(track_number="", helper_length_max=1, minimum_length=1) == ""
     assert beautify_disc_and_track_number.beautify_track_number(track_number="1", helper_length_max=1, minimum_length=1) == "1", "Test normal"
     assert beautify_disc_and_track_number.beautify_track_number(track_number="1", helper_length_max=2, minimum_length=2) == "01", "Test leading zeros 1"
