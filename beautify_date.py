@@ -2,7 +2,7 @@ import re
 
 class beautify_date:
     """
-    This utility class bundles id3 tag beautification methods for dates.
+    This utility class bundles id3 tag beautification methods for dates. This class beautifies a single string at a time.
     """
     
     @staticmethod
@@ -13,7 +13,10 @@ class beautify_date:
         
         output = string
         
-        if output is not None: # Dealing with the special of None - which is not converted into a string.
+        if output is None:
+            return(output)
+        
+        elif output is not None: # Dealing with the special of None - which is not converted into a string.
             output = str(output)
         
         try:
