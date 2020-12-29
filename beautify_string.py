@@ -11,7 +11,7 @@ import re # Regular expressions
 
 class beautify_string:
     """
-    This utility class bundles id3 tag beautification methods for strings.
+    This utility class bundles id3 tag beautification methods for strings. This class beautifies a single string at a time.
     """
     
     
@@ -107,7 +107,7 @@ class beautify_string:
         """
         output = text
         
-        output = re.sub(r"(?<=[a-zA-Z0-9]),(?=[a-zA-Z])", ", ", output, flags=re.IGNORECASE) # [a-zA-Z] does not contain German umlaute.
+        output = re.sub(r"(?<=[a-zA-Z]),(?=[a-zA-Z])|(?<=[0-9]),(?=[a-zA-Z])|(?<=[a-zA-Z]),(?=[0-9])", ", ", output, flags=re.IGNORECASE) # [a-zA-Z] does not contain German umlaute.
         
         return(output)
     
