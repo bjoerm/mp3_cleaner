@@ -11,7 +11,7 @@ import pandas as pd
 
 class TagBeautifier:
     """
-    This utility class bundles id3 tag beautification methods.
+    This utility class bundles id3 tag beautification methods. This class takes lists of the respective items (e.g. a list of track numbers). It then passes those to other classes that beautify single strings (e.g. one single track number).
     """
     
     @classmethod
