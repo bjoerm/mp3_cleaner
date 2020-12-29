@@ -46,11 +46,12 @@ class Environment: # TODO Find a more fitting name.
         # Grabs all mp3 files in the defined folder.
         files_list = glob.glob(
             self.wip_path + "/**/*.[mM][pP]3"  # glob itself seems to not care about whether file extension contain capital letters. Anyways, [mM][pP]3 is a bit safer than just mp3. This does not perceive .mp3a as .mp3. TODO Check whether it has problems with folders that contains the .mp3 somewhere.
-            , recursive=True)  # Recursive = True in combination with ** in the path will lead to a search in every folder and subfolder and subsubfolder and ...
+            , recursive=True # Recursive = True in combination with ** in the path will lead to a search in every folder and subfolder and subsubfolder and ...
+            )
 
         # Getting and attaching the folder path
         files = pd.DataFrame(data=files_list, columns=['file']) # Converting into a pandas data.frame and name the column.
-        files['file'] = files['file'].apply(Path)  # Getting the path, so the "parent" method can be used in the following line.
+        files['file'] = files['file'].apply(Path) # Getting the path, so the "parent" method can be used in the following line.
         files['folder'] = files['file'].apply(lambda x: x.parent) # Getting the folder of that respective file.
 
         self.files_and_folders = files # Updating the self data frame.
