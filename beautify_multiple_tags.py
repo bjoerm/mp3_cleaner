@@ -86,25 +86,27 @@ class TagBeautifier:
     @staticmethod
     def _beautify_track_number(tags: list) -> list:
         """
-        Beautifying the track number by adding/correcting leading zeros.
-        """ # Be aware that there are cases, where the first track number from cd 2 is not a 1 but continues the counting from disc 1. # TODO This can however be checked (by checking whether a disc number is available and check for lowest number for disc 2, 3, ...)
+        Beautifying the track number by adding/correcting leading zeros. The helper_lenght_max checks for the digits of the highest observed track number in the folder.
+        """
         
         output = tags
         
-        # Helper for number of tracks.
         
+        # Helper for number of tracks.
         ## Transforming "01/16" or "01/" into "01". This will then be transformed into an integer. # TODO Move this as part with the max into a method in track_number_beautification.
         helper_length_max = [
-            int(
-                beautify_disc_and_track_number.extract_track_number_from_slash_format(output[i].get("TRCK"))
-                ) for i in range(len(output))
+                beautify_disc_and_track_number.extract_track_number_from_slash_format(output[i].get("TRCK")) for i in range(len(output))
             ]
+        
+        helper_length_max = list(filter(None.__ne__, helper_length_max)) # Removing all None values. From: https://www.kite.com/python/answers/how-to-remove-none-from-a-list-in-python
+        
+        ## Edge case of all values being None values.
+        if len(helper_length_max) == 0:
+            return(output) # End method. Don't do any beautification.
         
         helper_length_max = max(helper_length_max) # Checking for the highest track number. Works also if multiple discs are present in the same folder.
         helper_length_max = len(str(helper_length_max)) # Converting into the number if digits.
         
-        
-        # TODO Deal with the case where no album name is present. Then do not do anything with the track numbers but keep them as they are. E.g. passing None as helper_length_max into the function already takes care of that.
         
         output = [
             {k:beautify_disc_and_track_number.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} # Beautifying the track number.

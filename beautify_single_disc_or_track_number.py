@@ -66,7 +66,10 @@ class beautify_disc_and_track_number:
         
         output = string
         
-        if output is not None: # Dealing with the special of None - which is not converted into a string.
+        if output is None:
+            return(None)
+        
+        else:
             output = str(output)
         
         
