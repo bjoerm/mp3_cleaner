@@ -1,3 +1,6 @@
+# TODO Add tests for the whole beautify_tags that contain real input (a list of dicts (which contain tags)) for testing of real life scenarios like a folder without any track numbers.
+
+
 from beautify_single_string import beautify_string
 from beautify_single_disc_or_track_number import beautify_disc_and_track_number
 from beautify_single_date import beautify_date
