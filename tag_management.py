@@ -21,7 +21,7 @@ class TagManager:
         
         # Work from folder to folder.
         for i in trange(len(unique_mp3_folders)): # Switch to range instead of trange if you don't want a progress bar from tqdm.
-            # print("Processing: " + str(unique_mp3_folders[i]))
+            print("Processing: " + str(unique_mp3_folders[i])) # TODO Include this better into tqdm.
             
             df_iteration = None # Cleaning the iteration df at the start of each loop.
             
@@ -41,6 +41,10 @@ class TagManager:
             
             # Remove files without (relevant ID3 tags).
             df_iteration = cls._skip_files_without_tags(df=df_iteration)
+            
+            ## Deal with case that all files in current folder can be without relevant tags (then continue to the next folder).
+            if len(df_iteration) == 0:
+                continue
             
             
             # Pass tag on to the beautifier utility class.
