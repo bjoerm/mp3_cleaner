@@ -9,7 +9,7 @@ from tag_management import TagManager
 
 
 def main():
-    # Get options
+    # Load options
     cfg = toml.load("options.toml", _dict=dict)
 
     # Set up environment, convert mp3 files to have a lowercase file extension and get list of mp3 files and their folder.

@@ -1,6 +1,6 @@
 from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 import pandas as pd
-from beautify_tags import TagBeautifier
+from beautify_multiple_tags import TagBeautifier
 
 
 class TagManager:

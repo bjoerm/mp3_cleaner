@@ -1,6 +1,6 @@
-from beautify_string import beautify_string
-from beautify_disc_and_track_number import beautify_disc_and_track_number
-from beautify_date import beautify_date
+from beautify_single_string import beautify_string
+from beautify_single_disc_or_track_number import beautify_disc_and_track_number
+from beautify_single_date import beautify_date
 
 
 def test_string_beautification():
