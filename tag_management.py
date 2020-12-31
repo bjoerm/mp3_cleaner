@@ -1,5 +1,6 @@
 import datetime
 from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
+from mutagen.mp3 import MP3 # Alternative to ID3 and ID3NoHeaderError.
 import pandas as pd
 from tqdm import trange
 
@@ -37,6 +38,9 @@ class TagManager:
             
             # Remove encoding information and only keep the text.
             df_iteration["unchanged_tag"] = cls._remove_string_encoding_information(tags=df_iteration["unchanged_tag"])
+            
+            # Remove files without (relevant ID3 tags).
+            df_iteration = cls._skip_files_without_tags(df=df_iteration)
             
             
             # Pass tag on to the beautifier utility class.
@@ -99,11 +103,25 @@ class TagManager:
         """
         Read the whole id3 tag for a single file.
         """
+
         
-        try:
-            id3 = ID3(filepath)
-        except ID3NoHeaderError:  # If there is no id3 tag in file, return None. # TODO Test this!
-            return None
+        # # The following returned still errors for mp3 files without an id3 tag. Despite the except ID3NoHeaderError.
+        # try:
+        #     id3 = ID3(filepath)
+        # except ID3NoHeaderError: #  ID3NoHeaderError # If there is no id3 tag in file, return None. # TODO Test this!
+        #     id3 = ID3()
+        #     # return None
+
+        # # The following works but seems to be a bit of a hack. TODO Think about it.
+        
+
+        mp3 = MP3(filepath)
+        if mp3.tags is None:
+            mp3.add_tags()
+        id3 = mp3.tags # Only fetching the id3 tag.
+        id3.filename = mp3.filename # Adding the filename as this is not passed.
+
+
 
         return(id3) # Returns an ID3 object.
 
@@ -151,6 +169,19 @@ class TagManager:
         assert len(output) == len(tags), "Test for not loosing tags."
         
         return(output)
+
+
+    @staticmethod
+    def _skip_files_without_tags(df: pd.DataFrame):
+        """
+        Skipping the files that have either no ID3 tag or that have no relevant/defined ID3 tag. They will be skipped in the following beautification as the tags are empty anyway.
+        """
+        
+        df = df[df.unchanged_tag != {}]
+        
+        df = df.reset_index(drop=True)
+        
+        return(df)
 
 
     @classmethod
