@@ -1,8 +1,10 @@
+import datetime
 from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 import pandas as pd
+from tqdm import trange
+
 from beautify_multiple_tags import TagBeautifier
 
-from tqdm import trange
 
 class TagManager:
 
@@ -13,6 +15,8 @@ class TagManager:
         """
         
         unique_mp3_folders = cls._get_unique_mp3_folders(files_and_folders=files_and_folders)
+        
+        df_log = pd.DataFrame()
         
         # Work from folder to folder.
         for i in trange(len(unique_mp3_folders)): # Switch to range instead of trange if you don't want a progress bar from tqdm.
@@ -44,6 +48,13 @@ class TagManager:
             # Write beautified tag to file.
             cls._write_beautified_tag_to_files(id3_column=df_iteration["id3"])
         
+            # Keep a log of the tags. Be aware that this might get big, if at some point the tag with an image of the album cover would be included.
+            df_log = df_log.append(df_iteration)
+        
+        
+        # Export a log of the untouched and beautified tags
+        df_log = df_log.astype(str)
+        df_log.to_parquet("logs\\log_" + str(datetime.datetime.now().strftime("%Y%m%d_%H%M%S")) + "_" + str(len(df_log)) + "_Tracks" + ".parquet")
 
 
     @staticmethod

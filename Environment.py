@@ -23,6 +23,9 @@ class Environment: # TODO Find a more fitting name.
 
         ## Convert all file extensions to lowercase
         self.convert_file_extension_to_lowercase()
+        
+        # Create a log folder (if it does not yet exist)
+        self.create_folder_for_logs()
 
 
     def _copy_files_to_working_folder(self):
@@ -72,3 +75,11 @@ class Environment: # TODO Find a more fitting name.
             os.rename(files[i], pre + ".mp3")  # Convert each file extention into lowercase.
 
         self.get_files_and_folders() # Ensure that this self data frame is updated after any potential changes have been done in this function.
+
+
+    def create_folder_for_logs(self):
+        """
+        Create a log folder, if it does not yet exist.
+        """
+        if not os.path.exists("logs"):
+            os.makedirs("logs")

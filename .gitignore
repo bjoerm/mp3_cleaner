@@ -1,9 +1,11 @@
 input/
 output/
-*.mp3
-*.code-workspace
+logs/
 venv/
 .idea/
 .vscode/
 __pycache__/
+*.mp3
+*.code-workspace
 *.pyc
+*.parquet
