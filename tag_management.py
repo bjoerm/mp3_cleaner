@@ -2,6 +2,7 @@ from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE
 import pandas as pd
 from beautify_multiple_tags import TagBeautifier
 
+from tqdm import trange
 
 class TagManager:
 
@@ -14,12 +15,12 @@ class TagManager:
         unique_mp3_folders = cls._get_unique_mp3_folders(files_and_folders=files_and_folders)
         
         # Work from folder to folder.
-        for i in unique_mp3_folders:
-            print("Processing: " + str(i))
+        for i in trange(len(unique_mp3_folders)): # Switch to range instead of trange if you don't want a progress bar from tqdm.
+            # print("Processing: " + str(unique_mp3_folders[i]))
             
             df_iteration = None # Cleaning the iteration df at the start of each loop.
             
-            df_iteration = cls._select_current_folder(files_and_folders=files_and_folders, current_unique_folder=i)
+            df_iteration = cls._select_current_folder(files_and_folders=files_and_folders, current_unique_folder=unique_mp3_folders[i])
 
             
             # Read all tags in folder
@@ -35,7 +36,7 @@ class TagManager:
             
             
             # Pass tag on to the beautifier utility class.
-            df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy(), path = str(i)) # str(i) refers to the currently processed folder.
+            df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy(), path = unique_mp3_folders[i]) # Input for path refers to the currently processed folder.
             
             
             df_iteration["id3"] = cls._overwrite_tags_in_id3_object(id3_column=df_iteration["id3"], beautified_tag=df_iteration["beautified_tag"])
