@@ -87,7 +87,7 @@ class beautify_disc_and_track_number:
         Look for the strings related to the number of discs. E.g. " cd" or "2cd" in the folder name. Could have also looked in the file name instead, but went for folder to have a folder-wide unique handling.
         """
         
-        output = bool(re.search(r"(^|\W|_)cd(\d{1,2}|\W{1,2}\d{1,2})([^a-zA-Z0-9]|$)|(^|\W|_)(\d{1,2}|\d{1,2}\W{1,2})cd([^a-zA-Z0-9]|$)", str(string), flags=re.IGNORECASE)) # Rather complex regex... Thus, put this into a separate function, so it is easier to include in unittests.
+        output = bool(re.search(r"(^|\W|_)cd(\d{1,2}|\W{1,2}\d{1,2})([^a-zA-Z\u0080-\uFFFF0-9]|$)|(^|\W|_)(\d{1,2}|\d{1,2}\W{1,2})cd([^a-zA-Z\u0080-\uFFFF0-9]|$)", str(string), flags=re.IGNORECASE)) # Rather complex regex... Thus, this was put into a separate method, so it is easier to include in unittests.
         
         return(output)
 

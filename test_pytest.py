@@ -11,7 +11,7 @@ def test_string_beautification():
     This tests the main/public method for beautifying strings. It contains all the (private) methods related to strings.
     """
     assert beautify_string.beautify_string("") == ""
-    assert beautify_string.beautify_string("Test's test's test`s test´s test'S") == "Test's Test's Test's Test's test's", "Test hyphens"
+    assert beautify_string.beautify_string("Test's test's test`s test´s") == "Test's Test's Test's Test's", "Test accents"
     assert beautify_string.beautify_string("Ac/Dc AC/DC ac/dc guns 'n' roses") == "ACDC ACDC ACDC Guns 'n' Roses", "Test edge cases"
     assert beautify_string.beautify_string(" lost in      space  Lost in Space ") == "Lost In Space Lost In Space", "Test spaces"
     assert beautify_string.beautify_string("where to? what now???") == "Where To What Now", "Question mark"
@@ -39,6 +39,8 @@ def test_string_beautification():
     assert beautify_string.beautify_string("Pt. 2") == "Part 2", "Test Part 2"
     assert beautify_string.beautify_string("Bomb Pt. 2") == "Bomb Part 2", "Test Part 3"
     assert beautify_string.beautify_string("test III") == "Test III"
+    assert beautify_string.beautify_string("äh") == "Äh"
+    assert beautify_string.beautify_string("äh !") == "Äh !"
     assert beautify_string.beautify_string(None) == None, "Test none"
 
 
@@ -76,12 +78,34 @@ def test_string_beautify_colons():
     assert beautify_string._beautify_colons("") == ""
     assert beautify_string._beautify_colons("Deus Ex: Human Revolution") == "Deus Ex - Human Revolution", "Colon followed by whitespace"
     assert beautify_string._beautify_colons("He: Hello") == "He - Hello", "Colon followed by whitespace"
+    assert beautify_string._beautify_colons("Deus : Ex") == "Deus - Ex"
+    assert beautify_string._beautify_colons("Deus: Ex") == "Deus - Ex"
+    assert beautify_string._beautify_colons("Über:Über") == "Über-Über"
+    assert beautify_string._beautify_colons("Über: Über") == "Über - Über"
+    assert beautify_string._beautify_colons("Ü: Ü") == "Ü - Ü"
+    assert beautify_string._beautify_colons("ß: ß") == "ß - ß"
+    assert beautify_string._beautify_colons("é: é") == "é - é"
     assert beautify_string._beautify_colons("Deus:Ex") == "Deus-Ex", "Colon followed by non-whitespace 1"
     assert beautify_string._beautify_colons("12:34") == "12-34", "Colon followed by non-whitespace 2"
     assert beautify_string._beautify_colons(" : ") == " - ", "Colon surrounded by whitespace"
     assert beautify_string._beautify_colons(":Ex") == "-Ex", "Colon surrounded by whitespace"
     assert beautify_string._beautify_colons("Ex:") == "Ex-", "Colon surrounded by whitespace"
+    assert beautify_string._beautify_colons("Ex:") == "Ex-", "Colon surrounded by whitespace"
 
+def test_enforce_round_brackets():
+    assert beautify_string._enforce_round_brackets("(Test)") == "(Test)"
+    assert beautify_string._enforce_round_brackets("(Test]") == "(Test)"
+    assert beautify_string._enforce_round_brackets("[Test]") == "(Test)"
+    assert beautify_string._enforce_round_brackets("[[Test]]") == "(Test)"
+    assert beautify_string._enforce_round_brackets("{Test}") == "(Test)"
+    assert beautify_string._enforce_round_brackets("⟨Test⟩") == "(Test)"
+
+
+
+def test_unify_hyphens():
+    assert beautify_string._unify_hyphens("Test-Case") == "Test-Case"
+    assert beautify_string._unify_hyphens("Test―Case") == "Test-Case"
+    assert beautify_string._unify_hyphens("Test‒Case") == "Test-Case"
 
 def test_string_replace_special_characters():
     assert beautify_string._replace_special_characters("") == ""
@@ -116,44 +140,53 @@ def test_string_remove_leading_the():
     assert beautify_string._remove_leading_the(remove_leading_the=True, text="The") == "The"
 
 
-
 def test_string_deal_with_special_words():
-    assert beautify_string._deal_with_special_words_and_bands(text="") == ""
-    assert beautify_string._deal_with_special_words_and_bands(text=" Featuring ") == " Feat. "
-    assert beautify_string._deal_with_special_words_and_bands(text="Featuring ") == "Feat. "
-    assert beautify_string._deal_with_special_words_and_bands(text="Featuring") == "Featuring"
-    assert beautify_string._deal_with_special_words_and_bands(text="(Featuring)") == "(Featuring)"
-    assert beautify_string._deal_with_special_words_and_bands(text="(Featuring abc)") == "(Feat. abc)"
-    assert beautify_string._deal_with_special_words_and_bands(text=" FEATURING ") == " Feat. "
-    assert beautify_string._deal_with_special_words_and_bands(text="Test Featuring") == "Test Featuring"
-    assert beautify_string._deal_with_special_words_and_bands(text=" Pt. 1 ") == " Part 1 "
-    assert beautify_string._deal_with_special_words_and_bands(text=" Pt. 1") == " Part 1"
-    assert beautify_string._deal_with_special_words_and_bands(text="Pt. 1 ") == "Part 1 "
-    assert beautify_string._deal_with_special_words_and_bands(text="Pt. 1") == "Part 1"
-    assert beautify_string._deal_with_special_words_and_bands(text="pt. 1") == "Part 1"
-    assert beautify_string._deal_with_special_words_and_bands(text="copt. 1") == "copt. 1"
-    assert beautify_string._deal_with_special_words_and_bands(text="remix") == "Remix"
-    assert beautify_string._deal_with_special_words_and_bands(text="REMIX") == "Remix"
-    assert beautify_string._deal_with_special_words_and_bands(text="cremeremix") == "cremeremix"
-    assert beautify_string._deal_with_special_words_and_bands(text="best remix") == "best Remix"
-    assert beautify_string._deal_with_special_words_and_bands(text="(remix)") == "(Remix)"
-    assert beautify_string._deal_with_special_words_and_bands(text=" (remix)") == " (Remix)"
-    assert beautify_string._deal_with_special_words_and_bands(text="(best remix)") == "(best Remix)"
-    assert beautify_string._deal_with_special_words_and_bands(text="live") == "Live"
-    assert beautify_string._deal_with_special_words_and_bands(text="(live)") == "(Live)"
-    assert beautify_string._deal_with_special_words_and_bands(text="LIVE") == "Live"
-    assert beautify_string._deal_with_special_words_and_bands(text="sunlive") == "sunlive"
+    assert beautify_string._deal_with_special_words_and_bands("") == ""
+    assert beautify_string._deal_with_special_words_and_bands(" Featuring ") == " Feat. "
+    assert beautify_string._deal_with_special_words_and_bands("Featuring ") == "Feat. "
+    assert beautify_string._deal_with_special_words_and_bands("Featuring") == "Featuring"
+    assert beautify_string._deal_with_special_words_and_bands("(Featuring)") == "(Featuring)"
+    assert beautify_string._deal_with_special_words_and_bands("(Featuring abc)") == "(Feat. abc)"
+    assert beautify_string._deal_with_special_words_and_bands(" FEATURING ") == " Feat. "
+    assert beautify_string._deal_with_special_words_and_bands("Test Featuring") == "Test Featuring"
+    assert beautify_string._deal_with_special_words_and_bands(" Pt. 1 ") == " Part 1 "
+    assert beautify_string._deal_with_special_words_and_bands(" Pt. 1") == " Part 1"
+    assert beautify_string._deal_with_special_words_and_bands("Pt. 1 ") == "Part 1 "
+    assert beautify_string._deal_with_special_words_and_bands("Pt. 1") == "Part 1"
+    assert beautify_string._deal_with_special_words_and_bands("pt. 1") == "Part 1"
+    assert beautify_string._deal_with_special_words_and_bands("copt. 1") == "copt. 1"
+    assert beautify_string._deal_with_special_words_and_bands("remix") == "Remix"
+    assert beautify_string._deal_with_special_words_and_bands("REMIX") == "Remix"
+    assert beautify_string._deal_with_special_words_and_bands("cremeremix") == "cremeremix"
+    assert beautify_string._deal_with_special_words_and_bands("best remix") == "best Remix"
+    assert beautify_string._deal_with_special_words_and_bands("(remix)") == "(Remix)"
+    assert beautify_string._deal_with_special_words_and_bands(" (remix)") == " (Remix)"
+    assert beautify_string._deal_with_special_words_and_bands("(best remix)") == "(best Remix)"
+    assert beautify_string._deal_with_special_words_and_bands("live") == "Live"
+    assert beautify_string._deal_with_special_words_and_bands("(live)") == "(Live)"
+    assert beautify_string._deal_with_special_words_and_bands("LIVE") == "Live"
+    assert beautify_string._deal_with_special_words_and_bands("sunlive") == "sunlive"
 
 
 
 def test_string_capitalize_string():
-    assert beautify_string._capitalize_string(text="") == ""
-    assert beautify_string._capitalize_string(text="Bernd's") == "Bernd's"
-    assert beautify_string._capitalize_string(text="Bernd's Great Song") == "Bernd's Great Song"
-    assert beautify_string._capitalize_string(text="Bernd's Great Song") == "Bernd's Great Song"
-    assert beautify_string._capitalize_string(text="DMX") == "DMX"
-    assert beautify_string._capitalize_string(text="DMX is testing") == "DMX Is Testing"
-    assert beautify_string._capitalize_string(text="bmX bike") == "bmX Bike"
+    assert beautify_string._capitalize_string("test's") == "Test's"
+    assert beautify_string._capitalize_string("Bernd's") == "Bernd's"
+    assert beautify_string._capitalize_string("test'N") == "test'N"
+    assert beautify_string._capitalize_string("test'S") == "test'S"
+    assert beautify_string._capitalize_string("Bernd's Great Song") == "Bernd's Great Song"
+    assert beautify_string._capitalize_string("Bernd's Great Song") == "Bernd's Great Song"
+    assert beautify_string._capitalize_string("DMX") == "DMX"
+    assert beautify_string._capitalize_string("DMX is testing") == "DMX Is Testing"
+    assert beautify_string._capitalize_string("bmX bike") == "bmX Bike"
+    assert beautify_string._capitalize_string("A-ha") == "A-ha"
+    assert beautify_string._capitalize_string("a-Ha") == "a-Ha"
+    assert beautify_string._capitalize_string("ärzte") == "Ärzte"
+    assert beautify_string._capitalize_string("bÄrzte") == "bÄrzte"
+    assert beautify_string._capitalize_string("data-now data-yesterday") == "Data-Now Data-Yesterday"
+    assert beautify_string._capitalize_string("m+m M+m") == "M+M M+m"
+    assert beautify_string._capitalize_string("") == ""
+
 
 
 
@@ -223,6 +256,11 @@ def test_mp3_tags_has_cd_string_in_folder_name():
     assert beautify_disc_and_track_number.has_cd_string_in_folder_name("2cdaasdf") == False
     assert beautify_disc_and_track_number.has_cd_string_in_folder_name("cd123455") == False
     assert beautify_disc_and_track_number.has_cd_string_in_folder_name("ACDC 2010") == False
+    assert beautify_disc_and_track_number.has_cd_string_in_folder_name("wcd") == False
+    assert beautify_disc_and_track_number.has_cd_string_in_folder_name("great cd") == False
+    assert beautify_disc_and_track_number.has_cd_string_in_folder_name("great cd 2000") == False
+    assert beautify_disc_and_track_number.has_cd_string_in_folder_name("great cd 20") == True
+    assert beautify_disc_and_track_number.has_cd_string_in_folder_name("great cd 2") == True
     assert beautify_disc_and_track_number.has_cd_string_in_folder_name(None) == False
     assert beautify_disc_and_track_number.has_cd_string_in_folder_name(50) == False
 
