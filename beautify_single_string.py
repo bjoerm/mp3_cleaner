@@ -175,10 +175,11 @@ class beautify_string:
             if regex.match(r".*\p{Lu}+.*", text_list[i]): # Does the string contain a capital letter somewhere? If so, leave it as it is.
                 text_list_improved[i] = text_list[i]
             
-            else: # If the string piece does not contain anywhere at least one capital letter, then convert it to uppercase.
-                text_list_improved[i] = text_list[i].capitalize()
-                
-                # TODO Add special functionality to deal with letters after special characters. E.g. m-m -> M-M and not M-m.
+            elif regex.match(r".+['|`|´]\w+", text_list[i]): # Does the string contains an accent (', ` or ´) before a string? If so, don't transform the part after the accent into uppercase. This needs to be done, after the check above for captial letters.
+                text_list_improved[i] = text_list[i].capitalize() # Capitalizes transforms that's into That's. While title would transform it into That'S.
+            
+            else: # Convert it to uppercase.
+                text_list_improved[i] = text_list[i].title()
         
         
         # Converting the list of strings back into a string.
