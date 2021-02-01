@@ -178,6 +178,9 @@ class beautify_string:
             elif regex.match(r".+['|`|´]\w+", text_list[i]): # Does the string contains an accent (', ` or ´) before a string? If so, don't transform the part after the accent into uppercase. This needs to be done, after the check above for captial letters.
                 text_list_improved[i] = text_list[i].capitalize() # Capitalizes transforms that's into That's. While title would transform it into That'S.
             
+            elif regex.match(r"'n'", text_list[i]): # Is the lowercase string 'n', so shortform of "and". Like in Guns 'n' Roses? If so, keep the 'n' lowercase.
+                text_list_improved[i] = text_list[i]
+            
             else: # Convert it to uppercase.
                 text_list_improved[i] = text_list[i].title()
         
@@ -202,7 +205,6 @@ class beautify_string:
         text = re.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=re.IGNORECASE) # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
         
         # Special band names
-        text = text.replace(" 'N' ", " 'n' ") # Guns 'n' Roses.
         text = re.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=re.IGNORECASE) # AC/DC
 
         return(text)

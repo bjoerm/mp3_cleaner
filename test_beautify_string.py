@@ -41,6 +41,7 @@ def test_string_beautification():
     assert beautify_string.beautify_string("äh") == "Äh"
     assert beautify_string.beautify_string("äh !") == "Äh !"
     assert beautify_string.beautify_string("your's") == "Your's"
+    assert beautify_string.beautify_string("Capone 'n' Noreaga") == "Capone 'n' Noreaga"
     assert beautify_string.beautify_string(None) == None, "Test none"
 
 
@@ -194,6 +195,8 @@ def test_string_capitalize_string():
     assert beautify_string._capitalize_string("a-ha") == "A-Ha"
     assert beautify_string._capitalize_string("ärzte") == "Ärzte"
     assert beautify_string._capitalize_string("bÄrzte") == "bÄrzte"
+    assert beautify_string._capitalize_string("Capone 'n' Noreaga") == "Capone 'n' Noreaga"
+    assert beautify_string._capitalize_string("Guns 'n' Roses") == "Guns 'n' Roses"
     assert beautify_string._capitalize_string("+44") == "+44"
     
     assert beautify_string._capitalize_string("") == ""
