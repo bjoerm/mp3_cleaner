@@ -3,6 +3,6 @@
 
 
 
-# Tags that shall be kept / improved.
+# Tags that shall be kept and improved.
 selected_id3_fields = ["POPM:no@email", "TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"]
 # Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames

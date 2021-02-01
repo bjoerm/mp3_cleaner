@@ -91,7 +91,6 @@ class TagBeautifier:
         
         output = tags
         
-        
         # Helper for number of tracks.
         ## Transforming "01/16" or "01/" into "01". This will then be transformed into an integer. # TODO Move this as part with the max into a method in track_number_beautification.
         helper_length_max = [
@@ -107,13 +106,13 @@ class TagBeautifier:
         helper_length_max = max(helper_length_max) # Checking for the highest track number. Works also if multiple discs are present in the same folder.
         helper_length_max = len(str(helper_length_max)) # Converting into the number if digits.
         
-        
         output = [
             {k:beautify_disc_and_track_number.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} # Beautifying the track number.
             for i in range(len(output))
             ]
         
         return(output)
+    
     
     @staticmethod
     def _beautify_disc_number(tags: list, path: str=None) -> list:
@@ -146,10 +145,8 @@ class TagBeautifier:
             if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
                 pass
             
-            
             if helper_folder_contains_cd_string == False: # If there is no a " cd" string in the folder name, remove the disc number.
                 [output[i].pop("TPOS", None) for i in range(len(output))] # Remove the tag.
-            
         
         return(output)
     

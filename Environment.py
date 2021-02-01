@@ -1,5 +1,4 @@
-
-# TODO Should this be a utility function?
+# TODO Should this be a utility function? Refactor it.
 
 import glob  # For reading files and folders.
 import os  # For file path check.
@@ -12,7 +11,7 @@ class Environment: # TODO Find a more fitting name.
 
     def __init__(self, input_path: str, wip_path: str):
 
-        self.input_path = input_path # TODO Ask Volker whether the underscore in the beginning is commonly used style to name (self) variables in a class.
+        self.input_path = input_path
         self.wip_path = wip_path
         self.files_and_folders = pd.DataFrame(columns=["file", "folder"]) # TODO Ask Volker whether it makes sense to put functions from the environment already in the __init__ or whether this should be done in the "main" call of that environment? As of now this only fetches it at the beginning once and even prior moving files or change file extension to lowercase. So this already hints at the reasonable answer. ;-)
 
