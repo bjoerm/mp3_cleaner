@@ -1,5 +1,6 @@
-# TODO Add log files with tags prior and after change.
-# TODO Add progress in percent calculated based on the share of finished folders.
+# TODO Instead of having a session log. Maybe have a global .parquet log file that is expanded after each run.
+# TODO Think about having a logic that moves informations on Feat. from the artist to the title. But might be a bit complicated if there are more suffixes, like (Live) or (Remix).
+
 
 import toml
 

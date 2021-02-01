@@ -233,3 +233,11 @@ class TagManager:
         # TODO Have some more checks to ensure that the correct file is gets the correct tag.
         
         [id3_column[i].save(v1 = 0, v2_version = 4) for i in id3_column.index] # Saving only as id3v2.4 tags and not as id3v1 at all.
+
+    
+    # TODO Add part here that changes the filenames (and ideally also folder). That should however come from a different class. That however will not be able to cover each possible case (e.g. multi cd album with no disc tags). 
+    # Basic logic should be:
+    ## If all tracks from same artist, then use {[Artist]} - {DiscNumber if multidisk}{Tracknumber if exists} - {Title}.mp3 # Maybe also only use tracknumber is it exists in all songs in the folder.
+    ## If from multiple artists, then use {DiscNumber if multidisk}{Tracknumber if exists} - {[Artist]} - {Title}.mp3 # Maybe also only use tracknumber is it exists in all songs in the folder.
+    
+    
