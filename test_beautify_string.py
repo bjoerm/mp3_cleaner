@@ -124,7 +124,7 @@ def test_string_replace_special_characters():
 def test_string_fill_missing_space_after_comma():
     assert beautify_string._fill_missing_space_after_comma("") == ""
     assert beautify_string._fill_missing_space_after_comma("baum,stamm") == "baum, stamm"
-    assert beautify_string._fill_missing_space_after_comma("10,5") == "10,5"    
+    assert beautify_string._fill_missing_space_after_comma("10,5") == "10,5"
     assert beautify_string._fill_missing_space_after_comma("5,neu") == "5, neu"
     assert beautify_string._fill_missing_space_after_comma("neu,5") == "neu, 5"
 
