@@ -136,16 +136,14 @@ class TagManager:
         Filtering of the original tag information to only keep the defined tag fields.
         """
         
-        # TODO This should be refactored to have only the id3 column (pd.Series), where every entry is a dictionary per file, as input and return an pd.Series of the same shape.
-        
-        pass
-        
         unchanged_tag = [
             {
                 k:v for (k, v) in id3_column[i].items() if k in selected_id3_fields
             } # Selecting only the tags that are specified in selected_id3_fields
             for i in id3_column.index
             ]
+        
+        assert len(id3_column) == len(unchanged_tag), "Test for not loosing tags."
         
         return(unchanged_tag)
 
@@ -220,9 +218,8 @@ class TagManager:
                 exec(f'id3.add({key}(encoding = 3, text = "{value}"))') # encoding = 3 = UTF8
 
             else:
-                # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here. That's a bit safer than just distinguishing between == "Rating" and != "Rating".
-                # TODO Code this.
-                continue
+                # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here.
+                raise NameError("It seems like a new key was added to options but not added to the handling above in this method.")
         
         return(id3)
 
@@ -233,6 +230,6 @@ class TagManager:
         Write the beautified tag from the id3 object to the respective files.
         """
         
-        # TODO Have some checks to ensure that the correct file is gets the correct tag.
+        # TODO Have some more checks to ensure that the correct file is gets the correct tag.
         
         [id3_column[i].save(v1 = 0, v2_version = 4) for i in id3_column.index] # Saving only as id3v2.4 tags and not as id3v1 at all.
