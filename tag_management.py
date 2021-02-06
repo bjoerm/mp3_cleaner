@@ -5,7 +5,7 @@ import pandas as pd
 from tqdm import trange
 
 from beautify_multiple_tags import TagBeautifier
-
+from beautify_multiple_filenames import FileBeautifier
 
 class TagManager:
 
@@ -55,6 +55,9 @@ class TagManager:
             
             # Write beautified tag to file.
             cls._write_beautified_tag_to_files(id3_column=df_iteration["id3"])
+            
+            # Beautify the filename.
+            FileBeautifier.beautify_filenames(df=df_iteration)
         
             # Keep a log of the tags. Be aware that this might get big, if at some point the tag with an image of the album cover would be included.
             df_log = df_log.append(df_iteration)
@@ -234,10 +237,4 @@ class TagManager:
         
         [id3_column[i].save(v1 = 0, v2_version = 4) for i in id3_column.index] # Saving only as id3v2.4 tags and not as id3v1 at all.
 
-    
-    # TODO Add part here that changes the filenames (and ideally also folder). That should however come from a different class. That however will not be able to cover each possible case (e.g. multi cd album with no disc tags). 
-    # Basic logic should be:
-    ## If all tracks from same artist, then use {[Artist]} - {DiscNumber if multidisk}{Tracknumber if exists} - {Title}.mp3 # Maybe also only use tracknumber is it exists in all songs in the folder.
-    ## If from multiple artists, then use {DiscNumber if multidisk}{Tracknumber if exists} - {[Artist]} - {Title}.mp3 # Maybe also only use tracknumber is it exists in all songs in the folder.
-    
     
