@@ -124,9 +124,9 @@ class TagBeautifier:
         output = tags
         
         # Check for different disc numbers in same folder.
-        helper_different_disc_number = [output[i].get("TPOS") for i in range(len(output))]
+        helper_different_disc_number = set(output[i].get("TPOS") for i in range(len(output))) # Set comprehension to remove duplciates.
         
-        helper_different_disc_number = list(set(helper_different_disc_number))
+        helper_different_disc_number = list(helper_different_disc_number)
 
         if helper_different_disc_number is None: # There is no disc number tag.
             pass
