@@ -193,12 +193,14 @@ def test_string_capitalize_string():
     assert beautify_string._capitalize_string("A-Ha") == "A-Ha"
     assert beautify_string._capitalize_string("a-Ha") == "a-Ha"
     assert beautify_string._capitalize_string("a-ha") == "A-Ha"
+    assert beautify_string._capitalize_string("self-destruct") == "Self-Destruct"
     assert beautify_string._capitalize_string("ärzte") == "Ärzte"
     assert beautify_string._capitalize_string("bÄrzte") == "bÄrzte"
     assert beautify_string._capitalize_string("Capone 'n' Noreaga") == "Capone 'n' Noreaga"
     assert beautify_string._capitalize_string("Guns 'n' Roses") == "Guns 'n' Roses"
     assert beautify_string._capitalize_string("+44") == "+44"
-    
+    assert beautify_string._capitalize_string("your's") == "Your's"
+    assert beautify_string._capitalize_string("you're") == "You're"
     assert beautify_string._capitalize_string("") == ""
 
 
