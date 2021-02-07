@@ -1,4 +1,5 @@
 # TODO Add option to turn file and folder renaming on and off.
+# TODO Add functionality to move "Feat. xyz" from artist to end of the title. Be however aware of possible problems with other suffixes like "(Live), (Remix), ...".
 # TODO Low prio: Is it possible to not update the date of a file when an improved id tag is written?
 
 
