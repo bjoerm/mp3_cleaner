@@ -1,5 +1,6 @@
-# TODO Rename the folder.
+# TODO Rename the folder as well.
 # TODO Write tests for this class!
+
 
 import os
 import pandas as pd

@@ -1,3 +1,4 @@
+# TODO Add option to turn file and folder renaming on and off.
 # TODO Low prio: Is it possible to not update the date of a file when an improved id tag is written?
 
 
@@ -28,12 +29,10 @@ class TagManager:
             
             df_iteration = None # Cleaning the iteration df at the start of each loop.
             
-            df_iteration = cls._select_current_folder(files_and_folders=files_and_folders, current_unique_folder=unique_mp3_folders[i])
-
+            df_iteration = cls._select_folder_for_iteration(files_and_folders=files_and_folders, current_unique_folder=unique_mp3_folders[i])
             
             # Read all tags in folder
             df_iteration["id3"] = cls._read_id3_tags_in_folder(paths_to_files=df_iteration["filepath"])
-            
             
             # Keep only selected tags
             # df_iteration = cls._keep_only_selected_tags(df_iteration=df_iteration, selected_id3_fields=selected_id3_fields) # TODO Remove
@@ -49,10 +48,8 @@ class TagManager:
             if len(df_iteration) == 0:
                 continue
             
-            
             # Pass tag on to the beautifier utility class.
             df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy(), path = unique_mp3_folders[i]) # Input for path refers to the currently processed folder.
-            
             
             df_iteration["id3"] = cls._overwrite_tags_in_id3_object(id3_column=df_iteration["id3"], beautified_tag=df_iteration["beautified_tag"])
             
@@ -85,7 +82,7 @@ class TagManager:
 
 
     @staticmethod
-    def _select_current_folder(files_and_folders: pd.DataFrame, current_unique_folder) -> pd.DataFrame:
+    def _select_folder_for_iteration(files_and_folders: pd.DataFrame, current_unique_folder) -> pd.DataFrame:
         """
         Selecting the files in the i'th unique folder.
         """
@@ -130,8 +127,6 @@ class TagManager:
             mp3.add_tags()
         id3 = mp3.tags # Only fetching the id3 tag.
         id3.filename = mp3.filename # Adding the filename as this is not passed.
-
-
 
         return(id3) # Returns an ID3 object.
 
@@ -239,5 +234,3 @@ class TagManager:
         # TODO Have some more checks to ensure that the correct file is gets the correct tag.
         
         [id3_column[i].save(v1 = 0, v2_version = 4) for i in id3_column.index] # Saving only as id3v2.4 tags and not as id3v1 at all.
-
-    
