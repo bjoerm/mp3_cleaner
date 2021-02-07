@@ -20,7 +20,7 @@ def test_string_beautification():
     assert beautify_string.beautify_string("A feat. B C featuring D E feat F") == "A Feat. B C Feat. D E Feat F", "Test Featuring"
     assert beautify_string.beautify_string("New Song Pt. 4 pt. 5 pt 6") == "New Song Part 4 Part 5 Pt 6", "Test Part"
     assert beautify_string.beautify_string("abC dEF ghi j5L") == "abC dEF Ghi j5L", "Test word contains capital letter - but not at beginning"
-    assert beautify_string.beautify_string("m&m M&m") == "M+M M+m", "Test &"
+    assert beautify_string.beautify_string("m&m M&m") == "M&M M&m", "Test &"
     assert beautify_string.beautify_string("baum,stamm") == "Baum, Stamm", "Test comma and space"
     assert beautify_string.beautify_string("10,5") == "10,5", "Test comma and space"
     assert beautify_string.beautify_string("Gerd,10") == "Gerd, 10", "Test comma and space"
@@ -118,8 +118,8 @@ def test_string_replace_special_characters():
     assert beautify_string._replace_special_characters("abc/def") == "abc-def"
     assert beautify_string._replace_special_characters("?") == ""
     assert beautify_string._replace_special_characters("WTF?") == "WTF"
-    assert beautify_string._replace_special_characters("&") == "+"
-    assert beautify_string._replace_special_characters("C&A") == "C+A"
+    assert beautify_string._replace_special_characters("&") == "&" # Nothing changed here.
+    assert beautify_string._replace_special_characters("C&A") == "C&A" # Nothing changed here.
     
 
 def test_string_fill_missing_space_after_comma():

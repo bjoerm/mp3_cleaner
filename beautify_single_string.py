@@ -119,9 +119,6 @@ class beautify_string:
         # Question marks
         text = text.replace("?", "")
         
-        # Ampersand (&)
-        text = text.replace("&", "+")
-        
         return(text)
     
     
