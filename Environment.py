@@ -1,4 +1,6 @@
 # TODO Should this be a utility function? Refactor it.
+# TODO Can list comprehensions be used here instead of the loop(s)?
+
 
 import glob  # For reading files and folders.
 import os  # For file path check.
@@ -13,7 +15,7 @@ class Environment: # TODO Find a more fitting name.
 
         self.input_path = input_path
         self.wip_path = wip_path
-        self.files_and_folders = pd.DataFrame(columns=["file", "folder"]) # TODO Ask Volker whether it makes sense to put functions from the environment already in the __init__ or whether this should be done in the "main" call of that environment? As of now this only fetches it at the beginning once and even prior moving files or change file extension to lowercase. So this already hints at the reasonable answer. ;-)
+        self.files_and_folders = pd.DataFrame(columns=["filepath", "folder"]) # TODO Ask Volker whether it makes sense to put functions from the environment already in the __init__ or whether this should be done in the "main" call of that environment? As of now this only fetches it at the beginning once and even prior moving files or change file extension to lowercase. So this already hints at the reasonable answer. ;-)
 
         # Execute one-time needed functions:
         ## Setting up working environment
@@ -52,9 +54,9 @@ class Environment: # TODO Find a more fitting name.
             )
 
         # Getting and attaching the folder path
-        files = pd.DataFrame(data=files_list, columns=['file']) # Converting into a pandas data.frame and name the column.
-        files['file'] = files['file'].apply(Path) # Getting the path, so the "parent" method can be used in the following line.
-        files['folder'] = files['file'].apply(lambda x: x.parent) # Getting the folder of that respective file.
+        files = pd.DataFrame(data=files_list, columns=["filepath"]) # Converting into a pandas data.frame and name the column.
+        files["filepath"] = files["filepath"].apply(Path) # Getting the path, so the "parent" method can be used in the following line.
+        files['folder'] = files["filepath"].apply(lambda x: x.parent) # Getting the folder of that respective file.
 
         self.files_and_folders = files # Updating the self data frame.
 
@@ -66,7 +68,7 @@ class Environment: # TODO Find a more fitting name.
 
         self.get_files_and_folders() # Ensure that this self data frame is updated.
         
-        files = list(self.files_and_folders['file'])
+        files = list(self.files_and_folders["filepath"])
 
         for i in range(len(files)):
             pre, ext = os.path.splitext(files[i])

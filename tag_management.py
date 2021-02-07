@@ -1,3 +1,6 @@
+# TODO Low prio: Is it possible to not update the date of a file when an improved id tag is written?
+
+
 import datetime
 from mutagen.id3 import ID3, ID3NoHeaderError, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 from mutagen.mp3 import MP3 # Alternative to ID3 and ID3NoHeaderError.
@@ -29,7 +32,7 @@ class TagManager:
 
             
             # Read all tags in folder
-            df_iteration["id3"] = cls._read_id3_tags_in_folder(paths_to_files=df_iteration["file"])
+            df_iteration["id3"] = cls._read_id3_tags_in_folder(paths_to_files=df_iteration["filepath"])
             
             
             # Keep only selected tags
