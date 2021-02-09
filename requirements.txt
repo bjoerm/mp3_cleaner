@@ -2,7 +2,7 @@ argon2-cffi==20.1.0
 atomicwrites==1.4.0
 attrs==20.2.0
 backcall==0.2.0
-bleach==3.1.5
+bleach==3.3.0
 cffi==1.14.3
 colorama==0.4.3
 decorator==4.4.2
