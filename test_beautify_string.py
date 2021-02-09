@@ -1,6 +1,6 @@
 # TODO Add tests for the whole beautify_tags that contain real input (a list of dicts (which contain tags)) for testing of real life scenarios like a folder without any track numbers.
 
-# TODO Check usage of fixtures: https://youtu.be/WkUBx3g2QfQ?t=5458
+# TODO Could this whole bunch of tests be made simpler by using Pytest parameters?
 
 from beautify_single_string import StringBeautifier
 
