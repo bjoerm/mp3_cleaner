@@ -12,7 +12,6 @@ class FileBeautifier:
     """
     
     
-    
     @classmethod
     def beautify_filenames(cls, df: pd.DataFrame):
         """
@@ -48,7 +47,7 @@ class FileBeautifier:
         is_same_artist = None
         
         if track_artist is None:
-            # Case when no track artist exists in the tags of any the files.
+            # Case when there is no track artist in all of the files.
             is_same_artist = None
         
         elif len(track_artist) == 1:
@@ -66,9 +65,9 @@ class FileBeautifier:
     
     
     @classmethod
-    def _check_existance_of_disc_and_track_number(cls, tags: pd.Series) -> list: # Returns a list of two booleans.
+    def _check_existance_of_disc_and_track_number(cls, tags: pd.Series) -> tuple:
         """
-        Checks whether all tracks in this iteration have a disc number and whether they all have a track number. If not all have it, the file renaming will be a bit different.
+        Checks whether all tracks in this iteration have a disc number and whether they all have a disc and track number. If not all have it, the file renaming will be a bit different.
         """
         
         disc_numbers = [tags[i].get("TPOS") for i in range(len(tags))]
@@ -145,6 +144,7 @@ class FileBeautifier:
         extension = "mp3" # Note that I am hardcoding here the file extension. Do not put a dot in front here! # TODO Raise exception would the total correct way instead of the comment before.
         
         # Constructing the filename from the pieces.
+        ## Keep in mind that above it is ensured that artist and title are not none.
         if is_same_artist == True and is_each_track_with_track_number == True:
             beautified_filename = f'{artist} - {number or ""} - {title}.{extension}'
         
