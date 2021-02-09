@@ -1,6 +1,6 @@
-from beautify_single_string import beautify_string
-from beautify_single_disc_or_track_number import beautify_disc_and_track_number
-from beautify_single_date import beautify_date
+from beautify_single_string import StringBeautifier
+from beautify_single_disc_or_track_number import DiscAndTrackBeautifier
+from beautify_single_date import DateBeautifier
 
 import pandas as pd
 
@@ -43,13 +43,13 @@ class TagBeautifier:
         
         # Beautifying the album and song title.
         output = [
-            {k:beautify_string.beautify_string(v) if k in ["TALB", "TIT2"] else v for (k, v) in output[i].items()} # Beautifying the album and song title.
+            {k:StringBeautifier.beautify_string(v) if k in ["TALB", "TIT2"] else v for (k, v) in output[i].items()} # Beautifying the album and song title.
             for i in range(len(output))
             ]
         
         # Beautifying the album artist and song artist. Difference here is that any leading "The" is cut.
         output = [
-            {k:beautify_string.beautify_string(v, remove_leading_the=True) if k in ["TPE1", "TPE2"] else v for (k, v) in output[i].items()}
+            {k:StringBeautifier.beautify_string(v, remove_leading_the=True) if k in ["TPE1", "TPE2"] else v for (k, v) in output[i].items()}
             for i in range(len(output))
             ]
     
@@ -94,7 +94,7 @@ class TagBeautifier:
         # Helper for number of tracks.
         ## Transforming "01/16" or "01/" into "01". This will then be transformed into an integer. # TODO Move this as part with the max into a method in track_number_beautification.
         helper_length_max = [
-                beautify_disc_and_track_number.extract_track_number_from_slash_format(output[i].get("TRCK")) for i in range(len(output))
+                DiscAndTrackBeautifier.extract_track_number_from_slash_format(output[i].get("TRCK")) for i in range(len(output))
             ]
         
         helper_length_max = list(filter(None.__ne__, helper_length_max)) # Removing all None values. From: https://www.kite.com/python/answers/how-to-remove-none-from-a-list-in-python
@@ -107,7 +107,7 @@ class TagBeautifier:
         helper_length_max = len(str(helper_length_max)) # Converting into the number if digits.
         
         output = [
-            {k:beautify_disc_and_track_number.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} # Beautifying the track number.
+            {k:DiscAndTrackBeautifier.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} # Beautifying the track number.
             for i in range(len(output))
             ]
         
@@ -140,7 +140,7 @@ class TagBeautifier:
         
         elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1": # There is only one disc number and that is disc number 1.
             
-            helper_folder_contains_cd_string = beautify_disc_and_track_number.has_cd_string_in_folder_name(path)
+            helper_folder_contains_cd_string = DiscAndTrackBeautifier.has_cd_string_in_folder_name(path)
             
             if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
                 pass
@@ -160,7 +160,7 @@ class TagBeautifier:
         output = tags
         
         output = [
-            {k: beautify_date.extract_year(v) if k in ["TDRC"] else v for (k, v) in output[i].items()} # Shorten to YYYY.
+            {k: DateBeautifier.extract_year(v) if k in ["TDRC"] else v for (k, v) in output[i].items()} # Shorten to YYYY.
             for i in range(len(output))]
     
         return(output)

@@ -1,7 +1,6 @@
-import re # Regular expressions
 import regex
 
-class beautify_string:
+class StringBeautifier:
     """
     This utility class bundles id3 tag beautification methods for strings. This class beautifies a single string at a time.
     """
@@ -42,9 +41,9 @@ class beautify_string:
         Removes any case of unneeded whitespace.
         """
         
-        text = re.sub(r" +", " ", text) # Remove any multiple whitespaces.
-        text = re.sub(r"^ +", "", text) # Remove any whitespace at the start.
-        text = re.sub(r" +$", "", text) # Remove any whitespace at the end.
+        text = regex.sub(r" +", " ", text) # Remove any multiple whitespaces.
+        text = regex.sub(r"^ +", "", text) # Remove any whitespace at the start.
+        text = regex.sub(r" +$", "", text) # Remove any whitespace at the end.
         
         return(text)
     
@@ -56,11 +55,11 @@ class beautify_string:
         """
         
         # Quotation marks
-        text = re.sub("\"", "'", text)
+        text = regex.sub("\"", "'", text)
 
         # Accents
-        text = re.sub("`", "'", text)
-        text = re.sub("´", "'", text)
+        text = regex.sub("`", "'", text)
+        text = regex.sub("´", "'", text)
         
         return(text)
     
@@ -72,10 +71,10 @@ class beautify_string:
         """
         
         # Case of colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
-        text = re.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]): (?=.+)", " - ", text) # \u0080-\uFFFF catches special characters from German and other languages https://stackoverflow.com/questions/36366125/
+        text = regex.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]): (?=.+)", " - ", text) # \u0080-\uFFFF catches special characters from German and other languages https://stackoverflow.com/questions/36366125/
         
         # All other cases of a colon.
-        text = re.sub(":", "-", text)
+        text = regex.sub(":", "-", text)
         
         return(text)
     
@@ -85,8 +84,8 @@ class beautify_string:
         """
         Converts curly and square brackets into round brackets.
         """
-        text = re.sub(r"\[+|\{+|⟨+", "(", text)
-        text = re.sub(r"\]+|\}+|⟩+", ")", text)
+        text = regex.sub(r"\[+|\{+|⟨+", "(", text)
+        text = regex.sub(r"\]+|\}+|⟩+", ")", text)
         
         
         return(text)
@@ -128,7 +127,7 @@ class beautify_string:
         Missing space after comma - as long as it is not followed by digits.
         """
         
-        text = re.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[0-9]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[a-zA-Z\u0080-\uFFFF]),(?=[0-9])", ", ", text, flags=re.IGNORECASE)
+        text = regex.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[0-9]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[a-zA-Z\u0080-\uFFFF]),(?=[0-9])", ", ", text, flags=regex.IGNORECASE)
         
         return(text)
     
@@ -146,7 +145,7 @@ class beautify_string:
         if text in ["The", "the"]:
             return(text)
         
-        text = re.sub(r"^(the\s)", "", text, flags=re.IGNORECASE)
+        text = regex.sub(r"^(the\s)", "", text, flags=regex.IGNORECASE)
         
         return(text)
     
@@ -196,13 +195,13 @@ class beautify_string:
         """
         
         # Special words
-        text = re.sub(r"(?<=^)Featuring |(?<= |\()Featuring ", "Feat. ", text, flags=re.IGNORECASE) # This part of two positive lookbehinds is not very elegant but adding ^ into the other one, returned an error due to the varying widths of ^ and e.g. " "
-        text = re.sub(r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=re.IGNORECASE)
-        text = re.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=re.IGNORECASE) # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
-        text = re.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=re.IGNORECASE) # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
+        text = regex.sub(r"(?<=^)Featuring |(?<= |\()Featuring ", "Feat. ", text, flags=regex.IGNORECASE) # This part of two positive lookbehinds is not very elegant but adding ^ into the other one, returned an error due to the varying widths of ^ and e.g. " "
+        text = regex.sub(r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=regex.IGNORECASE)
+        text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE) # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
+        text = regex.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=regex.IGNORECASE) # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
         
         # Special band names
-        text = re.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=re.IGNORECASE) # AC/DC
+        text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE) # AC/DC
 
         return(text)
     

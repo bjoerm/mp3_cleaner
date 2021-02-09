@@ -1,6 +1,6 @@
 import re
 
-class beautify_date:
+class DateBeautifier:
     """
     This utility class bundles id3 tag beautification methods for dates. This class beautifies a single string at a time.
     """
