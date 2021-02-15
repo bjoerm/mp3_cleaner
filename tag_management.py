@@ -79,7 +79,7 @@ class TagManager:
         unique_mp3_folders = unique_mp3_folders.folder.unique()
         unique_mp3_folders = list(unique_mp3_folders)
         
-        return(unique_mp3_folders)
+        return unique_mp3_folders
 
 
     @staticmethod
@@ -92,7 +92,7 @@ class TagManager:
         
         df_iteration = df_iteration.reset_index(drop=True)
         
-        return(df_iteration)
+        return df_iteration
 
 
     @classmethod
@@ -103,7 +103,7 @@ class TagManager:
 
         id3 = [cls._read_id3_tag_from_single_file(i) for i in paths_to_files] # Read all tags.
         
-        return(id3)
+        return id3
 
 
     @staticmethod
@@ -129,7 +129,7 @@ class TagManager:
         id3 = mp3.tags # Only fetching the id3 tag.
         id3.filename = mp3.filename # Adding the filename as this is not passed.
 
-        return(id3) # Returns an ID3 object.
+        return id3 # Returns an ID3 object.
 
 
     @staticmethod
@@ -147,7 +147,7 @@ class TagManager:
         
         assert len(id3_column) == len(unchanged_tag), "Test for not loosing tags."
         
-        return(unchanged_tag)
+        return unchanged_tag
 
 
     @staticmethod
@@ -171,8 +171,8 @@ class TagManager:
         output = pd.Series(output) # Converting back into a pd.Series.
         
         assert len(output) == len(tags), "Test for not loosing tags."
-        
-        return(output)
+
+        return output
 
 
     @staticmethod
@@ -185,7 +185,7 @@ class TagManager:
         
         df = df.reset_index(drop=True)
         
-        return(df)
+        return df
 
 
     @classmethod
@@ -199,7 +199,7 @@ class TagManager:
         # Create new ID3 object from beautified tag.
         id3_column = [cls._save_tags_to_single_id3_object(id3=id3_column[i], beautified_tag=beautified_tag[i]) for i in id3_column.index] # This will pass each i (file's ID3 tag) to the save function.
         
-        return(id3_column)
+        return id3_column
 
 
     
@@ -223,7 +223,7 @@ class TagManager:
                 # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here.
                 raise NameError("It seems like a new key was added to options but not added to the handling above in this method.")
         
-        return(id3)
+        return id3
 
 
     @staticmethod

@@ -14,7 +14,7 @@ class DateBeautifier:
         output = string
         
         if output is None:
-            return(output)
+            return output
         
         elif output is not None: # Dealing with the special of None - which is not converted into a string.
             output = str(output)
@@ -24,4 +24,4 @@ class DateBeautifier:
         except:
             pass # If no YYYY string can be extracted, e.g. data provided is "01-01-20", then return untouched string.
         
-        return(output)
+        return output

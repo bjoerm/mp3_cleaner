@@ -1,4 +1,4 @@
-# TODO Could this whole bunch of tests be made simpler by using Pytest parameters?
+# TODO Could this whole bunch of tests be made simpler by using Pytest parameters? Yes: https://docs.pytest.org/en/reorganize-docs/new-docs/user/parametrize.html
 
 
 from beautify_single_date import DateBeautifier

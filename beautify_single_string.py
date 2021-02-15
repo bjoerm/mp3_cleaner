@@ -12,7 +12,7 @@ class StringBeautifier:
         """
 
         if text == None: # Edge case of input being None.
-            return(None)
+            return None
 
         text_beautified = str(text) # Creating a copy of the input which is used, so the original input is kept for comparisons. And ensuring that the text is a string.
 
@@ -32,7 +32,7 @@ class StringBeautifier:
         
         text_beautified = cls._deal_with_special_words_and_bands(text=text_beautified)
 
-        return(text_beautified)
+        return text_beautified
 
 
     @staticmethod
@@ -45,7 +45,7 @@ class StringBeautifier:
         text = regex.sub(r"^ +", "", text) # Remove any whitespace at the start.
         text = regex.sub(r" +$", "", text) # Remove any whitespace at the end.
         
-        return(text)
+        return text
     
     
     @staticmethod
@@ -61,7 +61,7 @@ class StringBeautifier:
         text = regex.sub("`", "'", text)
         text = regex.sub("´", "'", text)
         
-        return(text)
+        return text
     
     
     @staticmethod
@@ -76,7 +76,7 @@ class StringBeautifier:
         # All other cases of a colon.
         text = regex.sub(":", "-", text)
         
-        return(text)
+        return text
     
     
     @staticmethod
@@ -88,7 +88,7 @@ class StringBeautifier:
         text = regex.sub(r"\]+|\}+|⟩+", ")", text)
         
         
-        return(text)
+        return text
     
     
     @staticmethod
@@ -99,7 +99,7 @@ class StringBeautifier:
         
         text = regex.sub(r"\p{Pd}", "-", text) # Pd matches every unicode character from the 'Punctuation, Dash' category: https://www.fileformat.info/info/unicode/category/Pd/list.htm
         
-        return(text)
+        return text
     
     @staticmethod
     def _replace_special_characters(text: str) -> str:
@@ -118,7 +118,7 @@ class StringBeautifier:
         # Question marks
         text = text.replace("?", "")
         
-        return(text)
+        return text
     
     
     @staticmethod
@@ -129,7 +129,7 @@ class StringBeautifier:
         
         text = regex.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[0-9]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[a-zA-Z\u0080-\uFFFF]),(?=[0-9])", ", ", text, flags=regex.IGNORECASE)
         
-        return(text)
+        return text
     
     
     @staticmethod
@@ -140,14 +140,14 @@ class StringBeautifier:
         
         
         if remove_leading_the == False:
-            return(text)
+            return text
         
-        if text in ["The", "the"]:
-            return(text)
+        if text in ["The", "the"]: # Edge case where the artist is named only "the".
+            return text
         
         text = regex.sub(r"^(the\s)", "", text, flags=regex.IGNORECASE)
         
-        return(text)
+        return text
     
 
     
@@ -160,7 +160,7 @@ class StringBeautifier:
         """
         
         if text == "":
-            return(text)
+            return text
         
         # Break the string into pieces at place with a space (into a list).
         text_list = text.split(" ")
@@ -185,7 +185,7 @@ class StringBeautifier:
         separator = " "
         output = separator.join(text_list_improved) # Converting the list of strings into a string.
         
-        return(output)
+        return output
     
     
     @staticmethod
@@ -203,5 +203,5 @@ class StringBeautifier:
         # Special band names
         text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE) # AC/DC
 
-        return(text)
+        return text
     

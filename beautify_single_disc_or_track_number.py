@@ -15,7 +15,7 @@ class DiscAndTrackBeautifier:
         """
         
         if track_number is None:
-            return(track_number)
+            return track_number
         
         track_number_beautified = str(track_number) # Ensuring that the input is a string.
         
@@ -49,12 +49,12 @@ class DiscAndTrackBeautifier:
                     pass
                 
                 else:
-                    return(track_number_beautified)
+                    return track_number_beautified
             
             track_number_beautified = track_number_beautified[abs(zeros_to_add):]
         
         
-        return(track_number_beautified)
+        return track_number_beautified
 
 
     @staticmethod
@@ -67,7 +67,7 @@ class DiscAndTrackBeautifier:
         output = string
         
         if output is None:
-            return(None)
+            return None
         
         else:
             output = str(output)
@@ -78,7 +78,7 @@ class DiscAndTrackBeautifier:
         except:
             pass # If for example None is entered, return None untouched.
         
-        return(output)
+        return output
 
 
     @staticmethod
@@ -89,7 +89,7 @@ class DiscAndTrackBeautifier:
         
         output = bool(re.search(r"(^|\W|_)cd(\d{1,2}|\W{1,2}\d{1,2})([^a-zA-Z\u0080-\uFFFF0-9]|$)|(^|\W|_)(\d{1,2}|\d{1,2}\W{1,2})cd([^a-zA-Z\u0080-\uFFFF0-9]|$)", str(string), flags=re.IGNORECASE)) # Rather complex regex... Thus, this was put into a separate method, so it is easier to include in unittests.
         
-        return(output)
+        return output
 
 
 

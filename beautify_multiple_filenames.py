@@ -61,7 +61,7 @@ class FileBeautifier:
         else:
             raise ValueError("Length of track artist might be below 1.")
         
-        return(is_same_artist)
+        return is_same_artist
     
     
     @classmethod
@@ -76,7 +76,7 @@ class FileBeautifier:
         is_each_track_with_disc_number = cls._helper_existance_of_disc_and_track_number(tags=tags, list_of_numbers=disc_numbers)
         is_each_track_with_track_number = cls._helper_existance_of_disc_and_track_number(tags=tags, list_of_numbers=track_numbers)
         
-        return(is_each_track_with_disc_number, is_each_track_with_track_number)
+        return (is_each_track_with_disc_number, is_each_track_with_track_number)
     
     
     @staticmethod
@@ -94,7 +94,7 @@ class FileBeautifier:
             # Are there as many (non None) track numbers as there files.
             is_each_track_with_number = True # Possible extension: You could make this even more sophisticated (either here or in the tag beautification) to check for multiple times the same track number.
         
-        return(is_each_track_with_number)
+        return is_each_track_with_number
     
     
     @classmethod
@@ -113,7 +113,7 @@ class FileBeautifier:
                 for i in range(len(tags))
             ]
         
-        return(beautified_filename)
+        return beautified_filename
     
     
     @classmethod
@@ -125,7 +125,7 @@ class FileBeautifier:
         if tag.get("TPE1") is None or tag.get("TIT2") is None:
             # Case where either the artist or the track name is missing in the tag.
             beautified_filename = None
-            return(beautified_filename)
+            return beautified_filename
         
         # Creating required single pieces.
         artist = cls._beautify_string_from_tag(tag=tag.get("TPE1"), add_square_brackets=True)
@@ -158,7 +158,7 @@ class FileBeautifier:
             # This should normally not be reached as the conditions above should capture all possible cases (as long as the input values are booleans).
             beautified_filename = None
         
-        return(beautified_filename)
+        return beautified_filename
     
     
     @staticmethod
@@ -169,7 +169,7 @@ class FileBeautifier:
         
         if tag is None or tag == "" or tag == " ":
             tag = ""
-            return(tag)
+            return tag
         
         else:
             tag = str(tag) # Short ensurer to prevent odd cases, when a tag is not a string.
@@ -177,7 +177,7 @@ class FileBeautifier:
         if add_square_brackets == True:
             tag = "[" + tag + "]"
         
-        return(tag)
+        return tag
     
     
     @staticmethod
@@ -188,7 +188,7 @@ class FileBeautifier:
         
         filepath = [folder[i] / filename[i] if filename[i] is not None else None for i in range(len(folder))] # Will write None if the filename also is None.
         
-        return(filepath)
+        return filepath
     
     
     @staticmethod

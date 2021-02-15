@@ -30,7 +30,7 @@ class TagBeautifier:
         
         assert len(tags) == len(untouched_tag), "Test for not loosing tags while beautifying."
         
-        return(tags)
+        return tags
 
     
     @staticmethod
@@ -53,7 +53,7 @@ class TagBeautifier:
             for i in range(len(output))
             ]
     
-        return(output)
+        return output
     
     
     @staticmethod
@@ -80,7 +80,7 @@ class TagBeautifier:
             
             [output[i].pop("TPE2", None) for i in range(len(output))] # Remove the TPE2 tag.
         
-        return(output)
+        return output
 
 
     @staticmethod
@@ -101,7 +101,7 @@ class TagBeautifier:
         
         ## Edge case of all values being None values.
         if len(helper_length_max) == 0:
-            return(output) # End method. Don't do any beautification.
+            return output # End method. Don't do any beautification.
         
         helper_length_max = max(helper_length_max) # Checking for the highest track number. Works also if multiple discs are present in the same folder.
         helper_length_max = len(str(helper_length_max)) # Converting into the number if digits.
@@ -111,7 +111,7 @@ class TagBeautifier:
             for i in range(len(output))
             ]
         
-        return(output)
+        return output
     
     
     @staticmethod
@@ -148,7 +148,7 @@ class TagBeautifier:
             if helper_folder_contains_cd_string == False: # If there is no a " cd" string in the folder name, remove the disc number.
                 [output[i].pop("TPOS", None) for i in range(len(output))] # Remove the tag.
         
-        return(output)
+        return output
     
     
     @staticmethod
@@ -163,7 +163,7 @@ class TagBeautifier:
             {k: DateBeautifier.extract_year(v) if k in ["TDRC"] else v for (k, v) in output[i].items()} # Shorten to YYYY.
             for i in range(len(output))]
     
-        return(output)
+        return output
     
     
     
