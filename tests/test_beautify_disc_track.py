@@ -1,3 +1,11 @@
+# def test_string_beautification():
+#     assert 1 == 1
+
+
+# def test_failed():
+#     assert 1 == 2
+
+
 
 # TODO Could this whole bunch of tests be made simpler by using Pytest parameters? Yes: https://docs.pytest.org/en/reorganize-docs/new-docs/user/parametrize.html
 
@@ -28,6 +36,8 @@ def test_track_number_beautification():
 
 
 
+
+
 def test_mp3_extract_track_number_from_slash_format():
     """
     Testing the regex that extracts the track number from potential 'slash format'.
@@ -41,6 +51,7 @@ def test_mp3_extract_track_number_from_slash_format():
     assert DiscAndTrackBeautifier.extract_track_number_from_slash_format("1/16") == "1"
     assert DiscAndTrackBeautifier.extract_track_number_from_slash_format(1) == "1"
     assert DiscAndTrackBeautifier.extract_track_number_from_slash_format(None) == None
+
 
 
 
@@ -78,5 +89,9 @@ def test_mp3_tags_has_cd_string_in_folder_name():
     assert DiscAndTrackBeautifier.has_cd_string_in_folder_name("great cd 2") == True
     assert DiscAndTrackBeautifier.has_cd_string_in_folder_name(None) == False
     assert DiscAndTrackBeautifier.has_cd_string_in_folder_name(50) == False
+
+
+
+
 
 
