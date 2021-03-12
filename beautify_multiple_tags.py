@@ -1,5 +1,5 @@
 from beautify_single_string import StringBeautifier
-from beautify_single_disc_track_number import DiscTrackBeautifier
+from beautify_single_number import NumberBeautifier
 from beautify_single_date import DateBeautifier
 
 import pandas as pd
@@ -91,7 +91,7 @@ class TagBeautifier:
         # Helper for number of tracks.
         # Transforming "01/16" or "01/" into "01". This will then be transformed into an integer. # TODO Move this as part with the max into a method in track_number_beautification.
         helper_length_max = [
-            DiscTrackBeautifier.extract_number_from_slash_format(output[i].get("TRCK")) for i in range(len(output))
+            NumberBeautifier.extract_number_from_slash_format(output[i].get("TRCK")) for i in range(len(output))
             ]
 
         helper_length_max = list(filter(None.__ne__, helper_length_max))  # Removing all None values. From: https://www.kite.com/python/answers/how-to-remove-none-from-a-list-in-python
@@ -104,7 +104,7 @@ class TagBeautifier:
         helper_length_max = len(str(helper_length_max))  # Converting into the number if digits.
 
         output = [
-            {k: DiscTrackBeautifier.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()}  # Beautifying the track number.
+            {k: NumberBeautifier.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()}  # Beautifying the track number.
             for i in range(len(output))
             ]
 
@@ -135,7 +135,7 @@ class TagBeautifier:
 
         elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1":  # There is only one disc number and that is disc number 1.
 
-            helper_folder_contains_cd_string = DiscTrackBeautifier.has_cd_string_in_folder_name(path)
+            helper_folder_contains_cd_string = NumberBeautifier.has_cd_string_in_folder_name(path)
 
             if helper_folder_contains_cd_string is True:  # If there is a " cd" string in the folder name, don't remove the disc number tag.
                 pass
@@ -153,7 +153,7 @@ class TagBeautifier:
         else:  # Maybe only call this if there is actually a slash in the number.
             [
                 output[i].update(
-                    {"TPOS": DiscTrackBeautifier.extract_number_from_slash_format(output[i].get("TPOS"))}
+                    {"TPOS": NumberBeautifier.extract_number_from_slash_format(output[i].get("TPOS"))}
                 )
                 for i in range(len(output))
             ]

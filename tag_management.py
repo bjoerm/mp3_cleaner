@@ -10,7 +10,7 @@ import pandas as pd
 from tqdm import trange
 
 from beautify_multiple_tags import TagBeautifier
-from beautify_multiple_filenames import FileBeautifier
+from beautify_filepaths import FileBeautifier
 
 
 class TagManager:

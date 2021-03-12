@@ -1,4 +1,4 @@
-from beautify_multiple_filenames import FileBeautifier
+from beautify_filepaths import FileBeautifier
 
 import pytest
 import pandas as pd
