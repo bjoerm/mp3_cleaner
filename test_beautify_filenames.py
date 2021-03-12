@@ -39,7 +39,7 @@ def tags_fully_missing_artist():
 
 
 def test_check_for_same_artist(tags_same_artist, tags_different_artist, tags_partially_missing_artist, tags_fully_missing_artist):
-    assert FileBeautifier._check_for_same_artist(tags=tags_fully_missing_artist) is None # BUG Fix this case! Maybe also have tags_partially_missing_artist return None.
+    assert FileBeautifier._check_for_same_artist(tags=tags_fully_missing_artist) is None
     assert FileBeautifier._check_for_same_artist(tags=tags_same_artist) is True
     assert FileBeautifier._check_for_same_artist(tags=tags_different_artist) is False
     assert FileBeautifier._check_for_same_artist(tags=tags_partially_missing_artist) is False
