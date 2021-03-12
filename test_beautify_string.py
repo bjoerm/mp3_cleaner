@@ -41,8 +41,11 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string("äh") == "Äh"
     assert StringBeautifier.beautify_string("äh !") == "Äh !"
     assert StringBeautifier.beautify_string("your's") == "Your's"
+    assert StringBeautifier.beautify_string('"123"') == "'123'"
+    assert StringBeautifier.beautify_string('"abc"') == "'Abc'"
+    assert StringBeautifier.beautify_string("'abc'") == "'Abc'"
     assert StringBeautifier.beautify_string("Capone 'n' Noreaga") == "Capone 'n' Noreaga"
-    assert StringBeautifier.beautify_string(None) == None, "Test none"
+    assert StringBeautifier.beautify_string(None) is None, "Test none"
 
 
 def test_string_beautification_leading_the(remove_leading_the=True): # Switch this to True to easily test it also for that case.
@@ -51,9 +54,8 @@ def test_string_beautification_leading_the(remove_leading_the=True): # Switch th
     assert StringBeautifier.beautify_string(" The Beatles ", remove_leading_the=remove_leading_the) == "Beatles", "Test Leading The"
     assert StringBeautifier.beautify_string("TheBeatles ", remove_leading_the=remove_leading_the) == "TheBeatles", "Test Leading The"
     assert StringBeautifier.beautify_string("The-Beatles ", remove_leading_the=remove_leading_the) == "The-Beatles", "Test Leading The"
-    assert StringBeautifier.beautify_string(None, remove_leading_the=remove_leading_the) == None, "Test none"
+    assert StringBeautifier.beautify_string(None, remove_leading_the=remove_leading_the) is None, "Test none"
     assert StringBeautifier.beautify_string("The", remove_leading_the=remove_leading_the) == "The", "Test for a band named 'The'"
-
 
 
 def test_string_remove_whitespaces():
@@ -65,7 +67,6 @@ def test_string_remove_whitespaces():
     assert StringBeautifier._remove_not_needed_whitespaces(" 123 456 ") == "123 456"
     assert StringBeautifier._remove_not_needed_whitespaces(" ") == ""
     assert StringBeautifier._remove_not_needed_whitespaces("  ") == ""
-
 
 
 def test_string_unify_quotation_marks_and_accents():
@@ -93,6 +94,7 @@ def test_string_beautify_colons():
     assert StringBeautifier._beautify_colons("Ex:") == "Ex-", "Colon surrounded by whitespace"
     assert StringBeautifier._beautify_colons("Ex:") == "Ex-", "Colon surrounded by whitespace"
 
+
 def test_enforce_round_brackets():
     assert StringBeautifier._enforce_round_brackets("(Test)") == "(Test)"
     assert StringBeautifier._enforce_round_brackets("(Test]") == "(Test)"
@@ -102,11 +104,11 @@ def test_enforce_round_brackets():
     assert StringBeautifier._enforce_round_brackets("⟨Test⟩") == "(Test)"
 
 
-
 def test_unify_hyphens():
     assert StringBeautifier._unify_hyphens("Test-Case") == "Test-Case"
     assert StringBeautifier._unify_hyphens("Test―Case") == "Test-Case"
     assert StringBeautifier._unify_hyphens("Test‒Case") == "Test-Case"
+
 
 def test_string_replace_special_characters():
     assert StringBeautifier._replace_special_characters("") == ""
@@ -120,7 +122,7 @@ def test_string_replace_special_characters():
     assert StringBeautifier._replace_special_characters("WTF?") == "WTF"
     assert StringBeautifier._replace_special_characters("&") == "&" # Nothing changed here.
     assert StringBeautifier._replace_special_characters("C&A") == "C&A" # Nothing changed here.
-    
+
 
 def test_string_fill_missing_space_after_comma():
     assert StringBeautifier._fill_missing_space_after_comma("") == ""
@@ -128,6 +130,7 @@ def test_string_fill_missing_space_after_comma():
     assert StringBeautifier._fill_missing_space_after_comma("10,5") == "10,5"
     assert StringBeautifier._fill_missing_space_after_comma("5,neu") == "5, neu"
     assert StringBeautifier._fill_missing_space_after_comma("neu,5") == "neu, 5"
+
 
 def test_string_remove_leading_the():
     assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="") == ""
@@ -169,7 +172,6 @@ def test_string_deal_with_special_words():
     assert StringBeautifier._deal_with_special_words_and_bands("sunlive") == "sunlive"
 
 
-
 def test_string_capitalize_string():
     """
     Remember that this shall not touch a string (part (surrounded by spaces)), if that has already any capital letter in it.
@@ -202,6 +204,3 @@ def test_string_capitalize_string():
     assert StringBeautifier._capitalize_string("your's") == "Your's"
     assert StringBeautifier._capitalize_string("you're") == "You're"
     assert StringBeautifier._capitalize_string("") == ""
-
-
-

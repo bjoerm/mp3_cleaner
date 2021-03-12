@@ -1,7 +1,7 @@
 import re
 
 
-class DiscAndTrackBeautifier:
+class DiscTrackBeautifier:
     """
     This utility class bundles id3 tag beautification methods for disc number and track number. This class beautifies a single string at a time.
     """

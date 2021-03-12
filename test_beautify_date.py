@@ -32,6 +32,4 @@ def test_mp3_tags_extract_year():
     assert DateBeautifier.extract_year("October '99") == "October '99" # TODO Adjust this case? But should be a total edge case possibly not worth the effort.
     assert DateBeautifier.extract_year(2020) == "2020"
     assert DateBeautifier.extract_year(1980) == "1980"
-    assert DateBeautifier.extract_year(None) == None
-
-
+    assert DateBeautifier.extract_year(None) is None

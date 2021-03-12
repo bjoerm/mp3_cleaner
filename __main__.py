@@ -11,7 +11,6 @@ from environment import Environment
 from tag_management import TagManager
 
 
-
 def main():
     # Load options
     cfg = toml.load("options.toml", _dict=dict)
