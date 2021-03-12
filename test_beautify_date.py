@@ -1,7 +1,7 @@
 # TODO Could this whole bunch of tests be made simpler by using Pytest parameters? Yes: https://docs.pytest.org/en/reorganize-docs/new-docs/user/parametrize.html
 
-
 from beautify_single_date import DateBeautifier
+
 
 def test_mp3_tags_extract_year():
     """
@@ -29,7 +29,7 @@ def test_mp3_tags_extract_year():
     assert DateBeautifier.extract_year("1999 ") == "1999"
     assert DateBeautifier.extract_year("20/12/2020") == "2020"
     assert DateBeautifier.extract_year("99") == "99"
-    assert DateBeautifier.extract_year("October '99") == "October '99" # TODO Adjust this case? But should be a total edge case possibly not worth the effort.
+    assert DateBeautifier.extract_year("October '99") == "October '99"  # TODO Adjust this case? But should be a total edge case possibly not worth the effort.
     assert DateBeautifier.extract_year(2020) == "2020"
     assert DateBeautifier.extract_year(1980) == "1980"
     assert DateBeautifier.extract_year(None) is None

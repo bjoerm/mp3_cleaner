@@ -142,10 +142,10 @@ class TagBeautifier:
 
             helper_folder_contains_cd_string = DiscTrackBeautifier.has_cd_string_in_folder_name(path)
 
-            if helper_folder_contains_cd_string == True: # If there is a " cd" string in the folder name, don't change anything.
+            if helper_folder_contains_cd_string is True: # If there is a " cd" string in the folder name, don't change anything.
                 pass
 
-            if helper_folder_contains_cd_string == False: # If there is no a " cd" string in the folder name, remove the disc number.
+            if helper_folder_contains_cd_string is False: # If there is no a " cd" string in the folder name, remove the disc number.
                 [output[i].pop("TPOS", None) for i in range(len(output))] # Remove the tag.
 
         return output

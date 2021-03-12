@@ -1,10 +1,10 @@
 # TODO Rename the folder as well.
-# TODO Write tests for this class!
 
 
 import os
 import pandas as pd
-import pathlib # Even though it is not explicitly called, it is needed as pathlib's path class is used here.
+import pathlib  # Even though it is not explicitly called, it is needed as pathlib's path type is worked with.
+
 
 class FileBeautifier:
     """
@@ -28,7 +28,7 @@ class FileBeautifier:
             , is_each_track_with_track_number=is_each_track_with_track_number
             )
 
-        df["beautified_filepath"] = cls._propose_beautified_filepath(folder=df.folder, filename=df.beautified_filename)
+        df["beautified_filepath"] = cls._generate_beautified_pathlib_filepath(folder=df.folder, filename=df.beautified_filename)
 
         cls._write_filename_from_tags(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
 
@@ -40,7 +40,7 @@ class FileBeautifier:
         Returns True for all tracks from the same artist, False for multiple artists and None for no artist information.
         """
 
-        track_artist = set(tags[i].get("TPE1") for i in range(len(tags))) # Using set comprehension instead of list comprehension to remove duplicates.
+        track_artist = set(tags[i].get("TPE1") for i in range(len(tags)))  # Using set comprehension instead of list comprehension to remove duplicates.
         track_artist = list(track_artist)
 
         is_same_artist = None
@@ -54,7 +54,7 @@ class FileBeautifier:
             is_same_artist = True
 
         elif len(track_artist) > 1:
-            # Case when there are multiple artists. This also includes the case when e.g. one track does not have a track artist tag but all others have one.
+            # Case when there are multiple artists. This also includes the case when e.g. one track does not have a track artist tags but all others have one.
             is_same_artist = False
 
         else:
@@ -89,7 +89,7 @@ class FileBeautifier:
 
         elif len(list_of_numbers) == len(tags):
             # Are there as many (non None) track numbers as there files.
-            is_each_track_with_number = True # Possible extension: You could make this even more sophisticated (either here or in the tag beautification) to check for multiple times the same track number.
+            is_each_track_with_number = True  # Possible extension: You could make this even more sophisticated (either here or in the tag beautification) to check for multiple times the same track number.
 
         return is_each_track_with_number
 
@@ -100,13 +100,13 @@ class FileBeautifier:
         """
 
         beautified_filename = [
-                cls._propose_single_filename_from_single_tag(
-                    tag=tags[i]
-                    , is_same_artist=is_same_artist
-                    , is_each_track_with_disc_number=is_each_track_with_disc_number
-                    , is_each_track_with_track_number=is_each_track_with_track_number
-                    )
-                for i in range(len(tags))
+            cls._propose_single_filename_from_single_tag(
+                tag=tags[i]
+                , is_same_artist=is_same_artist
+                , is_each_track_with_disc_number=is_each_track_with_disc_number
+                , is_each_track_with_track_number=is_each_track_with_track_number
+                )
+            for i in range(len(tags))
             ]
 
         return beautified_filename
@@ -126,27 +126,26 @@ class FileBeautifier:
         artist = cls._beautify_string_from_tag(tag=tag.get("TPE1"), add_square_brackets=True)
 
         # Combining disc and track number, if available.
-        number = "" # If there is no TPOS or TRCK, number will remain "".
+        number = ""  # If there is no TPOS or TRCK, number will remain "".
 
-        if is_each_track_with_disc_numberis True & is_each_track_with_track_numberis True:
-            number = number + cls._beautify_string_from_tag(tag=tag.get("TPOS")) # Adding disc number, if the disc as well as the track number are present. (On purpose only TPOS is added here as TRCK is added below.)
+        if is_each_track_with_disc_number is True & is_each_track_with_track_number is True:
+            number = number + cls._beautify_string_from_tag(tag=tag.get("TPOS"))  # Adding disc number, if the disc as well as the track number are present. (On purpose only TPOS is added here as TRCK is added below.)
 
-        if is_each_track_with_track_numberis True:
-            number = number + cls._beautify_string_from_tag(tag=tag.get("TRCK")) # Adding disc number, if it is present.
+        if is_each_track_with_track_number is True:
+            number = number + cls._beautify_string_from_tag(tag=tag.get("TRCK"))  # Adding disc number, if it is present.
 
         title = cls._beautify_string_from_tag(tag=tag.get("TIT2"))
 
-        extension = "mp3" # Note that I am hardcoding here the file extension. Do not put a dot in front here! # TODO Raise exception would the total correct way instead of the comment before.
+        extension = "mp3"  # Note that I am hardcoding here the file extension. Do not put a dot in front here! # TODO Raise exception would the total correct way instead of the comment before.
 
-        # Constructing the filename from the pieces.
-        ## Keep in mind that above it is ensured that artist and title are not none.
-        if is_same_artistis True and is_each_track_with_track_numberis True:
+        # Constructing the filename from the pieces. Keep in mind that above it is ensured that artist and title are not none.
+        if is_same_artist is True and is_each_track_with_track_number is True:
             beautified_filename = f'{artist} - {number or ""} - {title}.{extension}'
 
-        elif is_same_artistis False and is_each_track_with_track_numberis True:
+        elif is_same_artist is False and is_each_track_with_track_number is True:
             beautified_filename = f'{number or ""} - {artist} - {title}.{extension}'
 
-        elif is_each_track_with_track_numberis False:
+        elif is_each_track_with_track_number is False:
             beautified_filename = f'{artist} - {title}.{extension}'
 
         else:
@@ -158,7 +157,7 @@ class FileBeautifier:
     @staticmethod
     def _beautify_string_from_tag(tag: str, add_square_brackets: bool = False) -> str:
         """
-        This is a helper to make strings from tags (that shall be used for file names) more beautiful. It takes care of the case of tag = None.
+        This is a helper to make a string from a tag (that shall be used for file names) more beautiful. It also takes care of the case of tag = None and can add square brackets (e.g. around artist name).
         """
 
         if tag is None or tag == "" or tag == " ":
@@ -166,20 +165,20 @@ class FileBeautifier:
             return tag
 
         else:
-            tag = str(tag) # Short ensurer to prevent odd cases, when a tag is not a string.
+            tag = str(tag)  # Short ensurer to prevent odd cases, when a tag is not a string.
 
-        if add_square_bracketsis True:
+        if add_square_brackets is True:
             tag = "[" + tag + "]"
 
         return tag
 
     @staticmethod
-    def _propose_beautified_filepath(folder: pd.Series, filename: pd.Series) -> list:
+    def _generate_beautified_pathlib_filepath(folder: pd.Series, filename: pd.Series) -> list:
         """
         Combines the beautified filename with the folder. Returns a list of pathlib paths.
         """
 
-        filepath = [folder[i] / filename[i] if filename[i] is not None else None for i in range(len(folder))] # Will write None if the filename also is None.
+        filepath = [folder[i] / filename[i] if filename[i] is not None else None for i in range(len(folder))]  # Will write None if the filename also is None.
 
         return filepath
 
@@ -192,6 +191,6 @@ class FileBeautifier:
         check_for_none = any(i is None for i in filepath_beautified)
 
         if check_for_none is True:
-            return # Do not rename any files if there is any None value in the beautified filepath list.
+            return  # Do not rename any files if there is any None value in the beautified filepath list.
 
         [os.rename(filepath_current[i], filepath_beautified[i]) for i in range(len(filepath_beautified))]

@@ -16,7 +16,7 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string("where to? what now???") == "Where To What Now", "Question mark"
     assert StringBeautifier.beautify_string("?!?") == "!", "Question mark"
     assert StringBeautifier.beautify_string("I'am") == "I'am", "Test connected words"
-    assert StringBeautifier.beautify_string("data/now data\yesterday") == "Data-Now Data-Yesterday", "Test slash"
+    assert StringBeautifier.beautify_string("data/now data\\yesterday") == "Data-Now Data-Yesterday", "Test slash"
     assert StringBeautifier.beautify_string("A feat. B C featuring D E feat F") == "A Feat. B C Feat. D E Feat F", "Test Featuring"
     assert StringBeautifier.beautify_string("New Song Pt. 4 pt. 5 pt 6") == "New Song Part 4 Part 5 Pt 6", "Test Part"
     assert StringBeautifier.beautify_string("abC dEF ghi j5L") == "abC dEF Ghi j5L", "Test word contains capital letter - but not at beginning"
@@ -48,7 +48,7 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string(None) is None, "Test none"
 
 
-def test_string_beautification_leading_the(remove_leading_the=True): # Switch this to True to easily test it also for that case.
+def test_string_beautification_leading_the(remove_leading_the=True):  # Switch this to True to easily test it also for that case.
     assert StringBeautifier.beautify_string("", remove_leading_the=remove_leading_the) == ""
     assert StringBeautifier.beautify_string("The Beatles ", remove_leading_the=remove_leading_the) == "Beatles", "Test Leading The"
     assert StringBeautifier.beautify_string(" The Beatles ", remove_leading_the=remove_leading_the) == "Beatles", "Test Leading The"
@@ -120,8 +120,8 @@ def test_string_replace_special_characters():
     assert StringBeautifier._replace_special_characters("abc/def") == "abc-def"
     assert StringBeautifier._replace_special_characters("?") == ""
     assert StringBeautifier._replace_special_characters("WTF?") == "WTF"
-    assert StringBeautifier._replace_special_characters("&") == "&" # Nothing changed here.
-    assert StringBeautifier._replace_special_characters("C&A") == "C&A" # Nothing changed here.
+    assert StringBeautifier._replace_special_characters("&") == "&"  # Nothing changed here.
+    assert StringBeautifier._replace_special_characters("C&A") == "C&A"  # Nothing changed here.
 
 
 def test_string_fill_missing_space_after_comma():
@@ -186,9 +186,9 @@ def test_string_capitalize_string():
     assert StringBeautifier._capitalize_string("DMX is testing") == "DMX Is Testing"
     assert StringBeautifier._capitalize_string("bmX bike") == "bmX Bike"
     assert StringBeautifier._capitalize_string("data-now data-yesterday") == "Data-Now Data-Yesterday"
-    assert StringBeautifier._capitalize_string("Data-Now") == "Data-Now" # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
-    assert StringBeautifier._capitalize_string("Data-now") == "Data-now" # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
-    assert StringBeautifier._capitalize_string("data-Now") == "data-Now" # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
+    assert StringBeautifier._capitalize_string("Data-Now") == "Data-Now"  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
+    assert StringBeautifier._capitalize_string("Data-now") == "Data-now"  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
+    assert StringBeautifier._capitalize_string("data-Now") == "data-Now"  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
     assert StringBeautifier._capitalize_string("m+m") == "M+M"
     assert StringBeautifier._capitalize_string("M+m") == "M+m"
     assert StringBeautifier._capitalize_string("A-ha") == "A-ha"

@@ -7,16 +7,15 @@ class StringBeautifier:
     """
 
     @classmethod
-    def beautify_string(cls, text: str, remove_leading_the: bool=False) -> str:
+    def beautify_string(cls, text: str, remove_leading_the: bool = False) -> str:
         """
         This method beautifies strings. It removes not needed whitespaces, deals with special characters and some other things. It also capitalizes the string to appear more uniform.
         """
 
-        if text == None: # Edge case of input being None.
+        if text is None:  # Edge case of input being None.
             return None
 
-        text_beautified = str(text) # Creating a copy of the input which is used, so the original input is kept for comparisons. And ensuring that the text is a string.
-
+        text_beautified = str(text)  # Creating a copy of the input which is used, so the original input is kept for comparisons. And ensuring that the text is a string.
 
         # Beautify the string
         text_beautified = cls._remove_not_needed_whitespaces(text=text_beautified)
@@ -26,8 +25,7 @@ class StringBeautifier:
         text_beautified = cls._unify_hyphens(text=text_beautified)
         text_beautified = cls._replace_special_characters(text=text_beautified)
         text_beautified = cls._fill_missing_space_after_comma(text=text_beautified)
-        text_beautified = cls._remove_leading_the(remove_leading_the=remove_leading_the, text=text_beautified) # Will only remove if the input variable remove_leading_the is set to True.
-
+        text_beautified = cls._remove_leading_the(remove_leading_the=remove_leading_the, text=text_beautified)  # Will only remove if the input variable remove_leading_the is set to True.
 
         text_beautified = cls._capitalize_string(text=text_beautified)
 
@@ -35,19 +33,17 @@ class StringBeautifier:
 
         return text_beautified
 
-
     @staticmethod
     def _remove_not_needed_whitespaces(text: str) -> str:
         """
         Removes any case of unneeded whitespace.
         """
 
-        text = regex.sub(r" +", " ", text) # Remove any multiple whitespaces.
-        text = regex.sub(r"^ +", "", text) # Remove any whitespace at the start.
-        text = regex.sub(r" +$", "", text) # Remove any whitespace at the end.
+        text = regex.sub(r" +", " ", text)  # Remove any multiple whitespaces.
+        text = regex.sub(r"^ +", "", text)  # Remove any whitespace at the start.
+        text = regex.sub(r" +$", "", text)  # Remove any whitespace at the end.
 
         return text
-
 
     @staticmethod
     def _unify_quotation_marks_and_accents(text: str) -> str:
@@ -64,7 +60,6 @@ class StringBeautifier:
 
         return text
 
-
     @staticmethod
     def _beautify_colons(text: str) -> str:
         """
@@ -72,13 +67,12 @@ class StringBeautifier:
         """
 
         # Case of colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
-        text = regex.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]): (?=.+)", " - ", text) # \u0080-\uFFFF catches special characters from German and other languages https://stackoverflow.com/questions/36366125/
+        text = regex.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]): (?=.+)", " - ", text)  # \u0080-\uFFFF catches special characters from German and other languages https://stackoverflow.com/questions/36366125/
 
         # All other cases of a colon.
         text = regex.sub(":", "-", text)
 
         return text
-
 
     @staticmethod
     def _enforce_round_brackets(text: str) -> str:
@@ -88,9 +82,7 @@ class StringBeautifier:
         text = regex.sub(r"\[+|\{+|⟨+", "(", text)
         text = regex.sub(r"\]+|\}+|⟩+", ")", text)
 
-
         return text
-
 
     @staticmethod
     def _unify_hyphens(text: str) -> str:
@@ -98,7 +90,7 @@ class StringBeautifier:
         Convert all types of hyphens into simple "-".
         """
 
-        text = regex.sub(r"\p{Pd}", "-", text) # Pd matches every unicode character from the 'Punctuation, Dash' category: https://www.fileformat.info/info/unicode/category/Pd/list.htm
+        text = regex.sub(r"\p{Pd}", "-", text)  # Pd matches every unicode character from the 'Punctuation, Dash' category: https://www.fileformat.info/info/unicode/category/Pd/list.htm
 
         return text
 
@@ -121,7 +113,6 @@ class StringBeautifier:
 
         return text
 
-
     @staticmethod
     def _fill_missing_space_after_comma(text: str) -> str:
         """
@@ -132,27 +123,21 @@ class StringBeautifier:
 
         return text
 
-
     @staticmethod
     def _remove_leading_the(remove_leading_the: bool, text: str) -> str:
         """
         Remove any leading "The " from the string.
         """
 
-
-        if remove_leading_the == False:
+        if remove_leading_the is False:
             return text
 
-        if text in ["The", "the"]: # Edge case where the artist is named only "the".
+        if text in ["The", "the"]:  # Edge case where the artist is named only "the".
             return text
 
         text = regex.sub(r"^(the\s)", "", text, flags=regex.IGNORECASE)
 
         return text
-
-
-
-
 
     @staticmethod
     def _capitalize_string(text: str) -> str:
@@ -169,25 +154,23 @@ class StringBeautifier:
 
         # For each pieces, run capitalization.
         for i in range(len(text_list)):
-            if regex.match(r".*\p{Lu}+.*", text_list[i]): # Does the string contain a capital letter somewhere? If so, leave it as it is.
+            if regex.match(r".*\p{Lu}+.*", text_list[i]):  # Does the string contain a capital letter somewhere? If so, leave it as it is.
                 text_list_improved[i] = text_list[i]
 
-            elif regex.match(r".+['|`|´]\w+", text_list[i]): # Does the string contains an accent (', ` or ´) before a string? If so, don't transform the part after the accent into uppercase. This needs to be done, after the check above for captial letters.
-                text_list_improved[i] = text_list[i].capitalize() # Capitalizes transforms that's into That's. While title would transform it into That'S.
+            elif regex.match(r".+['|`|´]\w+", text_list[i]):  # Does the string contains an accent (', ` or ´) before a string? If so, don't transform the part after the accent into uppercase. This needs to be done, after the check above for captial letters.
+                text_list_improved[i] = text_list[i].capitalize()  # Capitalizes transforms that's into That's. While title would transform it into That'S.
 
-            elif regex.match(r"'n'", text_list[i]): # Is the lowercase string 'n', so shortform of "and". Like in Guns 'n' Roses? If so, keep the 'n' lowercase.
+            elif regex.match(r"'n'", text_list[i]):  # Is the lowercase string 'n', so shortform of "and". Like in Guns 'n' Roses? If so, keep the 'n' lowercase.
                 text_list_improved[i] = text_list[i]
 
-            else: # Convert it to uppercase.
+            else:  # Convert it to uppercase.
                 text_list_improved[i] = text_list[i].title()
-
 
         # Converting the list of strings back into a string.
         separator = " "
-        output = separator.join(text_list_improved) # Converting the list of strings into a string.
+        output = separator.join(text_list_improved)  # Converting the list of strings into a string.
 
         return output
-
 
     @staticmethod
     def _deal_with_special_words_and_bands(text: str) -> str:
@@ -196,12 +179,12 @@ class StringBeautifier:
         """
 
         # Special words
-        text = regex.sub(r"(?<=^)Featuring |(?<= |\()Featuring ", "Feat. ", text, flags=regex.IGNORECASE) # This part of two positive lookbehinds is not very elegant but adding ^ into the other one, returned an error due to the varying widths of ^ and e.g. " "
+        text = regex.sub(r"(?<=^)Featuring |(?<= |\()Featuring ", "Feat. ", text, flags=regex.IGNORECASE)  # This part of two positive lookbehinds is not very elegant but adding ^ into the other one, returned an error due to the varying widths of ^ and e.g. " "
         text = regex.sub(r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=regex.IGNORECASE)
-        text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE) # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
-        text = regex.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=regex.IGNORECASE) # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
+        text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE)  # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
+        text = regex.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=regex.IGNORECASE)  # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
 
         # Special band names
-        text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE) # AC/DC
+        text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE)  # AC/DC
 
         return text
