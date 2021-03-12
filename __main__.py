@@ -1,7 +1,6 @@
-# TODO Instead of having a session log. Maybe have a global .parquet log file that is expanded after each run.
+# TODO Instead of having a single session log. Maybe have a global .parquet log file that is expanded after each run.
 # TODO Think about having a logic that moves informations on Feat. from the artist to the title. But might be a bit complicated if there are more suffixes, like (Live) or (Remix).
-# TODO Think about converting "cd strings" (like "cd1") from the path into disc number tags. That would help the file beautification and recude manual work.
-# TODO Switch each "return(x)"" into "return x".
+# TODO Think about converting "cd strings" (like "cd1") from the path into disc number tags. That would help the file beautification and recude manual work. But might be bad in case where this is not a cd number.
 # TODO Finish tests about filenames.
 
 
