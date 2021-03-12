@@ -1,9 +1,9 @@
 # TODO Should this be a utility function? Refactor it.
 # TODO Can list comprehensions be used here instead of the loop(s)?
-
+# TODO Add status message so the user knows what is going on.
 
 import glob  # For reading files and folders.
-import os  # For file path check.
+import os  # For file path check. # TODO Refactor to only use pathlib.
 import pandas as pd
 from pathlib import Path  # For getting the parentfolder of the found mp3.
 import shutil  # For copying folders to create backups.

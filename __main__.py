@@ -4,6 +4,7 @@
 # TODO Finish tests about filenames.
 # TODO Think about keeping the tag with the album art (or at least have an option to activate and deactivate that one).
 # TODO Have option to switch renaming files on and off. Also a switch for folders.
+# TODO Think about option to throw away certain file types (e.g. .exe, .nfo, .txt, .url, .DS_Store, ...) to keep the folders clean.
 
 import toml
 
