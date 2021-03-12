@@ -7,42 +7,55 @@ import pandas as pd
 
 
 @pytest.fixture
-def tags_same_artist():
+def tags_same_values():
     return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1")
-        , dict(TPE1="Artist 1", TIT2="Title 2")
+        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TDRC="2000")
+        , dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album 1", TDRC="2000")
         ])
 
 
 @pytest.fixture
-def tags_different_artist():
+def tags_different_values():
     return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1")
-        , dict(TPE1="Artist 2", TIT2="Title 2")
+        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TDRC="2000")
+        , dict(TPE1="Artist 2", TIT2="Title 2", TALB="Album 2", TDRC="2001")
         ])
 
 
 @pytest.fixture
-def tags_partially_missing_artist():
+def tags_partially_missing_values():
     return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1")
-        , dict(TPE1=None, TIT2="Title 2")
+        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TDRC="2000")
+        , dict(TPE1=None, TIT2="Title 2", TALB=None, TDRC=None)
         ])
 
 
 @pytest.fixture
-def tags_fully_missing_artist():
+def tags_fully_missing_values():
     return pd.Series([
-        dict(TPE1=None, TIT2="Title 1")
-        , dict(TPE1=None, TIT2="Title 2")
+        dict(TPE1=None, TIT2="Title 1", TALB=None, TDRC=None)
+        , dict(TPE1=None, TIT2="Title 2", TALB=None, TDRC=None)
         ])
 
 
-def test_check_for_same_artist(tags_same_artist, tags_different_artist, tags_partially_missing_artist, tags_fully_missing_artist):
-    assert FileBeautifier._check_for_same_artist(tags=tags_fully_missing_artist) is None
-    assert FileBeautifier._check_for_same_artist(tags=tags_same_artist) is True
-    assert FileBeautifier._check_for_same_artist(tags=tags_different_artist) is False
-    assert FileBeautifier._check_for_same_artist(tags=tags_partially_missing_artist) is False
+def test_check_for_same_artist(tags_same_values, tags_different_values, tags_partially_missing_values, tags_fully_missing_values):
+    # Artist
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_fully_missing_values, id3_field="TPE1") is None
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_same_values, id3_field="TPE1") is True
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_different_values, id3_field="TPE1") is False
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_partially_missing_values, id3_field="TPE1") is False
+
+    # Album
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_fully_missing_values, id3_field="TALB") is None
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_same_values, id3_field="TALB") is True
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_different_values, id3_field="TALB") is False
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_partially_missing_values, id3_field="TALB") is False
+
+    # Date
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_fully_missing_values, id3_field="TDRC") is None
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_same_values, id3_field="TDRC") is True
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_different_values, id3_field="TDRC") is False
+    assert FileBeautifier._check_uniqueness_of_tag(tags=tags_partially_missing_values, id3_field="TDRC") is False
 
 
 @pytest.fixture

@@ -17,9 +17,11 @@ class FileBeautifier:
         Main method for beautifying filenames.
         """
 
-        is_same_artist = cls._check_for_same_artist(tags=df.beautified_tag)
-
+        # Helper checks for the renaming.
+        is_same_artist = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TPE1")
         is_each_track_with_disc_number, is_each_track_with_track_number = cls._check_existance_of_disc_and_track_number(tags=df.beautified_tag)
+        is_same_album_title = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TALB")
+        is_same_date = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TDRC")
 
         df["beautified_filename"] = cls._propose_multiple_filenames_from_multiple_tags(
             tags=df.beautified_tag
@@ -32,35 +34,37 @@ class FileBeautifier:
 
         cls._write_filename_from_tags(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
 
+        cls._beautify_folder(folder=df.folder, beautified_tag=df.beautified_tag, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number)
+
     @staticmethod
-    def _check_for_same_artist(tags: pd.Series) -> bool:
+    def _check_uniqueness_of_tag(tags: pd.Series, id3_field: str) -> bool:
         """
-        Checks whether all tracks in this iteration have the same artist. If not all have it, the file renaming will be a bit different.
+        Checks whether or not all entries of the specified id3 field contain the same value (e.g. whether all have the same artist).
 
-        Returns True for all tracks from the same artist, False for multiple artists and None for no artist information.
+        Returns True if that is the case or False if there are multiple different values of the specified id3 field within the entries. And None if there are no information.
         """
 
-        track_artist = set(tags[i].get("TPE1") for i in range(len(tags)))  # Using set comprehension instead of list comprehension to remove duplicates.
-        track_artist = list(track_artist)
+        unique_entries = set(tags[i].get(id3_field) for i in range(len(tags)))  # Using set comprehension instead of list comprehension to remove duplicates.
+        unique_entries = list(unique_entries)
 
-        is_same_artist = None
+        is_unique = None
 
-        if track_artist is None or track_artist == [None]:
+        if unique_entries is None or unique_entries == [None]:
             # Case when there is no track artist in all of the files.
-            is_same_artist = None
+            is_unique = None
 
-        elif len(track_artist) == 1:
+        elif len(unique_entries) == 1:
             # Case when all tracks have the same artist (which is not None).
-            is_same_artist = True
+            is_unique = True
 
-        elif len(track_artist) > 1:
+        elif len(unique_entries) > 1:
             # Case when there are multiple artists. This also includes the case when e.g. one track does not have a track artist tags but all others have one.
-            is_same_artist = False
+            is_unique = False
 
         else:
             raise ValueError("Length of track artist might be below 1.")
 
-        return is_same_artist
+        return is_unique
 
     @classmethod
     def _check_existance_of_disc_and_track_number(cls, tags: pd.Series) -> tuple:
@@ -77,9 +81,9 @@ class FileBeautifier:
         return (is_each_track_with_disc_number, is_each_track_with_track_number)
 
     @staticmethod
-    def _helper_existance_of_disc_and_track_number(tags: pd.Series, list_of_numbers: list):
+    def _helper_existance_of_disc_and_track_number(tags: pd.Series, list_of_numbers: list) -> bool:
         """
-        Helper method for _check_existance_of_disc_and_track_number to not there write the same code twice.
+        Helper method for _check_existance_of_disc_and_track_number to not write the same code twice.
         """
         is_each_track_with_number = None
 
@@ -194,3 +198,12 @@ class FileBeautifier:
             return  # Do not rename any files if there is any None value in the beautified filepath list.
 
         [os.rename(filepath_current[i], filepath_beautified[i]) for i in range(len(filepath_beautified))]
+
+
+    @staticmethod
+    def _beautify_folder(folder: pd.Series, beautified_tag: pd.Series, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool):
+        """
+        # TODO
+        """
+
+        pass
