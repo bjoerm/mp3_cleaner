@@ -30,15 +30,16 @@ def test_mp3_extract_track_number_from_slash_format():
     """
     Testing the regex that extracts the track number from potential 'slash format'.
     """
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format("") == ""
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format("01") == "01"
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format("01/") == "01"
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format("01/16") == "01"
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format("1") == "1"
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format("1/") == "1"
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format("1/16") == "1"
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format(1) == "1"
-    assert DiscTrackBeautifier.extract_track_number_from_slash_format(None) is None
+    assert DiscTrackBeautifier.extract_number_from_slash_format("") == ""
+    assert DiscTrackBeautifier.extract_number_from_slash_format("01") == "01"
+    assert DiscTrackBeautifier.extract_number_from_slash_format("01/") == "01"
+    assert DiscTrackBeautifier.extract_number_from_slash_format("01/16") == "01"
+    assert DiscTrackBeautifier.extract_number_from_slash_format("1") == "1"
+    assert DiscTrackBeautifier.extract_number_from_slash_format("1/") == "1"
+    assert DiscTrackBeautifier.extract_number_from_slash_format("1/16") == "1"
+    assert DiscTrackBeautifier.extract_number_from_slash_format("1/2") == "1"
+    assert DiscTrackBeautifier.extract_number_from_slash_format(1) == "1"
+    assert DiscTrackBeautifier.extract_number_from_slash_format(None) is None
 
 
 def test_mp3_tags_has_cd_string_in_folder_name():

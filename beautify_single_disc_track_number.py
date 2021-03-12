@@ -6,8 +6,8 @@ class DiscTrackBeautifier:
     This utility class bundles id3 tag beautification methods for disc number and track number. This class beautifies a single string at a time.
     """
 
-    @staticmethod
-    def beautify_track_number(track_number: str, helper_length_max: int, minimum_length: int = 2) -> str:
+    @classmethod
+    def beautify_track_number(cls, track_number: str, helper_length_max: int, minimum_length: int = 2) -> str:
         """
         Beautifying the track numbers.
         minimum_length sets the minimum integer length of the track number 2 means that an album with only 5 tracks, will still have all track number being filled with a leading zero, so that e.g. track number "5" becomes "05" on that album.
@@ -20,7 +20,7 @@ class DiscTrackBeautifier:
         track_number_beautified = str(track_number)  # Ensuring that the input is a string.
 
         # Extract track number from format track number/tracks on disc (e.g.: "01/16" for track 1 from 16 of this disc)).
-        track_number_beautified = re.sub(r"(?<=\d)\/\d+", "", track_number_beautified)  # "01/16" will be transformed into "01"
+        track_number_beautified = cls.extract_number_from_slash_format(track_number_beautified)  # "01/16" will be transformed into "01"
 
         # Remove non-integers
         track_number_beautified = re.sub(r"[^0-9]", "", track_number_beautified)
@@ -55,7 +55,7 @@ class DiscTrackBeautifier:
         return track_number_beautified
 
     @staticmethod
-    def extract_track_number_from_slash_format(string: str) -> str:
+    def extract_number_from_slash_format(string: str) -> str:
         """
         Replace any slash (and if there integers) after an initial interger.
         For dealing with cases like "01/16" or "1/" for the track number.
@@ -68,12 +68,7 @@ class DiscTrackBeautifier:
 
         else:
             output = str(output)
-
-        try:
             output = re.sub(r"(?<=\d)\/\d*", "", output)
-
-        except:
-            pass  # If for example None is entered, return None untouched.
 
         return output
 
