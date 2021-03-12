@@ -1,9 +1,5 @@
-# TODO Rename the folder as well.
-
-
-import os
 import pandas as pd
-import pathlib  # Even though it is not explicitly called, it is needed as pathlib's path type is worked with.
+import pathlib
 
 
 class FileBeautifier:
@@ -32,9 +28,11 @@ class FileBeautifier:
 
         df["beautified_filepath"] = cls._generate_beautified_pathlib_filepath(folder=df.folder, filename=df.beautified_filename)
 
-        cls._write_filename_from_tags(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
+        cls._write_filename(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
 
-        cls._beautify_folder(folder=df.folder, beautified_tag=df.beautified_tag, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number)
+        df["beautified_folder"] = cls._beautify_folder(tags=df.beautified_tag, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number)
+
+        cls._rename_folder(folder_current=df.folder, beautified_folder=df.beautified_folder)
 
     @staticmethod
     def _check_uniqueness_of_tag(tags: pd.Series, id3_field: str) -> bool:
@@ -133,7 +131,7 @@ class FileBeautifier:
         number = ""  # If there is no TPOS or TRCK, number will remain "".
 
         if is_each_track_with_disc_number is True & is_each_track_with_track_number is True:
-            number = number + cls._beautify_string_from_tag(tag=tag.get("TPOS"))  # Adding disc number, if the disc as well as the track number are present. (On purpose only TPOS is added here as TRCK is added below.)
+            number = cls._beautify_string_from_tag(tag=tag.get("TPOS"))  # Adding disc number, if the disc as well as the track number are present. (On purpose only TPOS is added here as TRCK is added below.)
 
         if is_each_track_with_track_number is True:
             number = number + cls._beautify_string_from_tag(tag=tag.get("TRCK"))  # Adding disc number, if it is present.
@@ -187,7 +185,7 @@ class FileBeautifier:
         return filepath
 
     @staticmethod
-    def _write_filename_from_tags(filepath_current, filepath_beautified):
+    def _write_filename(filepath_current: pd.Series, filepath_beautified: pd.Series):
         """
         Overwrites existing filename. However, if relevant tags are missing, then the file is not touched.
         """
@@ -197,13 +195,85 @@ class FileBeautifier:
         if check_for_none is True:
             return  # Do not rename any files if there is any None value in the beautified filepath list.
 
-        [os.rename(filepath_current[i], filepath_beautified[i]) for i in range(len(filepath_beautified))]
+        else:
 
+            # TODO Also have a check that there a no duplicates in filepath_beautified.
+
+            # Only rename files to new filenames if those do not already exist.
+            check_filepath_already_exists = [pathlib.Path(filepath_beautified[i]).is_file() for i in range(len(filepath_beautified))]
+
+            if any(i is True for i in check_filepath_already_exists) is True:
+                return
+
+            [filepath_current[i].rename(filepath_beautified[i]) for i in range(len(filepath_beautified))]
+
+    @classmethod
+    def _beautify_folder(cls, tags: pd.Series, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool) -> str:
+        """
+        Generate improved folder names from the tags. The input tags must be the already beautified ones.
+        """
+
+        # Cases where the folder name shall remain untouched.
+        if is_same_album_title is False or is_same_album_title is None:
+            return  # TODO This should return the untouched folder name.
+
+        elif is_same_artist is False or is_same_artist is None:
+            return  # TODO This should return the untouched folder name.
+
+        # Creating required single pieces.
+        artist = cls._beautify_string_from_tag(tag=tags[0].get("TPE1"), add_square_brackets=True)  # Pulling the artist information from the information on the first mp3 file.
+
+        album = cls._beautify_string_from_tag(tag=tags[0].get("TALB"))
+
+        disc_number = ""
+
+        if is_each_track_with_disc_number is True:
+            disc_number = cls._beautify_string_from_tag(tag=tags[0].get("TPOS"))
+
+        date = ""
+
+        if is_same_date is True:
+            date = cls._beautify_string_from_tag(tag=tags[0].get("TDRC"))
+
+        # Constructing the folder name from the pieces. Keep in mind that above it is ensured that artist and album title are unique and not none.
+        beautified_folder = None
+
+        if is_same_date is True and is_each_track_with_disc_number is True:
+            beautified_folder = f'{artist} - {album} (CD{disc_number}) ({date})'
+
+        elif is_same_date is True and is_each_track_with_disc_number is False:
+            beautified_folder = f'{artist} - {album} ({date})'
+
+        elif is_same_date is True and is_each_track_with_disc_number is False:
+            beautified_folder = f'{artist} - {album} (CD{disc_number})'
+
+        elif is_same_date is False and is_each_track_with_disc_number is False:
+            beautified_folder = f'{artist} - {album}'
+
+        else:
+            # This should normally not be reached as the conditions above should capture all possible cases (as long as the input values are booleans).
+            beautified_folder = None
+
+        return beautified_folder
 
     @staticmethod
-    def _beautify_folder(folder: pd.Series, beautified_tag: pd.Series, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool):
+    def _rename_folder(folder_current: pd.Series, beautified_folder: pd.Series):
         """
-        # TODO
+        Renames existing folder. However, if relevant tags are missing or special cases occur (like mixed artists), then the folder is not touched.
         """
 
-        pass
+        check_for_none = any(i is None for i in beautified_folder)
+
+        if check_for_none is True:
+            return  # Do not rename any files if there is any None value in the beautified filepath list.
+
+        else:
+            folder_current = folder_current[0]  # This is a pathlib object.
+            beautified_folder = beautified_folder[0]
+
+            beautified_folder = folder_current.parent / beautified_folder  # Only rename the last item of the folder path. Files in subdirectories are that way not moved around.
+
+            if pathlib.Path(beautified_folder).is_dir():
+                print(f'[Error] {beautified_folder} already exists. Folder was not renamed.')
+            else:
+                folder_current.rename(beautified_folder)
