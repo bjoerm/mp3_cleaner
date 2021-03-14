@@ -43,7 +43,7 @@ class TagManager:
             df_iteration["unchanged_tag"] = cls._remove_string_encoding_information(tags=df_iteration["unchanged_tag"])
 
             # Remove files without (relevant ID3 tags).
-            df_iteration = cls._skip_files_without_tags(df=df_iteration)
+            df_iteration, has_file_without_tags = cls._skip_files_without_tags(df=df_iteration)
 
             # Deal with case that all files in current folder can be without relevant tags (then continue to the next folder).
             if len(df_iteration) == 0:
@@ -58,7 +58,7 @@ class TagManager:
             cls._write_beautified_tag_to_files(id3_column=df_iteration["id3"])
 
             # Beautify the filename.
-            FileBeautifier.beautify_filenames(df=df_iteration)
+            FileBeautifier.beautify_filenames(df=df_iteration, has_file_without_tags=has_file_without_tags)
 
             # Keep a log of the tags. Be aware that this might get big, if at some point the tag with an image of the album cover would be included.
             df_log = df_log.append(df_iteration)
@@ -157,16 +157,22 @@ class TagManager:
         return output
 
     @staticmethod
-    def _skip_files_without_tags(df: pd.DataFrame):
+    def _skip_files_without_tags(df: pd.DataFrame) -> tuple:
         """
         Skipping the files that have either no ID3 tag or that have no relevant/defined ID3 tag. They will be skipped in the following beautification as the tags are empty anyway.
         """
 
-        df = df[df.unchanged_tag != {}]
+        has_file_without_tags = False
 
-        df = df.reset_index(drop=True)
+        if len(df) > len(df[df.unchanged_tag != {}]):
 
-        return df
+            has_file_without_tags = True
+
+            df = df[df.unchanged_tag != {}]
+
+            df = df.reset_index(drop=True)
+
+        return df, has_file_without_tags
 
     @classmethod
     def _overwrite_tags_in_id3_object(cls, id3_column: pd.Series, beautified_tag: pd.Series) -> pd.Series:

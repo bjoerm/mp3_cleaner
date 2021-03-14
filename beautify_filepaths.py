@@ -8,7 +8,7 @@ class FileBeautifier:
     """
 
     @classmethod
-    def beautify_filenames(cls, df: pd.DataFrame):
+    def beautify_filenames(cls, df: pd.DataFrame, has_file_without_tags: bool):
         """
         Main method for beautifying filenames.
         """
@@ -30,7 +30,7 @@ class FileBeautifier:
 
         cls._write_filename(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
 
-        df["beautified_folder"] = cls._beautify_folder(tags=df.beautified_tag, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number)
+        df["beautified_folder"] = cls._beautify_folder(tags=df.beautified_tag, has_file_without_tags=has_file_without_tags, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number)
 
         cls._rename_folder(folder_current=df.folder, beautified_folder=df.beautified_folder)
 
@@ -208,12 +208,15 @@ class FileBeautifier:
             [filepath_current[i].rename(filepath_beautified[i]) for i in range(len(filepath_beautified))]
 
     @classmethod
-    def _beautify_folder(cls, tags: pd.Series, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool) -> str:
+    def _beautify_folder(cls, tags: pd.Series, has_file_without_tags: bool, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool) -> str:
         """
         Generate improved folder names from the tags. The input tags must be the already beautified ones.
         """
 
         # Cases where the folder name shall remain untouched.
+        if has_file_without_tags is True:  # If there are any mp3 files without tags in the folder, do not rename the folder.
+            return  # TODO This should return the untouched folder name.
+
         if is_same_album_title is False or is_same_album_title is None:
             return  # TODO This should return the untouched folder name.
 
