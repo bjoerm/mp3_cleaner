@@ -13,17 +13,20 @@ import toml
 
 from environment import Environment
 from tag_management import TagManager
+from environment_v2 import DataPreparer
 
 
 def main():
     # Load options
     cfg = toml.load("options.toml", _dict=dict)
 
-    # Set up environment, convert mp3 files to have a lowercase file extension and get list of mp3 files and their folder.
-    env = Environment(input_path=cfg.get("input_path"), wip_path=cfg.get("wip_path"))
+    files_and_folders = DataPreparer.prepare_input(input_path=cfg.get("input_path"), wip_path=cfg.get("wip_path"), log_path=cfg.get("log_path"), overwrite_previous_output=cfg.get("overwrite_previous_output"), unwanted_files=cfg.get("unwanted_files"))
+
+    # # Set up environment, convert mp3 files to have a lowercase file extension and get list of mp3 files and their folder.
+    # env = Environment(input_path=cfg.get("input_path"), wip_path=cfg.get("wip_path"))
 
     # Improve the MP3 ID3 tags in the specified folder(s).
-    TagManager.improve_tags(selected_id3_fields=cfg.get("selected_id3_fields"), files_and_folders=env.files_and_folders)
+    TagManager.improve_tags(selected_id3_fields=cfg.get("selected_id3_fields"), files_and_folders=files_and_folders)
 
 
 if __name__ == "__main__":
