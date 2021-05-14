@@ -10,4 +10,4 @@ selected_id3_fields = ["APIC:", "POPM:no@email", "TALB", "TDRC", "TIT2", "TPE1",
 
 
 # Files and filetypes that shall be deleted.
-unwanted_files = [".exe", ".nfo", ".txt", ".url", "thumbs.db", "DS_Store"] # Only provide the end of the file(type) here.
+unwanted_files = [".exe", ".nfo", ".txt", ".url", "thumbs.db", "DS_Store", ".m3u", ".sfv"] # Only provide the end of the file(type) here.
