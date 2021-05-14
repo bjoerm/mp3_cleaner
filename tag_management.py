@@ -4,7 +4,7 @@
 
 
 import datetime
-from mutagen.id3 import POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
+from mutagen.id3 import APIC, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 from mutagen.mp3 import MP3  # Alternative to ID3 and ID3NoHeaderError.
 import pandas as pd
 from tqdm import trange
@@ -42,7 +42,7 @@ class TagManager:
             # Remove encoding information and only keep the text.
             df_iteration["unchanged_tag"] = cls._remove_string_encoding_information(tags=df_iteration["unchanged_tag"])
 
-            # Remove files without (relevant ID3 tags).
+            # Remove files without (relevant) ID3 tags.
             df_iteration, has_file_without_tags = cls._skip_files_without_tags(df=df_iteration)
 
             # Deal with case that all files in current folder can be without relevant tags (then continue to the next folder).
@@ -111,7 +111,7 @@ class TagManager:
         if mp3.tags is None:
             mp3.add_tags()
         id3 = mp3.tags  # Only fetching the id3 tag.
-        id3.filename = mp3.filename  # Adding the filename as this is not passed.
+        id3.filename = mp3.filename  # Adding the filename as that is not passed.
 
         return id3  # Returns an ID3 object.
 
@@ -144,7 +144,7 @@ class TagManager:
             dict(
                 (
                     k
-                    , output[i].get(k).text[0] if k != "POPM:no@email"  # Not touching the rating field ("POPM:no@email") which does not contain a "text" element.
+                    , output[i].get(k).text[0] if k not in ("APIC:", "POPM:no@email")  # Not touching the rating field ("POPM:no@email") and the album art as those do not contain any "text" element.
                     else output[i].get(k)
                 ) for k in output[i]
             ) for i in output.index
@@ -195,11 +195,13 @@ class TagManager:
 
         for key, value in beautified_tag.items():
 
-            if key == "POPM:no@email":  # Does not have a text field and thus a bit different structure.
-                exec(f'id3.add({value})')  # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
+            if key in ("POPM:no@email", "APIC:"):  # Does not have a text field and thus a bit different structure.
+                id3.add(value)
+                # exec(f'id3.add({value})')
 
             elif key in ("TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"):  # These fields (all but rating), have a text parameter which can be added the same way.
-                exec(f'id3.add({key}(encoding = 3, text = "{value}"))')  # encoding = 3 = UTF8
+                exec(f'id3.add({key}(encoding = 3, text = "{value}"))')  # encoding = 3 = UTF8 # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
+
 
             else:
                 # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here.
