@@ -1,81 +1,103 @@
-# TODO Should this be a utility function? Refactor it.
-# TODO Can list comprehensions be used here instead of the loop(s)?
-# TODO Add status message so the user knows what is going on.
+# TODO Where to do the conversion of mp3 file extensions to lowercase? In the other class it would be more fitting - although it will then not touch the files without tags. However, those files need to get a tag anyway before I can do anything with them.
 
-import glob  # For reading files and folders.
-import os  # For file path check. # TODO Refactor to only use pathlib.
+
+import glob
 import pandas as pd
-from pathlib import Path  # For getting the parentfolder of the found mp3.
-import shutil  # For copying folders to create backups.
+from pathlib import Path
+import shutil
+import regex
 
 
-class Environment:  # TODO Find a more fitting name.
+class DataPreparer:
 
-    def __init__(self, input_path: str, wip_path: str):
-
-        self.input_path = input_path
-        self.wip_path = wip_path
-        self.files_and_folders = pd.DataFrame(columns=["filepath", "folder"])  # TODO Ask Volker whether it makes sense to put functions from the environment already in the __init__ or whether this should be done in the "main" call of that environment? As of now this only fetches it at the beginning once and even prior moving files or change file extension to lowercase. So this already hints at the reasonable answer. ;-)
-
-        # Execute one-time needed functions:
-        # Setting up working environment
-        self._copy_files_to_working_folder()
-
-        # Convert all file extensions to lowercase
-        self.convert_file_extension_to_lowercase()
-
-        # Create a log folder (if it does not yet exist)
-        self.create_folder_for_logs()
-
-    def _copy_files_to_working_folder(self):
+    @classmethod
+    def prepare_input(cls, input_path: str, wip_path: str, log_path: str, overwrite_previous_output: bool, unwanted_files: list) -> pd.DataFrame:
         """
-        Setting up the workspace.
+        This is the main method. It will create a copy of the files from the input path in the output path, delete unwanted files there and will finally generate a data frame with all mp3 files (and related folders). That data frame is then used in the next class.
         """
 
-        # Delete previously existing working folder, if it exists.
-        if os.path.exists(self.wip_path):
-            shutil.rmtree(self.wip_path)
+        cls._ensure_existance_of_required_folders(input_path, wip_path, log_path)
 
-        # Copy files into a working folder so original files are not touched.
-        shutil.copytree(self.input_path, self.wip_path)
+        cls._overwrite_previous_output(overwrite_previous_output=overwrite_previous_output, wip_path=wip_path)
 
-    def get_files_and_folders(self):
+        cls._create_copy_that_will_be_beautified(input_path=input_path, wip_path=wip_path)
+
+        file_list = cls._list_all_files(wip_path=wip_path)
+
+        cls._delete_unwanted_files_from_output(file_list=file_list, unwanted_files=unwanted_files)
+
+        files_and_folders = cls._list_mp3_files_and_folders(file_list=file_list)
+
+        return files_and_folders
+
+    @staticmethod
+    def _ensure_existance_of_required_folders(*args: tuple):
         """
-        This function will return a two column data frame with all mp3 files and the folder that contains the .mp3 file.
-        """
-
-        # Grabs all mp3 files in the defined folder.
-        files_list = glob.glob(
-            self.wip_path + "/**/*.[mM][pP]3"  # glob itself seems to not care about whether file extension contain capital letters. Anyways, [mM][pP]3 is a bit safer than just mp3. This does not perceive .mp3a as .mp3. TODO Check whether it has problems with folders that contains the .mp3 somewhere.
-            , recursive=True  # Recursive = True in combination with ** in the path will lead to a search in every folder and subfolder and subsubfolder and ...
-            )
-
-        # Getting and attaching the folder path
-        files = pd.DataFrame(data=files_list, columns=["filepath"])  # Converting into a pandas data.frame and name the column.
-        files["filepath"] = files["filepath"].apply(Path)  # Getting the path, so the "parent" method can be used in the following line.
-        files['folder'] = files["filepath"].apply(lambda x: x.parent)  # Getting the folder of that respective file.
-
-        self.files_and_folders = files  # Updating the self data frame.
-
-    def convert_file_extension_to_lowercase(self):
-        """
-        Convert file extension to lowercase for all mp3's in working folder.
+        Ensure that all required folders exist (and create them if not).
         """
 
-        self.get_files_and_folders()  # Ensure that this self data frame is updated.
+        for i in args:
+            Path(i).mkdir(parents=True, exist_ok=True)
 
-        files = list(self.files_and_folders["filepath"])
-
-        for i in range(len(files)):
-            pre, ext = os.path.splitext(files[i])
-
-            os.rename(files[i], pre + ".mp3")  # Convert each file extention into lowercase.
-
-        self.get_files_and_folders()  # Ensure that this self data frame is updated after any potential changes have been done in this function.
-
-    def create_folder_for_logs(self):
+    @staticmethod
+    def _overwrite_previous_output(overwrite_previous_output: bool, wip_path: str):
         """
-        Create a log folder, if it does not yet exist.
+        Will delete the content of the output folder, if that option is chosen.
         """
-        if not os.path.exists("logs"):
-            os.makedirs("logs")
+
+        if overwrite_previous_output is False:
+            return
+
+        else:  # Deleting the folder.
+            shutil.rmtree(wip_path)
+
+    @staticmethod
+    def _create_copy_that_will_be_beautified(input_path: str, wip_path: str):
+        """
+        Copy files into a working folder so original files are not touched.
+        """
+
+        shutil.copytree(src=input_path, dst=wip_path)
+        # TODO Once this is upgraded to Python 3.8 or higher, dirs_exist_ok=True can be easily used. shutil.copytree(src=input_path, dst=wip_path, dirs_exist_ok=True).
+
+    @staticmethod
+    def _list_all_files(wip_path: str) -> list:
+        file_list = glob.glob(wip_path + "/**", recursive=True)
+
+        return(file_list)
+
+    @staticmethod
+    def _delete_unwanted_files_from_output(file_list: list, unwanted_files: list):
+        """
+        Deletes unwanted files to have the output folder only contain only contain relevant files.
+        """
+
+        # Transforming everything (in this function) to lowercase.
+        file_list = [file.lower() for file in file_list]
+        unwanted_files = [file.lower() for file in unwanted_files]
+
+        # Deleting unwanted files.
+        files_to_delete = []
+
+        for i in unwanted_files:
+            files_to_delete += [file for file in file_list if file.endswith(i)]
+
+        if len(files_to_delete) > 0:
+            for i in files_to_delete:
+                Path(i).unlink()
+
+    @staticmethod
+    def _list_mp3_files_and_folders(file_list: list):
+        """
+        This function will return a two column data frame with all mp3 files and the related folder.
+        """
+
+        # Filter the list of files to keep only the mp3 files.
+        mp3_list = [file for file in file_list if regex.match(r".+\.mp3$", file, flags=regex.IGNORECASE) is not None]
+
+        # Creating data frame of mp3 files.
+        df_mp3 = pd.DataFrame(data=mp3_list, columns=["filepath"])
+        df_mp3["filepath"] = df_mp3["filepath"].apply(Path)  # Converting into a pathlib Path object.
+        df_mp3["folder"] = df_mp3["filepath"].apply(lambda x: x.parent)  # Getting the folder of that respective file.
+
+        return df_mp3

@@ -11,9 +11,8 @@
 
 import toml
 
-from environment import Environment
 from tag_management import TagManager
-from environment_v2 import DataPreparer
+from environment import DataPreparer
 
 
 def main():
