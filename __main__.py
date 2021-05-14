@@ -1,13 +1,10 @@
 # TODO Add functionality that prevents folder renames in cases when there are files with tags and without at the same time. As of now cases with not tags are just dropped and are thus overlooked in later checks for Nones (in the rename folder part for example).
 
-
 # TODO Instead of having a single session log. Maybe have a global .parquet log file that is expanded after each run.
 # TODO Think about having a logic that moves informations on Feat. from the artist to the title.
 # TODO Think about converting "cd strings" (like "cd1") from the path into disc number tags. That would help the file beautification and recude manual work. But might be bad in case where this is not a cd number.
-# TODO Finish tests about filenames.
-# TODO Think about keeping the tag with the album art (or at least have an option to activate and deactivate that one).
+# TODO Finish tests about filenames (and foldernames).
 # TODO Have option to switch renaming files on and off. Also a switch for folders.
-# TODO Think about option to throw away certain file types (e.g. .exe, .nfo, .txt, .url, .DS_Store, Thumbs.db, ...) to keep the folders clean.
 
 import toml
 
