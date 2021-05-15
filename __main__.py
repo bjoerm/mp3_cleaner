@@ -2,9 +2,9 @@
 
 # TODO Instead of having a single session log. Maybe have a global .parquet log file that is expanded after each run.
 # TODO Think about having a logic that moves informations on Feat. from the artist to the title.
-# TODO Think about converting "cd strings" (like "cd1") from the path into disc number tags. That would help the file beautification and recude manual work. But might be bad in case where this is not a cd number.
+# TODO Think about converting "cd strings" (like "cd1") from the path into disc number tags. That would help the file beautification and recude manual work. But might be bad in case where "cd" is not referring to a cd number.
 # TODO Finish tests about filenames (and foldernames).
-# TODO Have option to switch renaming files on and off. Also a switch for folders.
+# TODO Have option to switch renaming files on and off. Also a switch for folders. And for album art tags.
 
 import toml
 
