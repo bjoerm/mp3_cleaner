@@ -178,7 +178,7 @@ class StringBeautifier:
         Deal with special cases like the strings featuring, pt., remix or live.
         """
 
-        # Special words
+        # Unifying special words
         text = regex.sub(r"(?<=^)Featuring |(?<= |\()Featuring ", "Feat. ", text, flags=regex.IGNORECASE)  # This part of two positive lookbehinds is not very elegant but adding ^ into the other one, returned an error due to the varying widths of ^ and e.g. " "
         text = regex.sub(r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=regex.IGNORECASE)
         text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE)  # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
@@ -188,3 +188,74 @@ class StringBeautifier:
         text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE)  # AC/DC
 
         return text
+
+
+class StringHelper:
+    """
+    This utility class contains helper methods that are not related to the generic string beautification above.
+    """
+
+    @classmethod
+    def move_feature_from_artist_to_track(cls, tpe1: str, tit2: str) -> list:
+
+        valid_inputs = cls._ensure_valid_strings(string=tpe1) and cls._ensure_valid_strings(string=tit2)
+
+        if valid_inputs is False:
+            has_feat_in_tpe1 = False
+            return has_feat_in_tpe1, tpe1, tit2
+
+        has_feat_in_tpe1, tpe1_without_feat, feat_info = cls._check_artist(tpe1=tpe1)
+
+        if has_feat_in_tpe1 is True:
+            tpe1_updated, tit2_updated = cls._move_feat(tpe1_without_feat=tpe1_without_feat, tit2=tit2, feat_info=feat_info)
+
+            valid_outputs = cls._ensure_valid_strings(string=tpe1) and cls._ensure_valid_strings(string=tit2)  # Ensuring that the output also matches the validation criteria (e.g. minimum string length). This prevents edge case where only the feat. information was in the artist string.
+
+            if valid_outputs:
+                tpe1, tit2 = tpe1_updated, tit2_updated
+            else:
+                has_feat_in_tpe1 = False  # Setting this switch back to false.
+
+        return has_feat_in_tpe1, tpe1, tit2
+
+    @staticmethod
+    def _ensure_valid_strings(string: str) -> list:
+        """
+        Check for the sanity of the input data. Both should contain valid strings.
+        """
+
+        is_valid = string is not None and len(string) >= 1
+
+        return(is_valid)
+
+    @staticmethod
+    def _check_artist(tpe1: str) -> list:
+        """
+        Check the artist field for " feat. " string and if that exists: extract it.
+        """
+
+        has_feat_in_tpe1 = False
+        tpe1_without_feat = ""
+        feat_info = ""
+
+        check = regex.search(r"(.+)(\s+feat.\s.+)", tpe1, regex.IGNORECASE)
+
+        if check is not None:
+            has_feat_in_tpe1 = True  # TODO Add sanity check that tit2 needs to be not none and have a length of at least 1 character.
+
+            # Splitting into groups:
+            tpe1_without_feat = check.group(1)
+            feat_info = check.group(2)  # This will start with a space which is okay.
+
+        return has_feat_in_tpe1, tpe1_without_feat, feat_info
+
+    @staticmethod
+    def _move_feat(tpe1_without_feat: str, tit2: str, feat_info: str) -> list:
+        """
+        Moving the feature info from the artist to the track title.
+        """
+
+        tpe1 = tpe1_without_feat
+        tit2 = tit2 + feat_info  # TODO Make this smarter to account for other suffixes like Remix, Live, ...
+
+        return tpe1, tit2

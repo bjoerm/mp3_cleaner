@@ -1,4 +1,4 @@
-from beautify_single_string import StringBeautifier
+from beautify_single_string import StringBeautifier, StringHelper
 from beautify_single_number import NumberBeautifier
 from beautify_single_date import DateBeautifier
 
@@ -22,6 +22,7 @@ class TagBeautifier:
 
         tags = cls._beautify_strings(tags=tags)
         tags = cls._check_obsolescence_of_album_artist(tags=tags)
+        tags = cls._check_feat_in_artist(tags=tags)
         tags = cls._beautify_track_number(tags=tags)
         tags = cls._beautify_disc_number(tags=tags, path=path)
         tags = cls._beautify_date(tags=tags)
@@ -46,7 +47,7 @@ class TagBeautifier:
             for i in range(len(output))
             ]
 
-        # Beautifying the album artist and song artist. Difference here is that any leading "The" is cut.
+        # Beautifying the artist. Here is any leading "The" is cut.
         output = [
             {k: StringBeautifier.beautify_string(v, remove_leading_the=True) if k in ["TPE1", "TPE2"] else v for (k, v) in output[i].items()}
             for i in range(len(output))
@@ -57,7 +58,7 @@ class TagBeautifier:
     @staticmethod
     def _check_obsolescence_of_album_artist(tags: list) -> list:
         """
-        Remove album artist if same as track artist.
+        Remove album artist if it is the same as track artist.
         """
 
         output = tags
@@ -77,6 +78,24 @@ class TagBeautifier:
                 for i in range(len(output))]
 
             [output[i].pop("TPE2", None) for i in range(len(output))]  # Remove the TPE2 tag.
+
+        return output
+
+    @staticmethod
+    def _check_feat_in_artist(tags: list) -> list:
+        """
+        Deal with the case of featuring information being in the track artist field by moving them from the track artist to the track name.
+        """
+
+        output = tags
+
+        for i in output:
+            has_feat_in_tpe1, tpe1_updated, tit2_updated = StringHelper.move_feature_from_artist_to_track(tpe1=i["TPE1"], tit2=i["TIT2"])  # TODO ADJUST!!!! ONLY TEMP WIP!!!!
+
+            if has_feat_in_tpe1 is True:
+                # Update the track artist and title tag
+                i["TPE1"] = tpe1_updated
+                i["TIT2"] = tit2_updated
 
         return output
 
