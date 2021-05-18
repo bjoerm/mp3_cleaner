@@ -90,12 +90,13 @@ class TagBeautifier:
         output = tags
 
         for i in output:
-            has_feat_in_tpe1, tpe1_updated, tit2_updated = StringHelper.move_feature_from_artist_to_track(tpe1=i["TPE1"], tit2=i["TIT2"])  # TODO ADJUST!!!! ONLY TEMP WIP!!!!
+            if "TPE1" in i and "TIT2" in i:  # Only execute the following, if these two tags exists.
+                has_feat_in_tpe1, tpe1_updated, tit2_updated = StringHelper.move_feature_from_artist_to_track(tpe1=i["TPE1"], tit2=i["TIT2"])  # TODO ADJUST!!!! ONLY TEMP WIP!!!!
 
-            if has_feat_in_tpe1 is True:
-                # Update the track artist and title tag
-                i["TPE1"] = tpe1_updated
-                i["TIT2"] = tit2_updated
+                if has_feat_in_tpe1 is True:
+                    # Update the track artist and title tag
+                    i["TPE1"] = tpe1_updated
+                    i["TIT2"] = tit2_updated
 
         return output
 
