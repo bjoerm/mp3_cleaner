@@ -44,7 +44,12 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string('"123"') == "'123'"
     assert StringBeautifier.beautify_string('"abc"') == "'Abc'"
     assert StringBeautifier.beautify_string("'abc'") == "'Abc'"
-    assert StringBeautifier.beautify_string("Capone 'n' Noreaga") == "Capone 'n' Noreaga"
+    assert StringBeautifier.beautify_string("1st") == "1st"
+    assert StringBeautifier.beautify_string("2nd") == "2nd"
+    assert StringBeautifier.beautify_string("3rd") == "3rd"
+    assert StringBeautifier.beautify_string("4th") == "4th"
+    assert StringBeautifier.beautify_string("34th") == "34th"
+    assert StringBeautifier.beautify_string("91st") == "91st"
     assert StringBeautifier.beautify_string(None) is None, "Test none"
 
 
