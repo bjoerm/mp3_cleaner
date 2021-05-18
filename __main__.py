@@ -10,7 +10,10 @@
 # TODO Add case to "_check_obsolescence_of_album_artist" where album artist is "VA" or similar. Or simply delete it whenever there is a track artist.
 # TODO Make _move_feat smarter to account for other suffixes like Remix, Live, ...
 # TODO _deal_with_special_words_and_bands should make "Artist - Title Live" to "Artist - Title (Live)". Same for "Remix" and "Feat.". This will be a bit complicated for cases like "Live in London", "Remix by" and of course "Feat.".
-
+# TODO If disc number is 1/1 remove it.
+# TODO Check whether the filter for .DS_Store really works. Seemed like it does not.
+# TODO Does not need to write the disc number to the folder name, if there are multiple disc names within the same folder. Currently it write CD1 there.
+# TODO 1st, 2nd, 3rd, 4th, ... should not be capitalized. Currently, 4th leads to 4Th.
 
 import toml
 
