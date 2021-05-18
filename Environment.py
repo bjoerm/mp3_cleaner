@@ -57,6 +57,8 @@ class DataPreparer:
         Copy files into a working folder so original files are not touched.
         """
 
+        print("\n[Status] Creating copies of input files.")
+
         shutil.copytree(src=input_path, dst=wip_path)
         # TODO Once this is upgraded to Python 3.8 or higher, dirs_exist_ok=True can be easily used. shutil.copytree(src=input_path, dst=wip_path, dirs_exist_ok=True).
 
