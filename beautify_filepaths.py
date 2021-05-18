@@ -16,6 +16,7 @@ class FileBeautifier:
         # Helper checks for the renaming.
         is_same_artist = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TPE1")
         is_each_track_with_disc_number, is_each_track_with_track_number = cls._check_existance_of_disc_and_track_number(tags=df.beautified_tag)
+        is_same_disc_number = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TPOS")
         is_same_album_title = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TALB")
         is_same_date = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TDRC")
 
@@ -30,7 +31,7 @@ class FileBeautifier:
 
         cls._write_filename(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
 
-        df["beautified_folder"] = cls._beautify_folder(tags=df.beautified_tag, has_file_without_tags=has_file_without_tags, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number)
+        df["beautified_folder"] = cls._beautify_folder(tags=df.beautified_tag, has_file_without_tags=has_file_without_tags, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number, is_same_disc_number=is_same_disc_number)
 
         cls._rename_folder(folder_current=df.folder, beautified_folder=df.beautified_folder)
 
@@ -60,7 +61,7 @@ class FileBeautifier:
             is_unique = False
 
         else:
-            raise ValueError("Length of track artist might be below 1.")
+            raise ValueError("This should not be reached. Length of tag entries might be below 1.")
 
         return is_unique
 
@@ -197,7 +198,7 @@ class FileBeautifier:
 
         else:
 
-            # TODO Also have a check that there a no duplicates in filepath_beautified.
+            # TODO Also have a check that there are no duplicates in filepath_beautified.
 
             # Only rename files to new filenames if those do not already exist.
             check_filepath_already_exists = [pathlib.Path(filepath_beautified[i]).is_file() for i in range(len(filepath_beautified))]
@@ -208,7 +209,7 @@ class FileBeautifier:
             [filepath_current[i].rename(filepath_beautified[i]) for i in range(len(filepath_beautified))]
 
     @classmethod
-    def _beautify_folder(cls, tags: pd.Series, has_file_without_tags: bool, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool) -> str:
+    def _beautify_folder(cls, tags: pd.Series, has_file_without_tags: bool, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool, is_same_disc_number: bool) -> str:
         """
         Generate improved folder names from the tags. The input tags must be the already beautified ones.
         """
@@ -231,7 +232,7 @@ class FileBeautifier:
         disc_number = ""
 
         if is_each_track_with_disc_number is True:
-            disc_number = cls._beautify_string_from_tag(tag=tags[0].get("TPOS"))
+            disc_number = cls._beautify_string_from_tag(tag=tags[0].get("TPOS"))  # This just takes the disc number from the first file.
 
         date = ""
 
@@ -241,14 +242,20 @@ class FileBeautifier:
         # Constructing the folder name from the pieces. Keep in mind that above it is ensured that artist and album title are unique and not none.
         beautified_folder = None
 
-        if is_same_date is True and is_each_track_with_disc_number is True:
+        if is_same_date is True and is_each_track_with_disc_number is True and is_same_disc_number is True:
             beautified_folder = f'{artist} - {album} (CD{disc_number}) ({date})'
+
+        elif is_same_date is True and is_each_track_with_disc_number is True and is_same_disc_number is False:
+            beautified_folder = f'{artist} - {album} ({date})'
 
         elif is_same_date is True and is_each_track_with_disc_number is False:
             beautified_folder = f'{artist} - {album} ({date})'
 
-        elif is_same_date is True and is_each_track_with_disc_number is False:
+        elif is_same_date is False and is_each_track_with_disc_number is True and is_same_disc_number is True:
             beautified_folder = f'{artist} - {album} (CD{disc_number})'
+
+        elif is_same_date is False and is_each_track_with_disc_number is True and is_same_disc_number is False:
+            beautified_folder = f'{artist} - {album}'
 
         elif is_same_date is False and is_each_track_with_disc_number is False:
             beautified_folder = f'{artist} - {album}'
