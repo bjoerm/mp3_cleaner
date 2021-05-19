@@ -239,7 +239,7 @@ class FileBeautifier:
             artist = artist.strip()
             artist = regex.sub(r"\s\d+$", "", artist)  # Remove any integers add the end. If this was Terminator 2, this will be changed into Terminator.
             artist = artist.strip()
-            artist = f"[{artist}]"
+            artist = f'[{artist}]'
 
         disc_number = ""
 
