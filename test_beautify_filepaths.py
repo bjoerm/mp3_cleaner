@@ -212,7 +212,3 @@ def test_beautify_folder(tags_same_values, tags_same_values_score, tags_same_val
     assert FileBeautifier._beautify_folder(tags=tags_same_values_soundtrack, has_file_without_tags=False, is_same_artist=True, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Album 1] - Album 1 (Soundtrack) (CD1) (2000)"
     assert FileBeautifier._beautify_folder(tags=tags_same_values_score, has_file_without_tags=False, is_same_artist=False, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Album 1] - Album 1 (Score) (CD1) (2000)"
     assert FileBeautifier._beautify_folder(tags=tags_same_values_soundtrack, has_file_without_tags=False, is_same_artist=False, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Album 1] - Album 1 (Soundtrack) (CD1) (2000)"
-
-
-    # (tags=tags_fully_missing_values, id3_field="TPE1") is None
-    # assert FileBeautifier._check_uniqueness_of_tag(tags=tags_same_values, id3_field="TPE1") is True
