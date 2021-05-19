@@ -1,4 +1,4 @@
-import re
+import regex
 
 
 class NumberBeautifier:
@@ -23,7 +23,7 @@ class NumberBeautifier:
         track_number_beautified = cls.extract_number_from_slash_format(track_number_beautified)  # "01/16" will be transformed into "01"
 
         # Remove non-integers
-        track_number_beautified = re.sub(r"[^0-9]", "", track_number_beautified)
+        track_number_beautified = regex.sub(r"[^0-9]", "", track_number_beautified)
 
         # Add leading zero (if required)
         helper_length_current_track = len(track_number_beautified)
@@ -68,7 +68,7 @@ class NumberBeautifier:
 
         else:
             output = str(output)
-            output = re.sub(r"(?<=\d)\/\d*", "", output)
+            output = regex.sub(r"(?<=\d)\/\d*", "", output)
 
         return output
 
@@ -78,6 +78,6 @@ class NumberBeautifier:
         Look for the strings related to the number of discs. E.g. " cd" or "2cd" in the folder name. Could have also looked in the file name instead, but went for folder to have a folder-wide unique handling.
         """
 
-        output = bool(re.search(r"(^|\W|_)cd(\d{1,2}|\W{1,2}\d{1,2})([^a-zA-Z\u0080-\uFFFF0-9]|$)|(^|\W|_)(\d{1,2}|\d{1,2}\W{1,2})cd([^a-zA-Z\u0080-\uFFFF0-9]|$)", str(string), flags=re.IGNORECASE))  # Rather complex regex... Thus, this was put into a separate method, so it is easier to include in unittests.
+        output = bool(regex.search(r"(^|\W|_)cd(\d{1,2}|\W{1,2}\d{1,2})([^a-zA-Z\u0080-\uFFFF0-9]|$)|(^|\W|_)(\d{1,2}|\d{1,2}\W{1,2})cd([^a-zA-Z\u0080-\uFFFF0-9]|$)", str(string), flags=regex.IGNORECASE))  # Rather complex regex... Thus, this was put into a separate method, so it is easier to include in unittests.
 
         return output
