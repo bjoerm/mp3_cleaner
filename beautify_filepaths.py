@@ -1,5 +1,6 @@
 import pandas as pd
 import pathlib
+import regex
 
 
 class FileBeautifier:
@@ -211,23 +212,29 @@ class FileBeautifier:
     @classmethod
     def _beautify_folder(cls, tags: pd.Series, has_file_without_tags: bool, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool, is_same_disc_number: bool) -> str:
         """
-        Generate improved folder names from the tags. The input tags must be the already beautified ones.
+        Generate improved folder names from the tags. The input tags must be the already beautified ones. If a None is returned, the folder name will not be touched.
         """
 
         # Cases where the folder name shall remain untouched.
         if has_file_without_tags is True:  # If there are any mp3 files without tags in the folder, do not rename the folder.
-            return  # TODO This should return the untouched folder name.
+            return
 
         if is_same_album_title is False or is_same_album_title is None:
-            return  # TODO This should return the untouched folder name.
+            return
 
-        elif is_same_artist is False or is_same_artist is None:
-            return  # TODO This should return the untouched folder name.
+        elif (is_same_artist is False or is_same_artist is None) and not tags[0].get("TALB").endswith(("(Score)", "(Soundtrack)")):
+            return
 
         # Creating required single pieces.
         artist = cls._beautify_string_from_tag(tag=tags[0].get("TPE1"), add_square_brackets=True)  # Pulling the artist information from the information on the first mp3 file.
 
         album = cls._beautify_string_from_tag(tag=tags[0].get("TALB"))
+
+        # Dealing with special case of soundtracks and scores.
+        if album.endswith(("(Score)", "(Soundtrack)")):
+            artist = cls._beautify_string_from_tag(tag=tags[0].get("TALB"), add_square_brackets=True)
+            artist = regex.sub(r"\s\(Score\)\]$|\s\(Soundtrack\)\]$", "]", artist)
+            artist = artist.strip()
 
         disc_number = ""
 
@@ -248,16 +255,16 @@ class FileBeautifier:
         elif is_same_date is True and is_each_track_with_disc_number is True and is_same_disc_number is False:
             beautified_folder = f'{artist} - {album} ({date})'
 
-        elif is_same_date is True and is_each_track_with_disc_number is False:
+        elif is_same_date is True and (is_each_track_with_disc_number is False or is_each_track_with_disc_number is None):
             beautified_folder = f'{artist} - {album} ({date})'
 
-        elif is_same_date is False and is_each_track_with_disc_number is True and is_same_disc_number is True:
+        elif (is_same_date is False or is_same_date is None) and is_each_track_with_disc_number is True and is_same_disc_number is True:
             beautified_folder = f'{artist} - {album} (CD{disc_number})'
 
-        elif is_same_date is False and is_each_track_with_disc_number is True and is_same_disc_number is False:
+        elif (is_same_date is False or is_same_date is None) and is_each_track_with_disc_number is True and is_same_disc_number is False:
             beautified_folder = f'{artist} - {album}'
 
-        elif is_same_date is False and is_each_track_with_disc_number is False:
+        elif (is_same_date is False or is_same_date is None) and (is_each_track_with_disc_number is False or is_each_track_with_disc_number is None):
             beautified_folder = f'{artist} - {album}'
 
         else:
