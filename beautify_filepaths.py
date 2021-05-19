@@ -32,7 +32,7 @@ class FileBeautifier:
 
         cls._write_filename(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
 
-        df["beautified_folder"] = cls._beautify_folder(tags=df.beautified_tag, has_file_without_tags=has_file_without_tags, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number, is_same_disc_number=is_same_disc_number)
+        df["beautified_folder"] = cls._beautify_folder_name(tags=df.beautified_tag, has_file_without_tags=has_file_without_tags, is_same_artist=is_same_artist, is_same_album_title=is_same_album_title, is_same_date=is_same_date, is_each_track_with_disc_number=is_each_track_with_disc_number, is_same_disc_number=is_same_disc_number)
 
         cls._rename_folder(folder_current=df.folder, beautified_folder=df.beautified_folder)
 
@@ -210,7 +210,7 @@ class FileBeautifier:
             [filepath_current[i].rename(filepath_beautified[i]) for i in range(len(filepath_beautified))]
 
     @classmethod
-    def _beautify_folder(cls, tags: pd.Series, has_file_without_tags: bool, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool, is_same_disc_number: bool) -> str:
+    def _beautify_folder_name(cls, tags: pd.Series, has_file_without_tags: bool, is_same_artist: bool, is_same_album_title: bool, is_same_date: bool, is_each_track_with_disc_number: bool, is_same_disc_number: bool) -> str:
         """
         Generate improved folder names from the tags. The input tags must be the already beautified ones. If a None is returned, the folder name will not be touched.
         """
@@ -232,9 +232,14 @@ class FileBeautifier:
 
         # Dealing with special case of soundtracks and scores.
         if album.endswith(("(Score)", "(Soundtrack)")):
-            artist = cls._beautify_string_from_tag(tag=tags[0].get("TALB"), add_square_brackets=True)
-            artist = regex.sub(r"\s\(Score\)\]$|\s\(Soundtrack\)\]$", "]", artist)
+            artist = cls._beautify_string_from_tag(tag=tags[0].get("TALB"), add_square_brackets=False)
+            artist = regex.sub(r"\(.+\)", "", artist)  # Remove any strings in brackets.
             artist = artist.strip()
+            artist = regex.sub(r"\s\p{Pd}\s.+$", "", artist)  # Remove anything that starts with a space-hyphen-space pattern.
+            artist = artist.strip()
+            artist = regex.sub(r"\s\d+$", "", artist)  # Remove any integers add the end. If this was Terminator 2, this will be changed into Terminator.
+            artist = artist.strip()
+            artist = f"[{artist}]"
 
         disc_number = ""
 
