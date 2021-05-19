@@ -25,6 +25,7 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string("10,5") == "10,5", "Test comma and space"
     assert StringBeautifier.beautify_string("Gerd,10") == "Gerd, 10", "Test comma and space"
     assert StringBeautifier.beautify_string("10,Gerd") == "10, Gerd", "Test comma and space"
+    assert StringBeautifier.beautify_string("10,gerd") == "10, Gerd", "Test comma and space"
     assert StringBeautifier.beautify_string(" ") == "", "Test empty 1"
     assert StringBeautifier.beautify_string("") == "", "Test empty 2"
     assert StringBeautifier.beautify_string("Nice Track REMIX") == "Nice Track Remix", "Test Remix suffix 1"
@@ -50,6 +51,8 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string("4th") == "4th"
     assert StringBeautifier.beautify_string("34th") == "34th"
     assert StringBeautifier.beautify_string("91st") == "91st"
+    assert StringBeautifier.beautify_string("st1") == "St1"
+    assert StringBeautifier.beautify_string("r2d2") == "R2D2"
     assert StringBeautifier.beautify_string(None) is None, "Test none"
 
 
