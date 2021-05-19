@@ -6,14 +6,11 @@
 # TODO Finish tests about filenames (and foldernames).
 # TODO Have option to switch renaming files on and off. Also a switch for folders. And for album art tags.
 
-# TODO Put input and output into batches/bins. E.g. every five albums are put into a single bin. That way it is easier to match input and output when encoding many folders at once.
-# TODO Add case to "_check_obsolescence_of_album_artist" where album artist is "VA" or similar. Or simply delete it whenever there is a track artist.
+# TODO Add case to "_check_obsolescence_of_album_artist" where album artist is "VA" or similar. Or simply delete album artist whenever there is a track artist.
 # TODO Make _move_feat smarter to account for other suffixes like Remix, Live, ...
-# TODO _deal_with_special_words_and_bands should make "Artist - Title Live" to "Artist - Title (Live)". Same for "Remix" and "Feat.". This will be a bit complicated for cases like "Live in London", "Remix by" and of course "Feat.".
+# TODO _deal_with_special_words_and_bands should create brackets, so it should make "Artist - Title Live" to "Artist - Title (Live)". Same for "Remix" and "Feat.". This will be a bit complicated for cases like "Live in London", "Remix by" and of course "Feat.".
 # TODO If disc number is 1/1 remove it.
-# TODO Check whether the filter for .DS_Store really works. Seemed like it does not.
 # TODO Does not need to write the disc number to the folder name, if there are multiple disc names within the same folder. Currently it write CD1 there.
-# TODO 1st, 2nd, 3rd, 4th, ... should not be capitalized. Currently, 4th leads to 4Th.
 
 import toml
 
