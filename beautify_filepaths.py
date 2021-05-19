@@ -21,14 +21,14 @@ class FileBeautifier:
         is_same_album_title = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TALB")
         is_same_date = cls._check_uniqueness_of_tag(tags=df.beautified_tag, id3_field="TDRC")
 
-        df["beautified_filename"] = cls._propose_multiple_filenames_from_multiple_tags(
+        df["beautified_filename"] = cls._propose_multiple_filenames_from_multiple_tags(  # Filename only.
             tags=df.beautified_tag
             , is_same_artist=is_same_artist
             , is_each_track_with_disc_number=is_each_track_with_disc_number
             , is_each_track_with_track_number=is_each_track_with_track_number
             )
 
-        df["beautified_filepath"] = cls._generate_beautified_pathlib_filepath(folder=df.folder, filename=df.beautified_filename)
+        df["beautified_filepath"] = cls._generate_beautified_pathlib_filepath(folder=df.folder, filename=df.beautified_filename)  # Folder plus filename.
 
         cls._write_filename(filepath_current=df.filepath, filepath_beautified=df.beautified_filepath)
 
