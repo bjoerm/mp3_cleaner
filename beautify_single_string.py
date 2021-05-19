@@ -157,13 +157,16 @@ class StringBeautifier:
             if regex.match(r".*\p{Lu}+.*", text_list[i]):  # Does the string contain a capital letter somewhere? If so, leave it as it is.
                 text_list_improved[i] = text_list[i]
 
+            elif regex.match(r"^\d+", text_list[i]):  # Does the string start with an integer (e.g. 1st, 2nd)? If so, leave it as it is. This could be expanded, to look for any intergers, not only at the beginning.
+                text_list_improved[i] = text_list[i]
+
             elif regex.match(r".+['|`|´]\w+", text_list[i]):  # Does the string contains an accent (', ` or ´) before a string? If so, don't transform the part after the accent into uppercase. This needs to be done, after the check above for captial letters.
                 text_list_improved[i] = text_list[i].capitalize()  # Capitalizes transforms that's into That's. While title would transform it into That'S.
 
-            elif regex.match(r"'n'", text_list[i]):  # Is the lowercase string 'n', so shortform of "and". Like in Guns 'n' Roses? If so, keep the 'n' lowercase.
-                text_list_improved[i] = text_list[i]
+            elif regex.match(r"^'n'$", text_list[i], flags=regex.IGNORECASE):  # Is the string an 'n' or 'N', so shortform of "and"? Like in Guns 'n' Roses? If so, keep the 'n' lowercase.
+                text_list_improved[i] = text_list[i].lower()
 
-            else:  # Convert it to uppercase.
+            else:  # Convert string to title format.
                 text_list_improved[i] = text_list[i].title()
 
         # Converting the list of strings back into a string.
