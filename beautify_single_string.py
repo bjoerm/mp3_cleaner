@@ -182,7 +182,7 @@ class StringBeautifier:
         """
 
         # Unifying special words
-        text = regex.sub(r"(?<=^)Featuring |(?<= |\()Featuring ", "Feat. ", text, flags=regex.IGNORECASE)  # This part of two positive lookbehinds is not very elegant but adding ^ into the other one, returned an error due to the varying widths of ^ and e.g. " "
+        text = regex.sub(r"(?<=^)Featuring |(?<=^)Ft. |(?<= |\()Featuring |(?<= |\()Ft. ", "Feat. ", text, flags=regex.IGNORECASE)  # This part of multiple positive lookbehinds is not very elegant but adding ^ (for looking at the start of the string) into the other one, returned an error due to the varying widths of ^ and e.g. " "
         text = regex.sub(r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=regex.IGNORECASE)
         text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE)  # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
         text = regex.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=regex.IGNORECASE)  # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
