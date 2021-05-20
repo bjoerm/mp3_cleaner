@@ -53,6 +53,7 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string("91st") == "91st"
     assert StringBeautifier.beautify_string("st1") == "St1"
     assert StringBeautifier.beautify_string("r2d2") == "R2D2"
+    assert StringBeautifier.beautify_string("The sound of you and me") == "The Sound Of You And Me"
     assert StringBeautifier.beautify_string(None) is None, "Test none"
 
 
@@ -211,4 +212,5 @@ def test_string_capitalize_string():
     assert StringBeautifier._capitalize_string("+44") == "+44"
     assert StringBeautifier._capitalize_string("your's") == "Your's"
     assert StringBeautifier._capitalize_string("you're") == "You're"
+    assert StringBeautifier._capitalize_string("The sound of you and me") == "The Sound Of You And Me"
     assert StringBeautifier._capitalize_string("") == ""
