@@ -42,7 +42,7 @@ class TagManager:
             # Remove encoding information and only keep the text.
             df_iteration["unchanged_tag"] = cls._remove_string_encoding_information(tags=df_iteration["unchanged_tag"])
 
-            # Remove files without (relevant) ID3 tags.
+            # Skip files without (relevant) ID3 tags.
             df_iteration, has_file_without_tags = cls._skip_files_without_tags(df=df_iteration)
 
             # Deal with case that all files in current folder can be without relevant tags (then continue to the next folder).
