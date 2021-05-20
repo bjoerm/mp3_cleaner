@@ -33,3 +33,4 @@ def test_mp3_tags_extract_year():
     assert DateBeautifier.extract_year(2020) == "2020"
     assert DateBeautifier.extract_year(1980) == "1980"
     assert DateBeautifier.extract_year(None) is None
+    assert True is False
