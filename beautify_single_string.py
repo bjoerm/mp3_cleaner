@@ -207,7 +207,7 @@ class StringHelper:
             has_feat_in_tpe1 = False
             return has_feat_in_tpe1, tpe1, tit2
 
-        has_feat_in_tpe1, tpe1_without_feat, feat_info = cls._check_artist(tpe1=tpe1)
+        has_feat_in_tpe1, tpe1_without_feat, feat_info = cls._check_artist_for_feat(tpe1=tpe1)
 
         if has_feat_in_tpe1 is True:
             tpe1_updated, tit2_updated = cls._move_feat(tpe1_without_feat=tpe1_without_feat, tit2=tit2, feat_info=feat_info)
@@ -232,7 +232,7 @@ class StringHelper:
         return(is_valid)
 
     @staticmethod
-    def _check_artist(tpe1: str) -> list:
+    def _check_artist_for_feat(tpe1: str) -> list:
         """
         Check the artist field for " feat. " string and if that exists: extract it.
         """
@@ -241,7 +241,7 @@ class StringHelper:
         tpe1_without_feat = ""
         feat_info = ""
 
-        check = regex.search(r"(.+)(\s+feat.\s.+)", tpe1, regex.IGNORECASE)
+        check = regex.search(r"(.+)(\s+feat.\s.+|\s+\(feat.\s+.*\))", tpe1, regex.IGNORECASE)  # Searching for " feat. " and " (feat. xyz)".
 
         if check is not None:
             has_feat_in_tpe1 = True  # TODO Add sanity check that tit2 needs to be not none and have a length of at least 1 character.
