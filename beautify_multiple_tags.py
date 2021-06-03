@@ -84,14 +84,14 @@ class TagBeautifier:
     @staticmethod
     def _check_feat_in_artist(tags: list) -> list:
         """
-        Deal with the case of featuring information being in the track artist field by moving them from the track artist to the track name.
+        Deal with the case of featuring information being in the track artist field by moving them from the track artist to the track name. Should be executed after the normal string beautification.
         """
 
         output = tags
 
         for i in output:
             if "TPE1" in i and "TIT2" in i:  # Only execute the following, if these two tags exists.
-                has_feat_in_tpe1, tpe1_updated, tit2_updated = StringHelper.move_feature_from_artist_to_track(tpe1=i["TPE1"], tit2=i["TIT2"])  # TODO ADJUST!!!! ONLY TEMP WIP!!!!
+                has_feat_in_tpe1, tpe1_updated, tit2_updated = StringHelper.move_feature_from_artist_to_track(tpe1=i["TPE1"], tit2=i["TIT2"])
 
                 if has_feat_in_tpe1 is True:
                     # Update the track artist and title tag
