@@ -136,6 +136,7 @@ class TagBeautifier:
         Beautifying the disc number by removing it, when it is disc number = 1 unless a) there are tags showing multiple disc numbers in the same folder OR b) the file path has "CD 1" (or similar) in it. In these two cases, keep it. If disc number > 1, also keep it.
         """
         # TODO Nice to have expansion: Delete leading zeros from the disc number. Or always have two digit long cd number.
+        # TODO Refactor split this into multiple smaller methods.
 
         output = tags
 
@@ -150,10 +151,13 @@ class TagBeautifier:
         elif len(helper_different_disc_number) > 1:  # There are multiple different disc numbers in the same folder.
             pass
 
-        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] != "1":  # There is only one disc number and that is not disc number 1.
+        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1/1":  # If there is only one disc number and that is disc number 1/1, remove the disc number tag.
+            [output[i].pop("TPOS", None) for i in range(len(output))]
+
+        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] != "1":  # If there is only one disc number and that is not disc number 1, leave it.
             pass
 
-        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1":  # There is only one disc number and that is disc number 1.
+        elif len(helper_different_disc_number) == 1 and helper_different_disc_number[0] == "1":  # If there is only one disc number and that is disc number 1, leave it.
 
             helper_folder_contains_cd_string = NumberBeautifier.has_cd_string_in_folder_name(path)
 
