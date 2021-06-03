@@ -58,7 +58,7 @@ class TagBeautifier:
     @staticmethod
     def _check_obsolescence_of_album_artist(tags: list) -> list:
         """
-        Remove album artist if it is the same as track artist.
+        Remove album artist if there is any track artist. If there is no track artist, but an album artist. That becomes new track artist.
         """
 
         output = tags
@@ -66,8 +66,8 @@ class TagBeautifier:
         track_artist = [output[i].get("TPE1") for i in range(len(output))]  # This is a list with an entry for each file/tag.
         album_artist = [output[i].get("TPE2") for i in range(len(output))]
 
-        # Remove the album artist when it is identical with track artist.
-        if track_artist == album_artist:
+        # Remove the album artist, if all tracks have a track artist.
+        if len(track_artist) == len(output):
             [output[i].pop("TPE2", None) for i in range(len(output))]  # Remove the TPE2 tag.
 
         # Move album artist to track artist, if track artist is not available.
