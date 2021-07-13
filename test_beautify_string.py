@@ -220,3 +220,9 @@ def test_string_capitalize_string():
     assert StringBeautifier._capitalize_string("We're") == "We're"
     assert StringBeautifier._capitalize_string("The sound of you and me") == "The Sound Of You And Me"
     assert StringBeautifier._capitalize_string("") == ""
+
+
+from beautify_single_string import StringHelper  # TODO Add tests for that class!
+
+def test_sort_track_name_suffixes():
+    assert StringHelper.sort_track_name_suffixes()

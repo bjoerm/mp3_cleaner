@@ -23,6 +23,7 @@ class TagBeautifier:
         tags = cls._beautify_strings(tags=tags)
         tags = cls._check_obsolescence_of_album_artist(tags=tags)
         tags = cls._check_feat_in_artist(tags=tags)
+        tags = cls._sort_track_name_suffixes(tags=tags)
         tags = cls._beautify_track_number(tags=tags)
         tags = cls._beautify_disc_number(tags=tags, path=path)
         tags = cls._beautify_date(tags=tags)
@@ -91,7 +92,7 @@ class TagBeautifier:
 
         for i in output:
             if "TPE1" in i and "TIT2" in i:  # Only execute the following, if these two tags exists.
-                has_feat_in_tpe1, tpe1_updated, tit2_updated = StringHelper.move_feature_from_artist_to_track(tpe1=i["TPE1"], tit2=i["TIT2"])
+                has_feat_in_tpe1, tpe1_updated, tit2_updated = StringHelper.move_feature_from_artist_to_track(artist=i["TPE1"], track_name=i["TIT2"])
 
                 if has_feat_in_tpe1 is True:
                     # Update the track artist and title tag
@@ -99,6 +100,23 @@ class TagBeautifier:
                     i["TIT2"] = tit2_updated
 
         return output
+
+    @staticmethod
+    def _sort_track_name_suffixes(tags: list) -> list:
+        """
+        Put any track name suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. Only sorts for strings in brackets.
+        """
+
+        output = tags
+
+        output = [
+            {k: StringHelper.sort_track_name_suffixes(track_name=v) if k == "TIT2" else v for (k, v) in output[i].items()}  # Beautifying the title.
+            for i in range(len(output))
+            ]
+
+
+        return output
+
 
     @staticmethod
     def _beautify_track_number(tags: list) -> list:

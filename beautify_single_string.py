@@ -195,31 +195,34 @@ class StringBeautifier:
 
 class StringHelper:
     """
-    This utility class contains helper methods that are not related to the generic string beautification above.
+    This utility class contains helper methods that are not related to the generic string beautification above, but e.g. might also be useful for filename improvements.
     """
 
     @classmethod
-    def move_feature_from_artist_to_track(cls, tpe1: str, tit2: str) -> list:
+    def move_feature_from_artist_to_track(cls, artist: str, track_name: str) -> list:
+        """
+        Move any feature information from the artist field to the track field.
+        """
 
-        valid_inputs = cls._ensure_valid_strings(string=tpe1) and cls._ensure_valid_strings(string=tit2)
+        valid_inputs = cls._ensure_valid_strings(string=artist) and cls._ensure_valid_strings(string=track_name)
 
         if valid_inputs is False:
-            has_feat_in_tpe1 = False
-            return has_feat_in_tpe1, tpe1, tit2
+            has_feat_in_artist = False
+            return has_feat_in_artist, artist, track_name
 
-        has_feat_in_tpe1, tpe1_without_feat, feat_info = cls._check_artist_for_feat(tpe1=tpe1)
+        has_feat_in_artist, artist_without_feat, feat_info = cls._check_artist_for_feat(artist=artist)
 
-        if has_feat_in_tpe1 is True:
-            tpe1_updated, tit2_updated = cls._move_feat(tpe1_without_feat=tpe1_without_feat, tit2=tit2, feat_info=feat_info)
+        if has_feat_in_artist is True:
+            tpe1_updated, track_name_updated = cls._move_feat(artist_without_feat=artist_without_feat, track_name=track_name, feat_info=feat_info)
 
-            valid_outputs = cls._ensure_valid_strings(string=tpe1) and cls._ensure_valid_strings(string=tit2)  # Ensuring that the output also matches the validation criteria (e.g. minimum string length). This prevents edge case where only the feat. information was in the artist string.
+            valid_outputs = cls._ensure_valid_strings(string=artist) and cls._ensure_valid_strings(string=track_name)  # Ensuring that the output also matches the validation criteria (e.g. minimum string length). This prevents edge case where only the feat. information was in the artist string.
 
             if valid_outputs:
-                tpe1, tit2 = tpe1_updated, tit2_updated
+                artist, track_name = tpe1_updated, track_name_updated
             else:
-                has_feat_in_tpe1 = False  # Setting this switch back to false.
+                has_feat_in_artist = False  # Setting this switch back to false.
 
-        return has_feat_in_tpe1, tpe1, tit2
+        return has_feat_in_artist, artist, track_name
 
     @staticmethod
     def _ensure_valid_strings(string: str) -> list:
@@ -232,33 +235,68 @@ class StringHelper:
         return(is_valid)
 
     @staticmethod
-    def _check_artist_for_feat(tpe1: str) -> list:
+    def _check_artist_for_feat(artist: str) -> list:
         """
         Check the artist field for " feat. " string and if that exists: extract it.
         """
 
-        has_feat_in_tpe1 = False
-        tpe1_without_feat = ""
+        has_feat_in_artist = False
+        artist_without_feat = ""
         feat_info = ""
 
-        check = regex.search(r"(.+)(\s+feat.\s.+|\s+\(feat.\s+.*\))", tpe1, regex.IGNORECASE)  # Searching for " feat. " and " (feat. xyz)".
+        check = regex.search(r"(.+)(\s+feat.\s.+|\s+\(feat.\s+.*\))", artist, regex.IGNORECASE)  # Searching for " feat. " and " (feat. xyz)".
 
         if check is not None:
-            has_feat_in_tpe1 = True  # TODO Add sanity check that tit2 needs to be not none and have a length of at least 1 character.
+            has_feat_in_artist = True  # TODO Add sanity check that tit2 needs to be not none and have a length of at least 1 character.
 
             # Splitting into groups:
-            tpe1_without_feat = check.group(1)
+            artist_without_feat = check.group(1)
             feat_info = check.group(2)  # This will start with a space which is okay.
 
-        return has_feat_in_tpe1, tpe1_without_feat, feat_info
+        return has_feat_in_artist, artist_without_feat, feat_info
 
     @staticmethod
-    def _move_feat(tpe1_without_feat: str, tit2: str, feat_info: str) -> list:
+    def _move_feat(artist_without_feat: str, track_name: str, feat_info: str) -> list:
         """
         Moving the feature info from the artist to the track title.
         """
 
-        tpe1 = tpe1_without_feat
-        tit2 = tit2 + feat_info  # TODO Make this smarter to account for other suffixes like Remix, Live, ...
+        artist = artist_without_feat
+        track_name = track_name + feat_info  # TODO Make this smarter to account for other suffixes like Remix, Live, ...
 
-        return tpe1, tit2
+        return artist, track_name
+
+    @classmethod
+    def sort_track_name_suffixes(cls, track_name: str) -> str:
+        """
+        Put any track name suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. Only sorts for strings in brackets.
+        """
+
+        at_least_two_sets_of_brackets = regex.search(r"(.+?)(\(.+\)\s\(.+\))", track_name, regex.IGNORECASE)  # Search for strings with multiple brackets at the end.
+
+        if at_least_two_sets_of_brackets is None:  # No two sets of brackets found.
+            return track_name
+
+        else:
+            track_name_without_suffix = at_least_two_sets_of_brackets.group(1).strip()  # Note that this would end with a space without the strip().
+            suffixes_unordered = at_least_two_sets_of_brackets.group(2)
+
+            brackets_with_suffixes = regex.findall(r"(\(.+?\))", suffixes_unordered, regex.IGNORECASE)
+
+            suffixes = {cls._first_word_in_string(text=bracket): bracket for bracket in brackets_with_suffixes}  # Create a dictionary which keys are the first word of the suffix. E.g. remix, feat, live, ...
+
+            # TODO NEXT STEP order the suffixes based on a given order of the keys. Deal with non-defined keys here as well.
+
+            pass
+
+    @staticmethod
+    def _first_word_in_string(text: str) -> str:
+        """
+        Returns only the first word of a string in brackets.
+        """
+
+        first_word = text.split()[0]
+        first_word = regex.sub(pattern=r"[^0-9a-zA-Z]+", repl="", string=first_word)  # Removing any non-alphanumeric characters.
+        first_word = first_word.lower()  # Uniquely transforming the word to lowercase.
+
+        return first_word
