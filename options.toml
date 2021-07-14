@@ -1,5 +1,5 @@
 input_path = "input" # TODO This could be an argument.
-wip_path = "output" # TODO This could be an argument.
+wip_path = "D:/Audio/!Neu/!2MP3 Cleaner Input" # "output" # TODO This could be an argument.
 log_path = "logs"
 
 overwrite_previous_output = true  # TODO This won't work if set to false as it will run into errors as the folder already exists.
@@ -12,4 +12,4 @@ selected_id3_fields = ["APIC:", "POPM:no@email", "TALB", "TDRC", "TIT2", "TPE1",
 unwanted_files = [".exe", ".nfo", ".txt", ".url", "thumbs.db", ".DS_Store", ".m3u", ".sfv"] # Only provide the end of the file(type) here.
 
 # Keywords that exist as track/filename suffixes. The order that is set here will be the order in which these suffixes are sorted.
-suffix_keywords = ["remix", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]
+suffix_keywords = ["remix", "acoustic", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]
