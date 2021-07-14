@@ -12,4 +12,4 @@ selected_id3_fields = ["APIC:", "POPM:no@email", "TALB", "TDRC", "TIT2", "TPE1",
 unwanted_files = [".exe", ".nfo", ".txt", ".url", "thumbs.db", ".DS_Store", ".m3u", ".sfv", ".log"] # Only provide the end of the file(type) here.
 
 # Keywords that exist as track/filename suffixes. The order that is set here will be the order in which these suffixes are sorted.
-suffix_keywords = ["remix", "acoustic", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]
+suffix_keywords = ["remix", "acoustic", "instrumental", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]
