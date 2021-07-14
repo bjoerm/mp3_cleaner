@@ -1,4 +1,6 @@
+import random
 import regex
+import string
 
 
 class StringBeautifier:
@@ -325,6 +327,7 @@ class StringHelper:
                 return last_word
 
             else:
+                random_key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))  # Will generate a random key to solve cases where e.g. the suffixes are two times the same and not defined in the suffix_keywords.
                 return first_word
 
         return first_word
