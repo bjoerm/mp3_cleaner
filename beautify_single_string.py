@@ -189,6 +189,9 @@ class StringBeautifier:
         text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE)  # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
         text = regex.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=regex.IGNORECASE)  # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
 
+        # Removing unwanted info
+        text = regex.sub(r" \(explicit\)", "", text, flags=regex.IGNORECASE)  # Removing any " (Explicit)" information.
+
         # Special band names
         text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE)  # AC/DC
 
