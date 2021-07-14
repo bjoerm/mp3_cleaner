@@ -29,7 +29,7 @@ def main():
     # env = Environment(input_path=cfg.get("input_path"), wip_path=cfg.get("wip_path"))
 
     # Improve the MP3 ID3 tags in the specified folder(s).
-    TagManager.improve_tags(selected_id3_fields=cfg.get("selected_id3_fields"), files_and_folders=files_and_folders)
+    TagManager.improve_tags(selected_id3_fields=cfg.get("selected_id3_fields"), files_and_folders=files_and_folders, suffix_keywords=cfg.get("suffix_keywords"))
 
 
 if __name__ == "__main__":

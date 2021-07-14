@@ -11,7 +11,7 @@ class TagBeautifier:
     """
 
     @classmethod
-    def beautify_tags(cls, tags: pd.Series, path: str) -> pd.Series:
+    def beautify_tags(cls, tags: pd.Series, path: str, suffix_keywords: list) -> pd.Series:
         """
         This is the main function that is called for beautifying id3 tags. It takes the id3 tags from a folder (as a pd.Series) and beautifies them. The path is used to look for additional information, like about the possible disc number. The method returns a pd.Series again.
         """
@@ -23,7 +23,7 @@ class TagBeautifier:
         tags = cls._beautify_strings(tags=tags)
         tags = cls._check_obsolescence_of_album_artist(tags=tags)
         tags = cls._check_feat_in_artist(tags=tags)
-        tags = cls._sort_track_name_suffixes(tags=tags)
+        tags = cls._sort_track_name_suffixes(tags=tags, suffix_keywords=suffix_keywords)
         tags = cls._beautify_track_number(tags=tags)
         tags = cls._beautify_disc_number(tags=tags, path=path)
         tags = cls._beautify_date(tags=tags)
@@ -102,7 +102,7 @@ class TagBeautifier:
         return output
 
     @staticmethod
-    def _sort_track_name_suffixes(tags: list) -> list:
+    def _sort_track_name_suffixes(tags: list, suffix_keywords: list) -> list:
         """
         Put any track name suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. Only sorts for strings in brackets.
         """
@@ -110,13 +110,11 @@ class TagBeautifier:
         output = tags
 
         output = [
-            {k: StringHelper.sort_track_name_suffixes(track_name=v) if k == "TIT2" else v for (k, v) in output[i].items()}  # Beautifying the title.
+            {k: StringHelper.sort_track_name_suffixes(track_name=v, suffix_keywords=suffix_keywords) if k == "TIT2" else v for (k, v) in output[i].items()}  # Beautifying the title.
             for i in range(len(output))
             ]
 
-
         return output
-
 
     @staticmethod
     def _beautify_track_number(tags: list) -> list:

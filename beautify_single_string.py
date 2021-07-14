@@ -267,9 +267,9 @@ class StringHelper:
         return artist, track_name
 
     @classmethod
-    def sort_track_name_suffixes(cls, track_name: str) -> str:
+    def sort_track_name_suffixes(cls, track_name: str, suffix_keywords: list) -> str:
         """
-        Put any track name suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. Only sorts for strings in brackets.
+        Put any track name suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. Only sorts for strings in brackets. The order comes from the order of the suffix_keywords list set in the script's options. However "Live" will always be the last bracket.
         """
 
         at_least_two_sets_of_brackets = regex.search(r"(.+?)(\(.+\)\s\(.+\))", track_name, regex.IGNORECASE)  # Search for strings with multiple brackets at the end.
@@ -279,24 +279,63 @@ class StringHelper:
 
         else:
             track_name_without_suffix = at_least_two_sets_of_brackets.group(1).strip()  # Note that this would end with a space without the strip().
-            suffixes_unordered = at_least_two_sets_of_brackets.group(2)
+            suffixes_unordered = at_least_two_sets_of_brackets.group(2)  # This is one single string.
 
-            brackets_with_suffixes = regex.findall(r"(\(.+?\))", suffixes_unordered, regex.IGNORECASE)
+            suffixes_unordered = regex.findall(r"(\(.+?\))", suffixes_unordered, regex.IGNORECASE)  # Turn the single string into a list where each item is a string in brackets.
 
-            suffixes = {cls._first_word_in_string(text=bracket): bracket for bracket in brackets_with_suffixes}  # Create a dictionary which keys are the first word of the suffix. E.g. remix, feat, live, ...
+            suffixes_dict = {cls._find_suffix_keyword(text=bracket, suffix_keywords=suffix_keywords): bracket for bracket in suffixes_unordered}  # Create a dictionary with the suffix keywords. E.g. remix, feat, live, .... Non-keywords will also get an entry in that dict.
 
-            # TODO NEXT STEP order the suffixes based on a given order of the keys. Deal with non-defined keys here as well.
+            # Taking the desired order from the order of the suffix_keywords list
+            suffix_keywords = suffix_keywords + list(set(suffixes_dict.keys()) - set(suffix_keywords))  # Expanding the suffix keywords list by any other non-specified keyword that was found. This is needed to have a list that is not missing any found keywords. This does not yet have (Live) at the end.
 
-            pass
+            suffixes_ordered = ""
+            live_suffix = ""
 
-    @staticmethod
-    def _first_word_in_string(text: str) -> str:
+            for k in suffix_keywords:
+                if k in suffixes_dict.keys() and k != "live":
+                    suffixes_ordered = f'{suffixes_ordered} {suffixes_dict.get(k) or ""}'
+                else:
+                    live_suffix = suffixes_dict.get(k)
+
+            suffixes_ordered = f'{suffixes_ordered} {live_suffix or ""}'
+
+            track_name_ordered = track_name_without_suffix + suffixes_ordered
+
+            track_name_ordered = regex.sub(r"\s+", " ", track_name_ordered).strip()
+
+            return track_name_ordered
+
+    @classmethod
+    def _find_suffix_keyword(cls, text: str, suffix_keywords: list) -> str:
         """
-        Returns only the first word of a string in brackets.
+        Search for the suffix keyword in the string. If not found, first string will be returned.
         """
+
+        text = cls._remove_string_noise(text)
 
         first_word = text.split()[0]
-        first_word = regex.sub(pattern=r"[^0-9a-zA-Z]+", repl="", string=first_word)  # Removing any non-alphanumeric characters.
-        first_word = first_word.lower()  # Uniquely transforming the word to lowercase.
+
+        if first_word in suffix_keywords:
+            return first_word
+
+        elif first_word not in suffix_keywords:
+            last_word = text.split()[-1]
+
+            if last_word in suffix_keywords:
+                return last_word
+
+            else:
+                return first_word
 
         return first_word
+
+    @staticmethod
+    def _remove_string_noise(text: str) -> str:
+        """
+        Gets rid of not needed characters like non-alphanumeric characters and capitalization from a string.
+        """
+
+        text = regex.sub(pattern=r"[^0-9a-zA-Z\s]+", repl="", string=text)  # Removing any non-alphanumeric characters.
+        text = text.lower()  # Uniquely transforming the word to lowercase.
+
+        return text
