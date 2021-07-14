@@ -271,7 +271,7 @@ class StringHelper:
     @classmethod
     def sort_track_name_suffixes(cls, track_name: str, suffix_keywords: list) -> str:
         """
-        Put any track name suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. Only sorts for strings in brackets. The order comes from the order of the suffix_keywords list set in the script's options. However "Live" will always be the last bracket.
+        Put any track names with multiple suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. The order comes from the order of the suffix_keywords list set in the script's options. However, "Live" will always be the last bracket.
         """
 
         at_least_two_sets_of_brackets = regex.search(r"(.+?)(\(.+\)\s\(.+\))", track_name, regex.IGNORECASE)  # Search for strings with multiple brackets at the end.
@@ -281,27 +281,35 @@ class StringHelper:
 
         else:
             track_name_without_suffix = at_least_two_sets_of_brackets.group(1).strip()  # Note that this would end with a space without the strip().
-            suffixes_unordered = at_least_two_sets_of_brackets.group(2)  # This is one single string.
+            suffixes_untouched_order = at_least_two_sets_of_brackets.group(2)  # This is one single string.
 
-            suffixes_unordered = regex.findall(r"(\(.+?\))", suffixes_unordered, regex.IGNORECASE)  # Turn the single string into a list where each item is a string in brackets.
+            suffixes_untouched_order = regex.findall(r"(\(.+?\))", suffixes_untouched_order, regex.IGNORECASE)  # Turn the single string into a list where each item is a string in brackets.
 
-            suffixes_dict = {cls._find_suffix_keyword(text=bracket, suffix_keywords=suffix_keywords): bracket for bracket in suffixes_unordered}  # Create a dictionary with the suffix keywords. E.g. remix, feat, live, .... Non-keywords will also get an entry in that dict.
+            defined_suffixes_dict = {}
+            non_defined_suffixes = ""
 
-            # Taking the desired order from the order of the suffix_keywords list
-            suffix_keywords = suffix_keywords + list(set(suffixes_dict.keys()) - set(suffix_keywords))  # Expanding the suffix keywords list by any other non-specified keyword that was found. This is needed to have a list that is not missing any found keywords. This does not yet have (Live) at the end.
+            for i in suffixes_untouched_order:
 
-            suffixes_ordered = ""
+                suffix = cls._remove_string_noise(i)
+
+                if suffix.split()[0] in suffix_keywords or suffix.split()[-1] in suffix_keywords:  # Checking if found suffix is in keyword list.
+                    defined_suffixes_dict[cls._find_suffix_keyword(text=i, suffix_keywords=suffix_keywords)] = i
+
+                else:
+                    non_defined_suffixes = " ".join([non_defined_suffixes, i])  # Keeping the original order.
+
+            defined_suffixes_ordered = ""
             live_suffix = ""
 
             for k in suffix_keywords:
-                if k in suffixes_dict.keys() and k != "live":
-                    suffixes_ordered = f'{suffixes_ordered} {suffixes_dict.get(k) or ""}'
+                if k in defined_suffixes_dict.keys() and k != "live":
+                    defined_suffixes_ordered = f'{defined_suffixes_ordered} {defined_suffixes_dict.get(k) or ""}'
                 else:
-                    live_suffix = suffixes_dict.get(k)
+                    live_suffix = defined_suffixes_dict.get(k)
 
-            suffixes_ordered = f'{suffixes_ordered} {live_suffix or ""}'
+            defined_suffixes_ordered = f'{defined_suffixes_ordered} {non_defined_suffixes or ""} {live_suffix or ""}'
 
-            track_name_ordered = track_name_without_suffix + suffixes_ordered
+            track_name_ordered = track_name_without_suffix + defined_suffixes_ordered
 
             track_name_ordered = regex.sub(r"\s+", " ", track_name_ordered).strip()
 
@@ -328,7 +336,7 @@ class StringHelper:
 
             else:
                 random_key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))  # Will generate a random key to solve cases where e.g. the suffixes are two times the same and not defined in the suffix_keywords.
-                return first_word
+                return random_key
 
         return first_word
 
