@@ -188,9 +188,13 @@ class StringBeautifier:
         text = regex.sub(r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=regex.IGNORECASE)
         text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE)  # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
         text = regex.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=regex.IGNORECASE)  # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
+        text = regex.sub(r"\svs\.\s|\svs\s", " vs. ", text, flags=regex.IGNORECASE)  # Unify vs.
 
         # Removing unwanted info
         text = regex.sub(r" \(explicit\)", "", text, flags=regex.IGNORECASE)  # Removing any " (Explicit)" information.
+        text = regex.sub(r"®", "", text, flags=regex.IGNORECASE)  # Special registered trademark icon.
+
+
 
         # Special band names
         text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE)  # AC/DC
@@ -218,6 +222,9 @@ class StringHelper:
         has_feat_in_artist, artist_without_feat, feat_info = cls._check_artist_for_feat(artist=artist)
 
         if has_feat_in_artist is True:
+
+            feat_info = cls._ensure_brackets_around_feat(has_feat_in_artist=has_feat_in_artist, feat_info=feat_info)
+
             tpe1_updated, track_name_updated = cls._move_feat(artist_without_feat=artist_without_feat, track_name=track_name, feat_info=feat_info)
 
             valid_outputs = cls._ensure_valid_strings(string=artist) and cls._ensure_valid_strings(string=track_name)  # Ensuring that the output also matches the validation criteria (e.g. minimum string length). This prevents edge case where only the feat. information was in the artist string.
@@ -249,16 +256,33 @@ class StringHelper:
         artist_without_feat = ""
         feat_info = ""
 
-        check = regex.search(r"(.+)(\s+feat.\s.+|\s+\(feat.\s+.*\))", artist, regex.IGNORECASE)  # Searching for " feat. " and " (feat. xyz)".
+        check = regex.search(r"(.+)(\s+feat\.\s+.+|\s+\(\s*feat\.\s+.+\))", artist, regex.IGNORECASE)  # Searching for " feat. " and " (feat. xyz)".
 
         if check is not None:
             has_feat_in_artist = True  # TODO Add sanity check that tit2 needs to be not none and have a length of at least 1 character.
 
             # Splitting into groups:
-            artist_without_feat = check.group(1)
-            feat_info = check.group(2)  # This will start with a space which is okay.
+            artist_without_feat = check.group(1).strip()
+            feat_info = check.group(2).strip()
 
         return has_feat_in_artist, artist_without_feat, feat_info
+
+    @staticmethod
+    def _ensure_brackets_around_feat(has_feat_in_artist, feat_info: str) -> str:
+        """
+        If the feat. info string that shall be moved does not yet have brackets around it. # TODO Check whether this also already works for feat. without brackets in the normal title. If not, can this be also called?
+        """
+
+        if has_feat_in_artist is False:
+            return feat_info
+
+        else:
+            has_bracket = regex.match(r"^\s*\(\s*feat\.\s+.+\)\s*$", feat_info, regex.IGNORECASE)
+
+            if has_bracket is None:
+                feat_info = f'({feat_info.strip()})'  # Wrap brackets around string.
+
+            return feat_info
 
     @staticmethod
     def _move_feat(artist_without_feat: str, track_name: str, feat_info: str) -> list:
@@ -267,7 +291,7 @@ class StringHelper:
         """
 
         artist = artist_without_feat
-        track_name = track_name + feat_info  # TODO Make this smarter to account for other suffixes like Remix, Live, ...
+        track_name = " ".join([track_name, feat_info])
 
         return artist, track_name
 
