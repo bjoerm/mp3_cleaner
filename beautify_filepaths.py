@@ -140,7 +140,7 @@ class FileBeautifier:
 
         title = cls._beautify_string_from_tag(tag=tag.get("TIT2"))
 
-        extension = "mp3"  # Note that I am hardcoding here the file extension. Do not put a dot in front here! # TODO Raise exception would the total correct way instead of the comment before.
+        extension = "mp3"  # Note that I am hardcoding here the file extension. Do not put a dot in front here!
 
         # Constructing the filename from the pieces. Keep in mind that above it is ensured that artist and title are not none.
         if is_same_artist is True and is_each_track_with_track_number is True:
