@@ -28,10 +28,9 @@ class StringBeautifier:
         text_beautified = cls._replace_special_characters(text=text_beautified)
         text_beautified = cls._fill_missing_space_after_comma(text=text_beautified)
         text_beautified = cls._remove_leading_the(remove_leading_the=remove_leading_the, text=text_beautified)  # Will only remove if the input variable remove_leading_the is set to True.
-
         text_beautified = cls._capitalize_string(text=text_beautified)
-
         text_beautified = cls._deal_with_special_words_and_bands(text=text_beautified)
+        text_beautified = cls._remove_not_needed_whitespaces(text=text_beautified)
 
         return text_beautified
 
@@ -41,9 +40,10 @@ class StringBeautifier:
         Removes any case of unneeded whitespace.
         """
 
-        text = regex.sub(r" +", " ", text)  # Remove any multiple whitespaces.
-        text = regex.sub(r"^ +", "", text)  # Remove any whitespace at the start.
-        text = regex.sub(r" +$", "", text)  # Remove any whitespace at the end.
+        text = regex.sub(r"\(\s", "(", text)  # Remove any whitespace after an opening bracket.
+        text = regex.sub(r"\s\)", ")", text)  # Remove any whitespace before a closing bracket.
+        text = regex.sub(r"\s+", " ", text)  # Remove any multiple whitespaces.
+        text = text.strip()  # Remove any whitespace at the start and end.
 
         return text
 
