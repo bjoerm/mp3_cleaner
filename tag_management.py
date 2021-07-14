@@ -1,7 +1,5 @@
 # TODO Add option to turn file and folder renaming on and off.
-# TODO Add functionality to move "Feat. xyz" from artist to end of the title. Be however aware of possible problems with other suffixes like "(Live), (Remix), ...".
 # TODO Low prio: Is it possible to not update the date of a file when an improved id tag is written?
-
 
 import datetime
 from mutagen.id3 import APIC, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
@@ -201,7 +199,6 @@ class TagManager:
 
             elif key in ("TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"):  # These fields (all but rating), have a text parameter which can be added the same way.
                 exec(f'id3.add({key}(encoding = 3, text = "{value}"))')  # encoding = 3 = UTF8 # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
-
 
             else:
                 # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here.

@@ -9,6 +9,7 @@
 # TODO Does not need to write the disc number to the folder name, if there are multiple disc names within the same folder. Currently it write CD1 there.
 # TODO It seems like file names are not beautified, if the first or first x entries are already in the desired beautified format. This is problematic, if later entries are not beautified yet.
 
+
 from datetime import datetime
 import toml
 
