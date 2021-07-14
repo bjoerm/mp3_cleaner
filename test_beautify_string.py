@@ -54,6 +54,7 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string("4th") == "4th"
     assert StringBeautifier.beautify_string("34th") == "34th"
     assert StringBeautifier.beautify_string("91st") == "91st"
+    assert StringBeautifier.beautify_string("30th") == "30th"
     assert StringBeautifier.beautify_string("st1") == "St1"
     assert StringBeautifier.beautify_string("r2d2") == "R2D2"
     assert StringBeautifier.beautify_string("The sound of you and me") == "The Sound Of You And Me"
@@ -222,6 +223,13 @@ def test_string_capitalize_string():
     assert StringBeautifier._capitalize_string("we're") == "We're"
     assert StringBeautifier._capitalize_string("We're") == "We're"
     assert StringBeautifier._capitalize_string("The sound of you and me") == "The Sound Of You And Me"
+    assert StringBeautifier._capitalize_string("1st") == "1st"
+    assert StringBeautifier._capitalize_string("2nd") == "2nd"
+    assert StringBeautifier._capitalize_string("3rd") == "3rd"
+    assert StringBeautifier._capitalize_string("4th") == "4th"
+    assert StringBeautifier._capitalize_string("34th") == "34th"
+    assert StringBeautifier._capitalize_string("91st") == "91st"
+    assert StringBeautifier._capitalize_string("30th") == "30th"
     assert StringBeautifier._capitalize_string("") == ""
 
 

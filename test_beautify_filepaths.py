@@ -191,7 +191,15 @@ def tags_same_values_soundtrack():
         ])
 
 
-def test_beautify_folder(tags_same_values, tags_same_values_score, tags_same_values_soundtrack):
+@pytest.fixture
+def tags_capitalization():
+    return pd.Series([
+        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album's (5th Edition)", TPOS="1", TDRC="2000")
+        , dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album's (5th Edition)", TPOS="1", TDRC="2000")
+        ])
+
+
+def test_beautify_folder(tags_same_values, tags_same_values_score, tags_same_values_soundtrack, tags_capitalization):
     # Normal albums
     assert FileBeautifier._beautify_folder_name(tags=tags_same_values, has_file_without_tags=False, is_same_artist=True, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Artist 1] - Album 1 (CD1) (2000)"
     assert FileBeautifier._beautify_folder_name(tags=tags_same_values, has_file_without_tags=False, is_same_artist=True, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=False) == "[Artist 1] - Album 1 (2000)"
@@ -212,3 +220,6 @@ def test_beautify_folder(tags_same_values, tags_same_values_score, tags_same_val
     assert FileBeautifier._beautify_folder_name(tags=tags_same_values_soundtrack, has_file_without_tags=False, is_same_artist=True, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Album] - Album 1 (Soundtrack) (CD1) (2000)"
     assert FileBeautifier._beautify_folder_name(tags=tags_same_values_score, has_file_without_tags=False, is_same_artist=False, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Album] - Album 1 (Score) (CD1) (2000)"
     assert FileBeautifier._beautify_folder_name(tags=tags_same_values_soundtrack, has_file_without_tags=False, is_same_artist=False, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Album] - Album 1 (Soundtrack) (CD1) (2000)"
+
+    # Capitalization # TODO Add more tests here.
+    assert FileBeautifier._beautify_folder_name(tags=tags_capitalization, has_file_without_tags=False, is_same_artist=True, is_same_album_title=True, is_same_date=True, is_each_track_with_disc_number=True, is_same_disc_number=True) == "[Artist 1] - Album's (5th Edition) (CD1) (2000)"
