@@ -16,7 +16,7 @@ from beautify_filepaths import FileBeautifier
 class TagManager:
 
     @classmethod
-    def improve_tags(cls, selected_id3_fields: list, files_and_folders: pd.DataFrame):
+    def improve_tags(cls, selected_id3_fields: list, files_and_folders: pd.DataFrame, suffix_keywords: list):
         """
         This method gets the folder list from the Environment class as input. It then goes iteratively through each folder and reads the tags from all MP3 files in that folder. The read tags are saved as mutagen ID3 objects. These tags are then beautified. The beautified tags then replace the originally read mutagen ID3 objects. Finally these are used to overwrite the tags in the mp3 files.
         """
@@ -50,7 +50,7 @@ class TagManager:
                 continue
 
             # Pass tag on to the beautifier utility class.
-            df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy(), path=unique_mp3_folders[i])  # Input for path refers to the currently processed folder.
+            df_iteration["beautified_tag"] = TagBeautifier.beautify_tags(tags=df_iteration["unchanged_tag"].copy(), path=unique_mp3_folders[i], suffix_keywords=suffix_keywords)  # Input for path refers to the currently processed folder.
 
             df_iteration["id3"] = cls._overwrite_tags_in_id3_object(id3_column=df_iteration["id3"], beautified_tag=df_iteration["beautified_tag"])
 
