@@ -219,10 +219,10 @@ class FileBeautifier:
         if has_file_without_tags is True:  # If there are any mp3 files without tags in the folder, do not rename the folder.
             return
 
-        if is_same_album_title is False or is_same_album_title is None:
+        if is_same_album_title is not True:
             return
 
-        elif (is_same_artist is False or is_same_artist is None) and not tags[0].get("TALB").endswith(("(Score)", "(Soundtrack)")):
+        elif (is_same_artist is False or is_same_artist is None) and not tags[0].get("TALB").endswith(("(Score)", "(Soundtrack)")) and is_same_album_title is not True:
             return
 
         # Creating required single pieces.
@@ -240,6 +240,10 @@ class FileBeautifier:
             artist = regex.sub(r"\s\d+$", "", artist)  # Remove any integers add the end. If this was Terminator 2, this will be changed into Terminator.
             artist = artist.strip()
             artist = f'[{artist}]'
+
+        # Dealing with special case of various artists but given album title
+        if (is_same_artist is False or is_same_artist is None) and not tags[0].get("TALB").endswith(("(Score)", "(Soundtrack)")) and is_same_album_title is True:
+            artist = '[Various Artists]'
 
         disc_number = ""
 
