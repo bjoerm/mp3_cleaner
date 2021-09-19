@@ -9,7 +9,7 @@ selected_id3_fields = ["APIC:", "POPM:no@email", "TALB", "TDRC", "TIT2", "TPE1",
 # Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames
 
 # Files and filetypes that shall be deleted.
-unwanted_files = [".exe", ".nfo", ".txt", ".url", "thumbs.db", ".DS_Store", ".m3u", ".sfv", ".log"] # Only provide the end of the file(type) here.
+unwanted_files = [".exe", ".nfo", ".txt", ".url", "thumbs.db", ".DS_Store", ".m3u", ".sfv", ".log", ".pdf"] # Only provide the end of the file(type) here.
 
 # Keywords that exist as track/filename suffixes. The order that is set here will be the order in which these suffixes are sorted.
 suffix_keywords = ["remix", "acoustic", "instrumental", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]
