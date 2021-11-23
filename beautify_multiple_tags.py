@@ -18,7 +18,7 @@ class TagBeautifier:
 
         untouched_tag = tags.copy()
 
-        tags = tags.to_list()  # The following methods use list comprehensions which would have converted the pd.Series into a list anyway. But this step makes that more transparant.
+        tags = tags.to_list()  # The following methods use list comprehensions which would have converted the pd.Series into a list anyway. This explicit step makes that more transparant.
 
         tags = cls._beautify_strings(tags=tags)
         tags = cls._check_obsolescence_of_album_artist(tags=tags)
