@@ -8,7 +8,7 @@
 # TODO If disc number is 1/1 remove it.
 # TODO Does not need to write the disc number to the folder name, if there are multiple disc names within the same folder. Currently it write CD1 there.
 # TODO It seems like file names are not beautified, if the first or first x entries are already in the desired beautified format. This is problematic, if later entries are not beautified yet.
-
+# TODO Script should also work if input only consists of a single file that is not in a folder.
 
 from datetime import datetime
 import toml
@@ -22,10 +22,20 @@ def main():
     cfg = toml.load("options.toml", _dict=dict)
 
     # Set up environment, convert mp3 files to have a lowercase file extension and get list of mp3 files and their folder.
-    files_and_folders = DataPreparer.prepare_input(input_path=cfg.get("input_path"), wip_path=cfg.get("wip_path"), log_path=cfg.get("log_path"), overwrite_previous_output=cfg.get("overwrite_previous_output"), unwanted_files=cfg.get("unwanted_files"))
+    files_and_folders = DataPreparer.prepare_input(
+        input_path=cfg.get("input_path"),
+        wip_path=cfg.get("wip_path"),
+        log_path=cfg.get("log_path"),
+        overwrite_previous_output=cfg.get("overwrite_previous_output"),
+        unwanted_files=cfg.get("unwanted_files"),
+    )
 
     # Improve the MP3 ID3 tags in the specified folder(s).
-    TagManager.improve_tags(selected_id3_fields=cfg.get("selected_id3_fields"), files_and_folders=files_and_folders, suffix_keywords=cfg.get("suffix_keywords"))
+    TagManager.improve_tags(
+        selected_id3_fields=cfg.get("selected_id3_fields"),
+        files_and_folders=files_and_folders,
+        suffix_keywords=cfg.get("suffix_keywords"),
+    )
 
 
 if __name__ == "__main__":
@@ -35,4 +45,6 @@ if __name__ == "__main__":
     main()
 
     finish_time = datetime.now()
-    print(f'Script finished at {finish_time.strftime("%H:%M:%S")}.\nTook {(finish_time - start_time).total_seconds()} seconds.')
+    print(
+        f'Script finished at {finish_time.strftime("%H:%M:%S")}.\nTook {(finish_time - start_time).total_seconds()} seconds.'
+    )

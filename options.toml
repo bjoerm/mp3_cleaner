@@ -1,15 +1,49 @@
-input_path = "input" # TODO This could be an argument.
-wip_path = "D:/Audio/!Neu/!2MP3 Cleaner Input" # "output" # TODO This could be an argument.
+input_path = "D:/Audio/!Neu/!2MP3 Cleaner Input" # "input" # TODO This could be an argument.
+wip_path = "D:/Audio/!Neu/!3MP3 Cleaner Output"  # "output" # TODO This could be an argument.
 log_path = "logs"
 
-overwrite_previous_output = true  # TODO This won't work if set to false as it will run into errors as the folder already exists.
+overwrite_previous_output = true # TODO This currently won't work if set to false as it will run into errors as the folder already exists.
 
 # Tags that shall be kept (and be beautified).
-selected_id3_fields = ["APIC:", "POPM:no@email", "TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"]
+selected_id3_fields = [
+    "APIC:",
+    "POPM:no@email",
+    "TALB",
+    "TDRC",
+    "TIT2",
+    "TPE1",
+    "TPE2",
+    "TPOS",
+    "TRCK",
+]
 # Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames
 
 # Files and filetypes that shall be deleted.
-unwanted_files = [".exe", ".nfo", ".txt", ".url", "thumbs.db", ".DS_Store", ".m3u", ".sfv", ".log", ".pdf"] # Only provide the end of the file(type) here.
+unwanted_files = [
+    ".exe",
+    ".nfo",
+    ".txt",
+    ".url",
+    "thumbs.db",
+    ".DS_Store",
+    ".m3u",
+    ".sfv",
+    ".log",
+    ".pdf",
+] # Only provide the end of the file(type) here.
 
 # Keywords that exist as track/filename suffixes. The order that is set here will be the order in which these suffixes are sorted.
-suffix_keywords = ["remix", "acoustic", "instrumental", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]
+suffix_keywords = [
+    "remix",
+    "acoustic",
+    "instrumental",
+    "feat",
+    "skit",
+    "produced",
+    "cut",
+    "cutted",
+    "bonus",
+    "part",
+    "pt",
+    "live",
+]

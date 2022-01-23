@@ -17,7 +17,9 @@ class StringBeautifier:
         if text is None:  # Edge case of input being None.
             return None
 
-        text_beautified = str(text)  # Creating a copy of the input which is used, so the original input is kept for comparisons. And ensuring that the text is a string.
+        text_beautified = str(
+            text
+        )  # Creating a copy of the input which is used, so the original input is kept for comparisons. And ensuring that the text is a string.
 
         # Beautify the string
         text_beautified = cls._remove_not_needed_whitespaces(text=text_beautified)
@@ -27,7 +29,9 @@ class StringBeautifier:
         text_beautified = cls._unify_hyphens(text=text_beautified)
         text_beautified = cls._replace_special_characters(text=text_beautified)
         text_beautified = cls._fill_missing_space_after_comma(text=text_beautified)
-        text_beautified = cls._remove_leading_the(remove_leading_the=remove_leading_the, text=text_beautified)  # Will only remove if the input variable remove_leading_the is set to True.
+        text_beautified = cls._remove_leading_the(
+            remove_leading_the=remove_leading_the, text=text_beautified
+        )  # Will only remove if the input variable remove_leading_the is set to True.
         text_beautified = cls._capitalize_string(text=text_beautified)
         text_beautified = cls._deal_with_special_words_and_bands(text=text_beautified)
         text_beautified = cls._remove_not_needed_whitespaces(text=text_beautified)
@@ -40,8 +44,12 @@ class StringBeautifier:
         Removes any case of unneeded whitespace.
         """
 
-        text = regex.sub(r"\(\s", "(", text)  # Remove any whitespace after an opening bracket.
-        text = regex.sub(r"\s\)", ")", text)  # Remove any whitespace before a closing bracket.
+        text = regex.sub(
+            r"\(\s", "(", text
+        )  # Remove any whitespace after an opening bracket.
+        text = regex.sub(
+            r"\s\)", ")", text
+        )  # Remove any whitespace before a closing bracket.
         text = regex.sub(r"\s+", " ", text)  # Remove any multiple whitespaces.
         text = text.strip()  # Remove any whitespace at the start and end.
 
@@ -54,7 +62,7 @@ class StringBeautifier:
         """
 
         # Quotation marks
-        text = regex.sub("\"", "'", text)
+        text = regex.sub('"', "'", text)
 
         # Accents
         text = regex.sub("`", "'", text)
@@ -69,7 +77,9 @@ class StringBeautifier:
         """
 
         # Case of colon followed by whitespace. E.g.: Deus Ex: Human Revolution -> Deus Ex - Human Revolution
-        text = regex.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]): (?=.+)", " - ", text)  # \u0080-\uFFFF catches special characters from German and other languages https://stackoverflow.com/questions/36366125/
+        text = regex.sub(
+            r"(?<=[a-zA-Z\u0080-\uFFFF]): (?=.+)", " - ", text
+        )  # \u0080-\uFFFF catches special characters from German and other languages https://stackoverflow.com/questions/36366125/
 
         # All other cases of a colon.
         text = regex.sub(":", "-", text)
@@ -92,7 +102,9 @@ class StringBeautifier:
         Convert all types of hyphens into simple "-".
         """
 
-        text = regex.sub(r"\p{Pd}", "-", text)  # Pd matches every unicode character from the 'Punctuation, Dash' category: https://www.fileformat.info/info/unicode/category/Pd/list.htm
+        text = regex.sub(
+            r"\p{Pd}", "-", text
+        )  # Pd matches every unicode character from the 'Punctuation, Dash' category: https://www.fileformat.info/info/unicode/category/Pd/list.htm
 
         return text
 
@@ -121,7 +133,12 @@ class StringBeautifier:
         Missing space after comma - as long as it is not followed by digits.
         """
 
-        text = regex.sub(r"(?<=[a-zA-Z\u0080-\uFFFF]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[0-9]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[a-zA-Z\u0080-\uFFFF]),(?=[0-9])", ", ", text, flags=regex.IGNORECASE)
+        text = regex.sub(
+            r"(?<=[a-zA-Z\u0080-\uFFFF]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[0-9]),(?=[a-zA-Z\u0080-\uFFFF])|(?<=[a-zA-Z\u0080-\uFFFF]),(?=[0-9])",
+            ", ",
+            text,
+            flags=regex.IGNORECASE,
+        )
 
         return text
 
@@ -156,16 +173,26 @@ class StringBeautifier:
 
         # For each pieces, run capitalization.
         for i in range(len(text_list)):
-            if regex.match(r".*\p{Lu}+.*", text_list[i]):  # Does the string contain a capital letter somewhere? If so, leave it as it is.
+            if regex.match(
+                r".*\p{Lu}+.*", text_list[i]
+            ):  # Does the string contain a capital letter somewhere? If so, leave it as it is.
                 text_list_improved[i] = text_list[i]
 
-            elif regex.match(r"^\d+", text_list[i]):  # Does the string start with an integer (e.g. 1st, 2nd)? If so, leave it as it is. This could be expanded, to look for any intergers, not only at the beginning.
+            elif regex.match(
+                r"^\d+", text_list[i]
+            ):  # Does the string start with an integer (e.g. 1st, 2nd)? If so, leave it as it is. This could be expanded, to look for any intergers, not only at the beginning.
                 text_list_improved[i] = text_list[i]
 
-            elif regex.match(r".+['|`|´]\w+", text_list[i]):  # Does the string contains an accent (', ` or ´) before a string? If so, don't transform the part after the accent into uppercase. This needs to be done, after the check above for captial letters.
-                text_list_improved[i] = text_list[i].capitalize()  # Capitalizes transforms that's into That's. While title would transform it into That'S.
+            elif regex.match(
+                r".+['|`|´]\w+", text_list[i]
+            ):  # Does the string contains an accent (', ` or ´) before a string? If so, don't transform the part after the accent into uppercase. This needs to be done, after the check above for captial letters.
+                text_list_improved[i] = text_list[
+                    i
+                ].capitalize()  # Capitalizes transforms that's into That's. While title would transform it into That'S.
 
-            elif regex.match(r"^'n'$", text_list[i], flags=regex.IGNORECASE):  # Is the string an 'n' or 'N', so shortform of "and"? Like in Guns 'n' Roses? If so, keep the 'n' lowercase.
+            elif regex.match(
+                r"^'n'$", text_list[i], flags=regex.IGNORECASE
+            ):  # Is the string an 'n' or 'N', so shortform of "and"? Like in Guns 'n' Roses? If so, keep the 'n' lowercase.
                 text_list_improved[i] = text_list[i].lower()
 
             else:  # Convert string to title format.
@@ -173,7 +200,9 @@ class StringBeautifier:
 
         # Converting the list of strings back into a string.
         separator = " "
-        output = separator.join(text_list_improved)  # Converting the list of strings into a string.
+        output = separator.join(
+            text_list_improved
+        )  # Converting the list of strings into a string.
 
         return output
 
@@ -184,20 +213,46 @@ class StringBeautifier:
         """
 
         # Unifying special words
-        text = regex.sub(r"(?<=^)Featuring |(?<=^)Ft. |(?<= |\()Featuring |(?<= |\()Ft. ", "Feat. ", text, flags=regex.IGNORECASE)  # This part of multiple positive lookbehinds is not very elegant but adding ^ (for looking at the start of the string) into the other one, returned an error due to the varying widths of ^ and e.g. " "
-        text = regex.sub(r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=regex.IGNORECASE)
-        text = regex.sub(r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )", "Remix", text, flags=regex.IGNORECASE)  # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
-        text = regex.sub(r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )", "Live", text, flags=regex.IGNORECASE)  # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
-        text = regex.sub(r"\svs\.\s|\svs\s", " vs. ", text, flags=regex.IGNORECASE)  # Unify vs.
+        text = regex.sub(
+            r"(?<=^)Featuring |(?<=^)Ft. |(?<= |\()Featuring |(?<= |\()Ft. ",
+            "Feat. ",
+            text,
+            flags=regex.IGNORECASE,
+        )  # This part of multiple positive lookbehinds is not very elegant but adding ^ (for looking at the start of the string) into the other one, returned an error due to the varying widths of ^ and e.g. " "
+        text = regex.sub(
+            r"(?<=^)Pt. |(?<= |\()Pt. ", "Part ", text, flags=regex.IGNORECASE
+        )
+        text = regex.sub(
+            r"(?<=^)remix(?=\)|$| )|(?<= |\()remix(?=\)|$| )",
+            "Remix",
+            text,
+            flags=regex.IGNORECASE,
+        )  # Preventing all capitalized REMIX and other similar forms. Must have space or open bracket at the beginning.
+        text = regex.sub(
+            r"(?<=^)live(?=\)|$| )|(?<= |\()live(?=\)|$| )",
+            "Live",
+            text,
+            flags=regex.IGNORECASE,
+        )  # Preventing all capitalized LIVE and other similar forms. Must have space or open bracket at the beginning.
+        text = regex.sub(
+            r"\svs\.\s|\svs\s", " vs. ", text, flags=regex.IGNORECASE
+        )  # Unify vs.
 
         # Removing unwanted info
-        text = regex.sub(r" \(explicit\)", "", text, flags=regex.IGNORECASE)  # Removing any " (Explicit)" information.
-        text = regex.sub(r"®", "", text, flags=regex.IGNORECASE)  # Special registered trademark icon.
-
-
+        text = regex.sub(
+            r" \(explicit\)", "", text, flags=regex.IGNORECASE
+        )  # Removing any " (Explicit)" information.
+        text = regex.sub(
+            r"®", "", text, flags=regex.IGNORECASE
+        )  # Special registered trademark icon.
 
         # Special band names
-        text = regex.sub(r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )", "ACDC", text, flags=regex.IGNORECASE)  # AC/DC
+        text = regex.sub(
+            r"(?<=^)ac-dc(?=\)|$| )|(?<= |\()ac-dc(?=\)|$| )",
+            "ACDC",
+            text,
+            flags=regex.IGNORECASE,
+        )  # AC/DC
 
         return text
 
@@ -213,21 +268,35 @@ class StringHelper:
         Move any feature information from the artist field to the track field.
         """
 
-        valid_inputs = cls._ensure_valid_strings(string=artist) and cls._ensure_valid_strings(string=track_name)
+        valid_inputs = cls._ensure_valid_strings(
+            string=artist
+        ) and cls._ensure_valid_strings(string=track_name)
 
         if valid_inputs is False:
             has_feat_in_artist = False
             return has_feat_in_artist, artist, track_name
 
-        has_feat_in_artist, artist_without_feat, feat_info = cls._check_artist_for_feat(artist=artist)
+        has_feat_in_artist, artist_without_feat, feat_info = cls._check_artist_for_feat(
+            artist=artist
+        )
 
         if has_feat_in_artist is True:
 
-            feat_info = cls._ensure_brackets_around_feat(has_feat_in_artist=has_feat_in_artist, feat_info=feat_info)
+            feat_info = cls._ensure_brackets_around_feat(
+                has_feat_in_artist=has_feat_in_artist, feat_info=feat_info
+            )
 
-            tpe1_updated, track_name_updated = cls._move_feat(artist_without_feat=artist_without_feat, track_name=track_name, feat_info=feat_info)
+            tpe1_updated, track_name_updated = cls._move_feat(
+                artist_without_feat=artist_without_feat,
+                track_name=track_name,
+                feat_info=feat_info,
+            )
 
-            valid_outputs = cls._ensure_valid_strings(string=artist) and cls._ensure_valid_strings(string=track_name)  # Ensuring that the output also matches the validation criteria (e.g. minimum string length). This prevents edge case where only the feat. information was in the artist string.
+            valid_outputs = cls._ensure_valid_strings(
+                string=artist
+            ) and cls._ensure_valid_strings(
+                string=track_name
+            )  # Ensuring that the output also matches the validation criteria (e.g. minimum string length). This prevents edge case where only the feat. information was in the artist string.
 
             if valid_outputs:
                 artist, track_name = tpe1_updated, track_name_updated
@@ -244,7 +313,7 @@ class StringHelper:
 
         is_valid = string is not None and len(string) >= 1
 
-        return(is_valid)
+        return is_valid
 
     @staticmethod
     def _check_artist_for_feat(artist: str) -> list:
@@ -256,7 +325,9 @@ class StringHelper:
         artist_without_feat = ""
         feat_info = ""
 
-        check = regex.search(r"(.+)(\s+feat\.\s+.+|\s+\(\s*feat\.\s+.+\))", artist, regex.IGNORECASE)  # Searching for " feat. " and " (feat. xyz)".
+        check = regex.search(
+            r"(.+)(\s+feat\.\s+.+|\s+\(\s*feat\.\s+.+\))", artist, regex.IGNORECASE
+        )  # Searching for " feat. " and " (feat. xyz)".
 
         if check is not None:
             has_feat_in_artist = True  # TODO Add sanity check that tit2 needs to be not none and have a length of at least 1 character.
@@ -277,10 +348,12 @@ class StringHelper:
             return feat_info
 
         else:
-            has_bracket = regex.match(r"^\s*\(\s*feat\.\s+.+\)\s*$", feat_info, regex.IGNORECASE)
+            has_bracket = regex.match(
+                r"^\s*\(\s*feat\.\s+.+\)\s*$", feat_info, regex.IGNORECASE
+            )
 
             if has_bracket is None:
-                feat_info = f'({feat_info.strip()})'  # Wrap brackets around string.
+                feat_info = f"({feat_info.strip()})"  # Wrap brackets around string.
 
             return feat_info
 
@@ -301,16 +374,24 @@ class StringHelper:
         Put any track names with multiple suffixes like (... remix), (acoustic), (live ...), (feat. ...) into an adequate order. The order comes from the order of the suffix_keywords list set in the script's options. However, "Live" will always be the last bracket.
         """
 
-        at_least_two_sets_of_brackets = regex.search(r"(.+?)(\(.+\)\s\(.+\))", track_name, regex.IGNORECASE)  # Search for strings with multiple brackets at the end.
+        at_least_two_sets_of_brackets = regex.search(
+            r"(.+?)(\(.+\)\s\(.+\))", track_name, regex.IGNORECASE
+        )  # Search for strings with multiple brackets at the end.
 
         if at_least_two_sets_of_brackets is None:  # No two sets of brackets found.
             return track_name
 
         else:
-            track_name_without_suffix = at_least_two_sets_of_brackets.group(1).strip()  # Note that this would end with a space without the strip().
-            suffixes_untouched_order = at_least_two_sets_of_brackets.group(2)  # This is one single string.
+            track_name_without_suffix = at_least_two_sets_of_brackets.group(
+                1
+            ).strip()  # Note that this would end with a space without the strip().
+            suffixes_untouched_order = at_least_two_sets_of_brackets.group(
+                2
+            )  # This is one single string.
 
-            suffixes_untouched_order = regex.findall(r"(\(.+?\))", suffixes_untouched_order, regex.IGNORECASE)  # Turn the single string into a list where each item is a string in brackets.
+            suffixes_untouched_order = regex.findall(
+                r"(\(.+?\))", suffixes_untouched_order, regex.IGNORECASE
+            )  # Turn the single string into a list where each item is a string in brackets.
 
             defined_suffixes_dict = {}
             non_defined_suffixes = ""
@@ -319,11 +400,20 @@ class StringHelper:
 
                 suffix = cls._remove_string_noise(i)
 
-                if suffix.split()[0] in suffix_keywords or suffix.split()[-1] in suffix_keywords:  # Checking if found suffix is in keyword list.
-                    defined_suffixes_dict[cls._find_suffix_keyword(text=i, suffix_keywords=suffix_keywords)] = i
+                if (
+                    suffix.split()[0] in suffix_keywords
+                    or suffix.split()[-1] in suffix_keywords
+                ):  # Checking if found suffix is in keyword list.
+                    defined_suffixes_dict[
+                        cls._find_suffix_keyword(
+                            text=i, suffix_keywords=suffix_keywords
+                        )
+                    ] = i
 
                 else:
-                    non_defined_suffixes = " ".join([non_defined_suffixes, i])  # Keeping the original order.
+                    non_defined_suffixes = " ".join(
+                        [non_defined_suffixes, i]
+                    )  # Keeping the original order.
 
             defined_suffixes_ordered = ""
             live_suffix = ""
@@ -362,7 +452,9 @@ class StringHelper:
                 return last_word
 
             else:
-                random_key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))  # Will generate a random key to solve cases where e.g. the suffixes are two times the same and not defined in the suffix_keywords.
+                random_key = "".join(
+                    random.choices(string.ascii_uppercase + string.digits, k=10)
+                )  # Will generate a random key to solve cases where e.g. the suffixes are two times the same and not defined in the suffix_keywords.
                 return random_key
 
         return first_word
@@ -373,7 +465,9 @@ class StringHelper:
         Gets rid of not needed characters like non-alphanumeric characters and capitalization from a string.
         """
 
-        text = regex.sub(pattern=r"[^0-9a-zA-Z\s]+", repl="", string=text)  # Removing any non-alphanumeric characters.
+        text = regex.sub(
+            pattern=r"[^0-9a-zA-Z\s]+", repl="", string=text
+        )  # Removing any non-alphanumeric characters.
         text = text.lower()  # Uniquely transforming the word to lowercase.
 
         return text
