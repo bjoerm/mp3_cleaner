@@ -8,34 +8,22 @@ import pandas as pd
 
 @pytest.fixture
 def tags_same_values():
-    return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TPOS="1", TDRC="2000")
-        , dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album 1", TPOS="1", TDRC="2000")
-        ])
+    return pd.Series([dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TPOS="1", TDRC="2000"), dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album 1", TPOS="1", TDRC="2000")])
 
 
 @pytest.fixture
 def tags_different_values():
-    return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TDRC="2000")
-        , dict(TPE1="Artist 2", TIT2="Title 2", TALB="Album 2", TDRC="2001")
-        ])
+    return pd.Series([dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TDRC="2000"), dict(TPE1="Artist 2", TIT2="Title 2", TALB="Album 2", TDRC="2001")])
 
 
 @pytest.fixture
 def tags_partially_missing_values():
-    return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TDRC="2000")
-        , dict(TPE1=None, TIT2="Title 2", TALB=None, TDRC=None)
-        ])
+    return pd.Series([dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1", TDRC="2000"), dict(TPE1=None, TIT2="Title 2", TALB=None, TDRC=None)])
 
 
 @pytest.fixture
 def tags_fully_missing_values():
-    return pd.Series([
-        dict(TPE1=None, TIT2="Title 1", TALB=None, TDRC=None)
-        , dict(TPE1=None, TIT2="Title 2", TALB=None, TDRC=None)
-        ])
+    return pd.Series([dict(TPE1=None, TIT2="Title 1", TALB=None, TDRC=None), dict(TPE1=None, TIT2="Title 2", TALB=None, TDRC=None)])
 
 
 def test_check_for_same_artist(tags_same_values, tags_different_values, tags_partially_missing_values, tags_fully_missing_values):
@@ -60,90 +48,57 @@ def test_check_for_same_artist(tags_same_values, tags_different_values, tags_par
 
 @pytest.fixture
 def tags_w_disc_and_w_track_number():
-    return pd.Series([
-        dict(TRCK="01", TALB="Album 1", TPOS="1")
-        , dict(TRCK="02", TALB="Album 1", TPOS="1")
-        ])
+    return pd.Series([dict(TRCK="01", TALB="Album 1", TPOS="1"), dict(TRCK="02", TALB="Album 1", TPOS="1")])
 
 
 @pytest.fixture
 def tags_w_disc_and_wo_track_number():
-    return pd.Series([
-        dict(TALB="Album 1", TPOS="1")
-        , dict(TALB="Album 1", TPOS="1")
-        ])
+    return pd.Series([dict(TALB="Album 1", TPOS="1"), dict(TALB="Album 1", TPOS="1")])
 
 
 @pytest.fixture
 def tags_wo_disc_and_w_track_number():
-    return pd.Series([
-        dict(TRCK="01", TALB="Album 1")
-        , dict(TRCK="02", TALB="Album 1")
-        ])
+    return pd.Series([dict(TRCK="01", TALB="Album 1"), dict(TRCK="02", TALB="Album 1")])
 
 
 @pytest.fixture
 def tags_wo_disc_and_wo_track_number():
-    return pd.Series([
-        dict(TALB="Album 1")
-        , dict(TALB="Album 1")
-        ])
+    return pd.Series([dict(TALB="Album 1"), dict(TALB="Album 1")])
 
 
 @pytest.fixture
 def tags_w_disc_and_partial_track_number():
-    return pd.Series([
-        dict(TRCK="01", TALB="Album 1", TPOS="1")
-        , dict(TALB="Album 1", TPOS="1")
-        ])
+    return pd.Series([dict(TRCK="01", TALB="Album 1", TPOS="1"), dict(TALB="Album 1", TPOS="1")])
 
 
 @pytest.fixture
 def tags_wo_disc_and_partial_track_number():
-    return pd.Series([
-        dict(TRCK="01", TALB="Album 1")
-        , dict(TALB="Album 1")
-        ])
+    return pd.Series([dict(TRCK="01", TALB="Album 1"), dict(TALB="Album 1")])
 
 
 @pytest.fixture
 def tags_partial_disc_and_w_track_number():
-    return pd.Series([
-        dict(TRCK="01", TALB="Album 1", TPOS="1")
-        , dict(TRCK="02", TALB="Album 1")
-        ])
+    return pd.Series([dict(TRCK="01", TALB="Album 1", TPOS="1"), dict(TRCK="02", TALB="Album 1")])
 
 
 @pytest.fixture
 def tags_partial_disc_and_wo_track_number():
-    return pd.Series([
-        dict(TALB="Album 1", TPOS="1")
-        , dict(TALB="Album 1")
-        ])
+    return pd.Series([dict(TALB="Album 1", TPOS="1"), dict(TALB="Album 1")])
 
 
 @pytest.fixture
 def tags_partial_disc_and_partial_track_number():
-    return pd.Series([
-        dict(TALB="Album 1", TPOS="1")
-        , dict(TRCK="02", TALB="Album 1")
-        ])
+    return pd.Series([dict(TALB="Album 1", TPOS="1"), dict(TRCK="02", TALB="Album 1")])
 
 
 @pytest.fixture
 def tags_w_disc_and_same_track_number():
-    return pd.Series([
-        dict(TALB="Album 1", TRCK="01", TPOS="1")
-        , dict(TALB="Album 1", TRCK="01", TPOS="1")
-        ])
+    return pd.Series([dict(TALB="Album 1", TRCK="01", TPOS="1"), dict(TALB="Album 1", TRCK="01", TPOS="1")])
 
 
 @pytest.fixture
 def tags_wo_disc_and_same_track_number():
-    return pd.Series([
-        dict(TALB="Album 1", TRCK="01")
-        , dict(TALB="Album 1", TRCK="01")
-        ])
+    return pd.Series([dict(TALB="Album 1", TRCK="01"), dict(TALB="Album 1", TRCK="01")])
 
 
 def test_check_existance_of_disc_and_track_number(tags_w_disc_and_w_track_number, tags_w_disc_and_wo_track_number, tags_wo_disc_and_w_track_number, tags_wo_disc_and_wo_track_number, tags_w_disc_and_partial_track_number, tags_wo_disc_and_partial_track_number, tags_partial_disc_and_w_track_number, tags_partial_disc_and_wo_track_number, tags_partial_disc_and_partial_track_number, tags_w_disc_and_same_track_number, tags_wo_disc_and_same_track_number):
@@ -158,6 +113,7 @@ def test_check_existance_of_disc_and_track_number(tags_w_disc_and_w_track_number
     assert FileBeautifier._check_existance_of_disc_and_track_number(tags=tags_partial_disc_and_partial_track_number) == (False, False)
     assert FileBeautifier._check_existance_of_disc_and_track_number(tags=tags_w_disc_and_same_track_number) == (True, True)
     assert FileBeautifier._check_existance_of_disc_and_track_number(tags=tags_wo_disc_and_same_track_number) == (False, True)
+
 
 # TODO Use pytest parameters for FileBeautifier._propose_single_filename_from_single_tag
 
@@ -177,26 +133,17 @@ def test_beautify_string_from_tag():
 
 @pytest.fixture
 def tags_same_values_score():
-    return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1 (Score)", TPOS="1", TDRC="2000")
-        , dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album 1 (Score)", TPOS="1", TDRC="2000")
-        ])
+    return pd.Series([dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1 (Score)", TPOS="1", TDRC="2000"), dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album 1 (Score)", TPOS="1", TDRC="2000")])
 
 
 @pytest.fixture
 def tags_same_values_soundtrack():
-    return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1 (Soundtrack)", TPOS="1", TDRC="2000")
-        , dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album 1 (Soundtrack)", TPOS="1", TDRC="2000")
-        ])
+    return pd.Series([dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album 1 (Soundtrack)", TPOS="1", TDRC="2000"), dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album 1 (Soundtrack)", TPOS="1", TDRC="2000")])
 
 
 @pytest.fixture
 def tags_capitalization():
-    return pd.Series([
-        dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album's (5th Edition)", TPOS="1", TDRC="2000")
-        , dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album's (5th Edition)", TPOS="1", TDRC="2000")
-        ])
+    return pd.Series([dict(TPE1="Artist 1", TIT2="Title 1", TALB="Album's (5th Edition)", TPOS="1", TDRC="2000"), dict(TPE1="Artist 1", TIT2="Title 2", TALB="Album's (5th Edition)", TPOS="1", TDRC="2000")])
 
 
 def test_beautify_folder(tags_same_values, tags_same_values_score, tags_same_values_soundtrack, tags_capitalization):

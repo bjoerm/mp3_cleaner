@@ -45,6 +45,4 @@ if __name__ == "__main__":
     main()
 
     finish_time = datetime.now()
-    print(
-        f'Script finished at {finish_time.strftime("%H:%M:%S")}.\nTook {(finish_time - start_time).total_seconds()} seconds.'
-    )
+    print(f'Script finished at {finish_time.strftime("%H:%M:%S")}.\nTook {(finish_time - start_time).total_seconds()} seconds.')

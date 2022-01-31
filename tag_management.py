@@ -12,7 +12,6 @@ from beautify_filepaths import FileBeautifier
 
 
 class TagManager:
-
     @classmethod
     def improve_tags(cls, selected_id3_fields: list, files_and_folders: pd.DataFrame, suffix_keywords: list):
         """
@@ -119,12 +118,7 @@ class TagManager:
         Filtering of the original tag information to only keep the defined tag fields.
         """
 
-        unchanged_tag = [
-            {
-                k: v for (k, v) in id3_column[i].items() if k in selected_id3_fields
-            }  # Selecting only the tags that are specified in selected_id3_fields
-            for i in id3_column.index
-            ]
+        unchanged_tag = [{k: v for (k, v) in id3_column[i].items() if k in selected_id3_fields} for i in id3_column.index]  # Selecting only the tags that are specified in selected_id3_fields
 
         assert len(id3_column) == len(unchanged_tag), "Test for not loosing tags."
 
@@ -141,12 +135,13 @@ class TagManager:
         output = [
             dict(
                 (
-                    k
-                    , output[i].get(k).text[0] if k not in ("APIC:", "POPM:no@email")  # Not touching the rating field ("POPM:no@email") and the album art as those do not contain any "text" element.
-                    else output[i].get(k)
-                ) for k in output[i]
-            ) for i in output.index
-            ]
+                    k,
+                    output[i].get(k).text[0] if k not in ("APIC:", "POPM:no@email") else output[i].get(k),  # Not touching the rating field ("POPM:no@email") and the album art as those do not contain any "text" element.
+                )
+                for k in output[i]
+            )
+            for i in output.index
+        ]
 
         output = pd.Series(output)  # Converting back into a pd.Series.
 

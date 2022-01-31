@@ -5,6 +5,7 @@ log_path = "logs"
 overwrite_previous_output = true # TODO This currently won't work if set to false as it will run into errors as the folder already exists.
 
 # Tags that shall be kept (and be beautified).
+# Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames
 selected_id3_fields = [
     "APIC:",
     "POPM:no@email",
@@ -16,7 +17,7 @@ selected_id3_fields = [
     "TPOS",
     "TRCK",
 ]
-# Documentation on tag ids (called frames by mutagen): https://mutagen.readthedocs.io/en/latest/api/id3_frames.html#id3v2-3-4-frames
+
 
 # Files and filetypes that shall be deleted.
 unwanted_files = [
@@ -30,6 +31,10 @@ unwanted_files = [
     ".sfv",
     ".log",
     ".pdf",
+    ".zip",
+    ".rar",
+    ".7z",
+    "AlbumArtSmall.jpg",
 ] # Only provide the end of the file(type) here.
 
 # Keywords that exist as track/filename suffixes. The order that is set here will be the order in which these suffixes are sorted.

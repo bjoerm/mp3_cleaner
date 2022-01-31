@@ -9,7 +9,6 @@ import regex
 
 
 class DataPreparer:
-
     @classmethod
     def prepare_input(cls, input_path: str, wip_path: str, log_path: str, overwrite_previous_output: bool, unwanted_files: list) -> pd.DataFrame:
         """
@@ -66,7 +65,7 @@ class DataPreparer:
     def _list_all_files(wip_path: str) -> list:
         file_list = glob.glob(wip_path + "/**", recursive=True)
 
-        return(file_list)
+        return file_list
 
     @staticmethod
     def _delete_unwanted_files_from_output(file_list: list, unwanted_files: list):

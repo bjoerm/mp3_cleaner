@@ -106,6 +106,7 @@ def test_string_beautify_colons():
     assert StringBeautifier._beautify_colons("é: é") == "é - é"
     assert StringBeautifier._beautify_colons("Deus:Ex") == "Deus-Ex", "Colon followed by non-whitespace 1"
     assert StringBeautifier._beautify_colons("12:34") == "12-34", "Colon followed by non-whitespace 2"
+    assert StringBeautifier._beautify_colons("Folge 34: Test") == "Folge 34 - Test"
     assert StringBeautifier._beautify_colons(" : ") == " - ", "Colon surrounded by whitespace"
     assert StringBeautifier._beautify_colons(":Ex") == "-Ex", "Colon surrounded by whitespace"
     assert StringBeautifier._beautify_colons("Ex:") == "Ex-", "Colon surrounded by whitespace"
