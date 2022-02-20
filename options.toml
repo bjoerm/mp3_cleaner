@@ -39,6 +39,7 @@ unwanted_files = [
     "AlbumArtSmall.jpg",
     ".htm",
     ".html",
+    ".ini",
 ] # Only provide the end of the file(type) here.
 
 # Keywords that exist as track/filename suffixes. The order that is set here will be the order in which these suffixes are sorted.
