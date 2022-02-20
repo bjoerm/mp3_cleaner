@@ -62,6 +62,8 @@ def test_string_beautification():
     assert StringBeautifier.beautify_string("We're") == "We're"
     assert StringBeautifier.beautify_string("we´re") == "We're"
     assert StringBeautifier.beautify_string("We´re") == "We're"
+    assert StringBeautifier.beautify_string("We`re") == "We're"
+    assert StringBeautifier.beautify_string("BG-EE") == "BG-EE"
     assert StringBeautifier.beautify_string(None) is None, "Test none"
 
 
