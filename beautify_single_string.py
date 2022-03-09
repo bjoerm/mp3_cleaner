@@ -341,8 +341,9 @@ class StringHelper:
             suffixes_untouched_order = regex.findall(r"(\(.+?\))", suffixes_untouched_order, regex.IGNORECASE)  # Turn the single string into a list where each item is a string in brackets.
 
             defined_suffixes_dict = {}
-            non_defined_suffixes = ""
+            undefined_suffixes = ""
 
+            # Splitting the found suffixes into defined and undefined ones.
             for i in suffixes_untouched_order:
 
                 suffix = cls._remove_string_noise(i)
@@ -351,18 +352,19 @@ class StringHelper:
                     defined_suffixes_dict[cls._find_suffix_keyword(text=i, suffix_keywords=suffix_keywords)] = i
 
                 else:
-                    non_defined_suffixes = " ".join([non_defined_suffixes, i])  # Keeping the original order.
+                    undefined_suffixes = " ".join([undefined_suffixes, i])  # Keeping the original order.
 
+            # Setting the new suffix order.
             defined_suffixes_ordered = ""
             live_suffix = ""
 
             for k in suffix_keywords:
-                if k in defined_suffixes_dict.keys() and k != "live":
+                if k in defined_suffixes_dict.keys() and k != "live":  # The separation of "live" is needed here when undefined suffixes would be set between defined ones and live (which shall always be at the end).
                     defined_suffixes_ordered = f'{defined_suffixes_ordered} {defined_suffixes_dict.get(k) or ""}'
                 else:
                     live_suffix = defined_suffixes_dict.get(k)
 
-            defined_suffixes_ordered = f'{defined_suffixes_ordered} {non_defined_suffixes or ""} {live_suffix or ""}'
+            defined_suffixes_ordered = f'{defined_suffixes_ordered} {undefined_suffixes or ""} {live_suffix or ""}'
 
             track_name_ordered = track_name_without_suffix + defined_suffixes_ordered
 

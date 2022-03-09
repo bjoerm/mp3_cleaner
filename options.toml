@@ -31,7 +31,7 @@ unwanted_files = [
     ".m3u",
     ".m3u8",
     ".sfv",
-    ".log",
+    ".pls",
     ".pdf",
     ".zip",
     ".rar",
@@ -42,18 +42,20 @@ unwanted_files = [
     ".ini",
 ] # Only provide the end of the file(type) here.
 
-# Keywords that exist as track/filename suffixes. The order that is set here will be the order in which these suffixes are sorted.
+# Keywords that exist as track/filename suffixes. The order of the list will be the order in which these suffixes are sorted.
 suffix_keywords = [
     "remix",
     "acoustic",
     "instrumental",
-    "feat",
     "skit",
     "produced",
     "cut",
     "cutted",
+    "short",
+    "shorter",
     "bonus",
     "part",
     "pt",
+    "feat",
     "live",
 ]
