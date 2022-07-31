@@ -9,7 +9,7 @@ iniconfig==1.1.1
 mccabe==0.6.1
 mutagen==1.45.1
 mypy-extensions==0.4.3
-numpy==1.21.6
+numpy==1.22.0
 packaging==20.9
 pandas==1.2.3
 pathspec==0.9.0
