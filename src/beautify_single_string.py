@@ -1,6 +1,7 @@
 import random
-import regex
 import string
+
+import regex
 
 
 class StringBeautifier:

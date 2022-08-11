@@ -1,7 +1,7 @@
 # TODO Could this whole bunch of tests be made simpler by using Pytest parameters?
 
 
-from beautify_single_number import NumberBeautifier
+from src.beautify_single_number import NumberBeautifier
 
 
 def test_track_number_beautification():

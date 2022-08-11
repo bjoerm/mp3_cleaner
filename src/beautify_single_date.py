@@ -1,4 +1,4 @@
-import re
+import regex
 
 
 class DateBeautifier:
@@ -21,7 +21,7 @@ class DateBeautifier:
             output = str(output)
 
         try:
-            output = re.search(r"(19|20|21)\d{2}", output).group(0)  # Look for 19xx, 20xx or 21xx (where xx are two digits). First found entry will be taken.
+            output = regex.search(r"(19|20|21)\d{2}", output).group(0)  # Look for 19xx, 20xx or 21xx (where xx are two digits). First found entry will be taken.
         except:
             pass  # If no YYYY string can be extracted, e.g. data provided is "01-01-20", then return untouched string.
 

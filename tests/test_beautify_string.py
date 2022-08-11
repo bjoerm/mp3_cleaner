@@ -4,8 +4,7 @@
 
 import pytest
 
-from beautify_single_string import StringBeautifier
-from beautify_single_string import StringHelper
+from src.beautify_single_string import StringBeautifier, StringHelper
 
 
 def test_string_beautification():

@@ -1,8 +1,8 @@
-from beautify_single_string import StringBeautifier, StringHelper
-from beautify_single_number import NumberBeautifier
-from beautify_single_date import DateBeautifier
-
 import pandas as pd
+
+from beautify_single_date import DateBeautifier
+from beautify_single_number import NumberBeautifier
+from beautify_single_string import StringBeautifier, StringHelper
 
 
 class TagBeautifier:
@@ -105,10 +105,7 @@ class TagBeautifier:
 
         output = tags
 
-        output = [
-            {k: StringHelper.sort_track_name_suffixes(track_name=v, suffix_keywords=suffix_keywords) if k == "TIT2" else v for (k, v) in output[i].items()}  # Beautifying the title.
-            for i in range(len(output))
-        ]
+        output = [{k: StringHelper.sort_track_name_suffixes(track_name=v, suffix_keywords=suffix_keywords) if k == "TIT2" else v for (k, v) in output[i].items()} for i in range(len(output))]  # Beautifying the title.
 
         return output
 
@@ -133,12 +130,7 @@ class TagBeautifier:
         helper_length_max = max(helper_length_max)  # Checking for the highest track number. Works also if multiple discs are present in the same folder.
         helper_length_max = len(str(helper_length_max))  # Converting into the number if digits.
 
-        output = [
-            {
-                k: NumberBeautifier.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()
-            }  # Beautifying the track number.
-            for i in range(len(output))
-        ]
+        output = [{k: NumberBeautifier.beautify_track_number(v, helper_length_max=helper_length_max, minimum_length=2) if k in ["TRCK"] else v for (k, v) in output[i].items()} for i in range(len(output))]  # Beautifying the track number.
 
         return output
 

@@ -1,7 +1,7 @@
-from beautify_filepaths import FileBeautifier
-
-import pytest
 import pandas as pd
+import pytest
+
+from src.beautify_filepaths import FileBeautifier
 
 # This uses pytest fixtures. See https://pycon.switowski.com/06-testing/pytest/ for a good intro.
 
@@ -101,7 +101,19 @@ def tags_wo_disc_and_same_track_number():
     return pd.Series([dict(TALB="Album 1", TRCK="01"), dict(TALB="Album 1", TRCK="01")])
 
 
-def test_check_existance_of_disc_and_track_number(tags_w_disc_and_w_track_number, tags_w_disc_and_wo_track_number, tags_wo_disc_and_w_track_number, tags_wo_disc_and_wo_track_number, tags_w_disc_and_partial_track_number, tags_wo_disc_and_partial_track_number, tags_partial_disc_and_w_track_number, tags_partial_disc_and_wo_track_number, tags_partial_disc_and_partial_track_number, tags_w_disc_and_same_track_number, tags_wo_disc_and_same_track_number):
+def test_check_existance_of_disc_and_track_number(
+    tags_w_disc_and_w_track_number,
+    tags_w_disc_and_wo_track_number,
+    tags_wo_disc_and_w_track_number,
+    tags_wo_disc_and_wo_track_number,
+    tags_w_disc_and_partial_track_number,
+    tags_wo_disc_and_partial_track_number,
+    tags_partial_disc_and_w_track_number,
+    tags_partial_disc_and_wo_track_number,
+    tags_partial_disc_and_partial_track_number,
+    tags_w_disc_and_same_track_number,
+    tags_wo_disc_and_same_track_number,
+):
     assert FileBeautifier._check_existance_of_disc_and_track_number(tags=tags_w_disc_and_w_track_number) == (True, True)  # First element refers to disc number, second track number.
     assert FileBeautifier._check_existance_of_disc_and_track_number(tags=tags_w_disc_and_wo_track_number) == (True, False)
     assert FileBeautifier._check_existance_of_disc_and_track_number(tags=tags_wo_disc_and_w_track_number) == (False, True)

@@ -1,5 +1,6 @@
-import pandas as pd
 import pathlib
+
+import pandas as pd
 import regex
 
 
@@ -104,9 +105,7 @@ class FileBeautifier:
 
         elif len(list_of_numbers) == len(tags):
             # Are there as many (non None) track numbers as there files.
-            is_each_track_with_number = (
-                True  # Possible extension: You could make this even more sophisticated (either here or in the tag beautification) to check for multiple times the same track number.
-            )
+            is_each_track_with_number = True  # Possible extension: You could make this even more sophisticated (either here or in the tag beautification) to check for multiple times the same track number.
 
         return is_each_track_with_number
 
@@ -158,9 +157,7 @@ class FileBeautifier:
         number = ""  # If there is no TPOS or TRCK, number will remain "".
 
         if is_each_track_with_disc_number is True & is_each_track_with_track_number is True:
-            number = cls._beautify_string_from_tag(
-                tag=tag.get("TPOS")
-            )  # Adding disc number, if the disc as well as the track number are present. (On purpose only TPOS is added here as TRCK is added below.)
+            number = cls._beautify_string_from_tag(tag=tag.get("TPOS"))  # Adding disc number, if the disc as well as the track number are present. (On purpose only TPOS is added here as TRCK is added below.)
 
         if is_each_track_with_track_number is True:
             number = number + cls._beautify_string_from_tag(tag=tag.get("TRCK"))  # Adding disc number, if it is present.

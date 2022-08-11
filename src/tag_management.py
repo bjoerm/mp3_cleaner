@@ -2,13 +2,14 @@
 # TODO Low prio: Is it possible to not update the date of a file when an improved id tag is written?
 
 import datetime
+
+import pandas as pd
 from mutagen.id3 import APIC, POPM, TALB, TDRC, TIT2, TPE1, TPE2, TPOS, TRCK
 from mutagen.mp3 import MP3  # Alternative to ID3 and ID3NoHeaderError.
-import pandas as pd
 from tqdm import trange
 
-from beautify_multiple_tags import TagBeautifier
 from beautify_filepaths import FileBeautifier
+from beautify_multiple_tags import TagBeautifier
 
 
 class TagManager:

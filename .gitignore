@@ -2,6 +2,7 @@ input/
 output/
 logs/
 venv/
+.venv/
 .idea/
 .vscode/
 __pycache__/

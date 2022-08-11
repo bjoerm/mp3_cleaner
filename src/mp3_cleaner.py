@@ -11,10 +11,11 @@
 # TODO Script should also work if input only consists of a single file that is not in a folder.
 
 from datetime import datetime
+
 import toml
 
-from tag_management import TagManager
 from environment import DataPreparer
+from tag_management import TagManager
 
 
 def main():

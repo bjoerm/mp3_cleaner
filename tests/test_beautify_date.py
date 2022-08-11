@@ -1,6 +1,6 @@
 # TODO Could this whole bunch of tests be made simpler by using Pytest parameters? Yes: https://docs.pytest.org/en/reorganize-docs/new-docs/user/parametrize.html
 
-from beautify_single_date import DateBeautifier
+from src.beautify_single_date import DateBeautifier
 
 
 def test_mp3_tags_extract_year():
