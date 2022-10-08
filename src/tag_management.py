@@ -59,7 +59,7 @@ class TagManager:
             FileBeautifier.beautify_filenames(df=df_iteration, has_file_without_tags=has_file_without_tags)
 
             # Keep a log of the tags. Be aware that this might get big, if at some point the tag with an image of the album cover would be included.
-            df_log = df_log.append(df_iteration)
+            df_log = pd.concat([df_log, df_iteration])
 
         # Export a log of the untouched and beautified tags
         df_log = df_log.astype(str)
