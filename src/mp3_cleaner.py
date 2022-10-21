@@ -10,6 +10,7 @@
 # TODO It seems like file names are not beautified, if the first or first x entries are already in the desired beautified format. This is problematic, if later entries are not beautified yet.
 # TODO Script should also work if input only consists of a single file that is not in a folder.
 # TODO Rename (Original Motion Picture Soundtrack) into (Score).
+# TODO There seems to be an error, when the track numbers in a folder can/do reach three digits (so more than 100 files). It will currently only fill one leading zero.
 
 
 from datetime import datetime
