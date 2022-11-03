@@ -1,12 +1,19 @@
 attrs==22.1.0
 colorama==0.4.6
+cramjam==2.6.1
+fastparquet==0.8.3
+flake8==5.0.4
+fsspec==2022.10.0
 iniconfig==1.1.1
+mccabe==0.7.0
 mutagen==1.46.0
 numpy==1.23.4
 packaging==21.3
 pandas==1.5.1
 pluggy==1.0.0
+pycodestyle==2.9.1
 pydantic==1.10.2
+pyflakes==2.5.0
 pyparsing==3.0.9
 pytest==7.2.0
 python-dateutil==2.8.2
@@ -16,4 +23,3 @@ six==1.16.0
 toml==0.10.2
 tqdm==4.64.1
 typing_extensions==4.4.0
--e git+https://github.com/bjoerm/mp3_cleaner.git@b13f220c4d2348829d7d756e80dce378f500f000#egg=UNKNOWN
