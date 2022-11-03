@@ -9,12 +9,11 @@ numpy==1.23.1
 packaging==21.3
 pandas==1.4.3
 pluggy==1.0.0
-py==1.11.0
 pyarrow==9.0.0
 pycodestyle==2.9.1
 pyflakes==2.5.0
 pyparsing==3.0.9
-pytest==7.1.2
+pytest==7.2.0
 python-dateutil==2.8.2
 pytz==2022.1
 regex==2022.7.25
