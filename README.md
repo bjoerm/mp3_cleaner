@@ -7,3 +7,6 @@ Beautifies ID3 tags, filenames and foldernames of MP3 audio files.
 * Beautifies and unifies ID3 tags for artist and track name as well as track and disc number plus record year.
 * Beautifies the file names and folders.
 * Removes unwanted filetypes from album.
+
+
+Update from 2022-11: The script is currently being refactored into a better written form. Check the [development branch](https://github.com/bjoerm/mp3_cleaner/tree/2022_refactoring_oop) for current status.
