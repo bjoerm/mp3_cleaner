@@ -19,10 +19,10 @@ class File:
         self.filepath = filepath
         self.tags_imported = self.import_tags_as_dict()  # TODO Hier auf die Main-Method verweisen, welche den obigen groben Ablauf abbildet.
 
-    def import_tags_as_dict(self):
+    def import_tags_as_dict(self) -> ImportedTagsModel:
         tags_imported = self._import_id3_tag_from_file()
         tags_imported = self._extract_imported_text_tags(tags_imported)
-        self._normalize_and_validate_imported_tags(tags_imported)
+        tags_imported = self._normalize_and_validate_imported_tags(tags_imported)
 
         return tags_imported
 
@@ -45,14 +45,16 @@ class File:
         return tags_dict
 
     def _normalize_and_validate_imported_tags(self, tags_imported: Dict[str, str | bytes | POPM]):
-        ImportedTagsModel(**tags_imported)
+        tags = ImportedTagsModel(**tags_imported)
+
+        return tags
 
     def export_tags_in_file(self):
         # TODO A second public method that is used for writing output to files.
         pass
 
     def _validate_tags_prior_update(self):
-        # TODO Via Pydantic it should be checked whether the output is still according to the desired form. This could theoretically also be done on the folder level instead using root_validators.
+        # TODO Via Pydantic it should be checked whether the output is still according to the desired form. Should a new class be written for that?
         pass
 
     def _write_beautified_tag_to_files(self):
