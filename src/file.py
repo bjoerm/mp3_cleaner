@@ -1,35 +1,19 @@
-from dataclasses import dataclass
+# TODO What enhancements rely on knowing what other files in the folder look like?
+
+
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict
 
 from mutagen.id3 import APIC, ID3, POPM
 from mutagen.mp3 import MP3  # Alternative to ID3 and ID3NoHeaderError.
-from pydantic import BaseModel, Field, StrictBytes, conint, constr
 
 from beautify_filepaths import FileBeautifier
 from beautify_multiple_tags import TagBeautifier
-
-
-class ImportedTagsModel(BaseModel):
-    APIC: Optional[StrictBytes] = Field(..., alias="APIC:", description="Attached picture")
-    POPM: Optional[Any] = Field(alias="POPM:no@email", description="Popularimeter. This frame keys a rating (out of 255) and a play count to an email address.")
-    TALB: Optional[str] = Field(description="Album name")
-    TDRC: Optional[str] = Field(description="Recording time")  # TODO Think about whether mutagen.id3.TDRL (release time) shouldn't also be checked.
-    TIT2: Optional[str] = Field(description="Track name")
-    TPE1: Optional[str] = Field(description="Lead Artist/Performer/Soloist/Group")
-    TPE2: Optional[str] = Field(description="Band/Orchestra/Accompaniment")
-    TPOS: Optional[constr(regex=r"^[0-9]+")] = Field(description="Part of set. Example: Disc number.")
-    TRCK: Optional[constr(regex=r"^[0-9]+")] = Field(description="Track Number")
-
-    class Config:
-        arbitrary_types_allowed = True
-        anystr_strip_whitespace = True  # This only refers to leading and trailing whitespace for str & byte types.
+from pydantic_models import ImportedTagsModel
 
 
 class File:
-    # Grobe Idee:
-    # Eine Folder Klasse übergibt beim Instanzieren der File Klasse das Feld filepath (zu der File) an diese Klasse.
-    # Die File Klasse liest dann alle Tags der File ein, filtert nur auf gesuchte Tags, konvertiert diese in ein Dictionary, validiert (und normiert) dieses Dict anschließend via Pydantic. Die folgenden Beautifications sollten dann wieder auf Folderebene passieren, da File-übergreifende Infos in manchen Fällen benötigt werden.
+    """This class reads all tags of a file, extracts the relevant informations and only keeps accepted fields. The latter is done via Pydantic."""
 
     def __init__(self, filepath: Path):
         self.filepath = filepath
@@ -60,7 +44,7 @@ class File:
 
         return tags_dict
 
-    def _normalize_and_validate_imported_tags(self, tags_imported: Dict[str, str | APIC | POPM]):
+    def _normalize_and_validate_imported_tags(self, tags_imported: Dict[str, str | bytes | POPM]):
         ImportedTagsModel(**tags_imported)
 
     def export_tags_in_file(self):
