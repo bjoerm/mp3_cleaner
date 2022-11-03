@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from src.beautify_filepaths import FileBeautifier
+from beautify_filepaths import FileBeautifier
 
 # This uses pytest fixtures. See https://pycon.switowski.com/06-testing/pytest/ for a good intro.
 
