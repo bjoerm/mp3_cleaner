@@ -1,5 +1,5 @@
-input_path = "D:/Audio/!Neu/!2MP3 Cleaner Input" # "input" # TODO This could be an argument.
-wip_path = "D:/Audio/!Neu/!3MP3 Cleaner Output"  # "output" # TODO This could be an argument.
+input_path = "input" # "input" # TODO This could be an argument.
+wip_path = "output"  # "output" # TODO This could be an argument.
 log_path = "logs"
 
 overwrite_previous_output = true # TODO This currently won't work if set to false as it will run into errors as the folder already exists.
@@ -16,7 +16,7 @@ selected_id3_fields = [
     "TPE2",
     "TPOS",
     "TRCK",
-]
+] # TODO accepted fits better than selected.
 
 
 # Files and filetypes that shall be deleted.
