@@ -1,5 +1,6 @@
 import random
 import string
+from typing import Optional
 
 import regex
 
@@ -10,7 +11,7 @@ class StringBeautifier:
     """
 
     @classmethod
-    def beautify_string(cls, text: str, remove_leading_the: bool = False) -> str:
+    def beautify_string(cls, text: Optional[str], remove_leading_the: bool = False) -> str:
         """
         This method beautifies strings. It removes not needed whitespaces, deals with special characters and some other things. It also capitalizes the string to appear more uniform.
         """
@@ -227,6 +228,7 @@ class StringBeautifier:
         return text
 
 
+# TODO This whole class should be removed once refactoring is done.
 class StringHelper:
     """
     This utility class contains helper methods that are not related to the generic string beautification above, but e.g. might also be useful for filename improvements.
