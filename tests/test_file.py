@@ -17,7 +17,7 @@ from file import File
     ],
 )
 def test_check_alternative_fields(name, main_field, helper_field, expected_output):
-    assert File.check_alternative_fields(main_field, helper_field) == (expected_output, None), name
+    assert File.check_alternative_fields(main_field=main_field, helper_field=helper_field) == (expected_output, None), name
 
 
 @pytest.mark.parametrize(
@@ -33,4 +33,32 @@ def test_check_alternative_fields(name, main_field, helper_field, expected_outpu
     ],
 )
 def test_check_alternative_fields(name, arist_in, track_in, artist_out, track_out):
-    assert File.check_feat_in_artist(arist_in, track_in) == (artist_out, track_out), name
+    assert File.check_feat_in_artist(album_artist=arist_in, track=track_in) == (artist_out, track_out), name
+
+
+@pytest.mark.parametrize(
+    "name, input_track, output_track, output_suffix",
+    [
+        ["No Suffix", "Track", "Track", None],
+        ["One Suffix", "Track (Feat. ABC)", "Track (Feat. ABC)", None],
+        ["Two Suffixes", "Track (Feat. ABC) (Live)", "Track", "(Feat. ABC) (Live)"],
+        ["Two Suffixes", "Track (Live) (Feat. ABC)", "Track", "(Live) (Feat. ABC)"],
+        ["Many Suffixes", "Track (Remix) (Acoustic) (Live) (Feat. ABC)", "Track", "(Remix) (Acoustic) (Live) (Feat. ABC)"],
+    ],
+)
+def test_extract_suffixes(name, input_track, output_track, output_suffix):
+    assert File._extract_suffixes(track_name=input_track) == (output_track, output_suffix), name
+
+
+@pytest.mark.parametrize(
+    "name, input, expected_output",
+    [
+        ["No Suffix", "Track", "Track"],
+        ["One Suffix", "Track (Feat. ABC)", "Track (Feat. ABC)"],
+        ["Two Suffixes", "Track (Feat. ABC) (Live)", "Track (Feat. ABC) (Live)"],
+        ["Two Suffixes", "Track (Live) (Feat. ABC)", "Track (Feat. ABC) (Live)"],
+        ["Many Suffixes", "Track (Remix) (Acoustic) (Live) (Feat. ABC)", "Track (Remix) (Acoustic) (Feat. ABC) (Live)"],
+    ],
+)
+def test_sort_track_name_suffixes(name, input, expected_output):
+    assert File.sort_track_name_suffixes(track_name=input) == expected_output, name
