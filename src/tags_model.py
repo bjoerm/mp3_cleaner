@@ -1,15 +1,7 @@
 from typing import Any, Optional
 
 import regex
-from pydantic import (
-    BaseModel,
-    Field,
-    StrictBytes,
-    conint,
-    constr,
-    root_validator,
-    validator,
-)
+from pydantic import BaseModel, Field, StrictBytes, conint, constr, validator
 
 from beautify_single_string import StringBeautifier
 
@@ -43,8 +35,15 @@ class TagsImportedModel(BaseModel):
     @validator("TDRC", "TDRC", pre=True)
     def extract_year(cls, value):
         """Extract only the year and omit any other information on the precise date."""
-        value = int(regex.search(pattern=r"(19|20|21)\d{2}", string=str(value))[0])
-        return value
+        if value is None:
+            return value
+
+        value = regex.search(pattern=r"(18|19|20|21)\d{2}", string=str(value))  # This is a bit stricter than just \d{4}.
+        if value is None:
+            return None
+
+        else:
+            return int(value[0])  # The first found term.
 
     class Config:
         arbitrary_types_allowed = True

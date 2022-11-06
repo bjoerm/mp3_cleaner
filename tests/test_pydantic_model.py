@@ -18,7 +18,7 @@ def test_extract_number_from_slash_format(name, input, expected_output):
 
 @pytest.mark.parametrize(
     "name, input, expected_output",
-    [["Normal", "2000", 2000], ["Normal", "01-01-2000", 2000], ["Normal", "2000-01-01", 2000], ["Normal", "01.01.2000", 2000], ["Int", 2000, 2000]],
+    [["Normal", "2000", 2000], ["Normal", "01-01-2000", 2000], ["Normal", "2000-01-01", 2000], ["Normal", "01.01.2000", 2000], ["Int", 2000, 2000], ["Shorter Number", "1", None], ["Shorter Number", "10", None], ["Shorter Number", "100", None]],
 )
 def test_extract_year(name, input, expected_output):
     assert TagsImportedModel.extract_year(input) == expected_output, name
