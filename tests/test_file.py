@@ -17,7 +17,7 @@ from file import File
     ],
 )
 def test_check_alternative_fields(name, main_field, helper_field, expected_output):
-    assert File.check_secondary_tag_fields(main_field=main_field, helper_field=helper_field) == (expected_output, None), name
+    assert File.check_fallback_tag_fields(main_field=main_field, helper_field=helper_field) == (expected_output, None), name
 
 
 @pytest.mark.parametrize(
