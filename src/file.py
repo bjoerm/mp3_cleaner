@@ -39,8 +39,8 @@ class File:
     def validate_and_beautify_tags(self) -> TagsImportedModel:
         """TODO Docstring"""
         tags = TagsImportedModel(**self.tags_imported)
-        tags.TPE1, tags.TPE2 = self.check_secondary_tag_fields(tags.TPE1, tags.TPE2)
-        tags.TDRC, tags.TDRL = self.check_secondary_tag_fields(tags.TDRC, tags.TDRL)
+        tags.TPE1, tags.TPE2 = self.check_fallback_tag_fields(tags.TPE1, tags.TPE2)
+        tags.TDRC, tags.TDRL = self.check_fallback_tag_fields(tags.TDRC, tags.TDRL)
         tags.TALB = StringBeautifier.beautify_string(tags.TALB)
         tags.TIT2 = StringBeautifier.beautify_string(tags.TIT2)
         tags.TPE1 = StringBeautifier.beautify_string(tags.TPE1, remove_leading_the=True)
@@ -52,7 +52,7 @@ class File:
         return tags
 
     @staticmethod
-    def check_secondary_tag_fields(main_field: Any, helper_field: Any) -> Tuple[Any, None]:
+    def check_fallback_tag_fields(main_field: Any, helper_field: Any) -> Tuple[Any, None]:
         """If there is no main_field (like track artist), use the helper_field (like album artist) instead. helper_field is emptied anyway afterwards."""
 
         if main_field is None and helper_field is not None:
@@ -150,6 +150,7 @@ class File:
         pass
 
         # TODO Use another Filename class?
+        # TODO abc.tags_beautified.dict() -> change the dict key for APIC back to APIC:. Also check whether POPM need changes.
 
 
 if __name__ == "__main__":

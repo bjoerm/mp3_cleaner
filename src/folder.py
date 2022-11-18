@@ -22,7 +22,7 @@ class Folder:
 
         self.mp3_files = glob.glob(
             f"{str(self.folder_full_output)}/*.mp3", recursive=False
-        )  # Setting recursive to False is done as each folder with MP3 files in it should get (currently, 2022-11) its own call of the Folder class. Recursive=True would also mess up some album wide defined methods in this class.
+        )  # Setting recursive to False is done as each folder with MP3 files in it should get (currently, 2022-11) its own call of the Folder class. Recursive=True would mess up some album wide defined methods in this class.
 
         self.file_classes = self.init_file_classes()
         # TODO After the init album wide tags should be beautified (e.g. leading zeros in track numbers). This should be done via a (public) classmethod in File that gets e.g. the number of leading zeros from here (the album class). That way the File classes (inside thie file_classes list) are all updated.
