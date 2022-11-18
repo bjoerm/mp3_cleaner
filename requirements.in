@@ -1,0 +1,14 @@
+# How-to update requirements.txt
+# pip install pip-tools
+# pip-compile --upgrade requirements.in --resolver=backtracking
+# pip-sync
+
+black
+fastparquet
+flake8
+isort
+mutagen
+pydantic
+pytest
+regex
+tqdm
