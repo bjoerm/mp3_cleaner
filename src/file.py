@@ -1,4 +1,5 @@
 # TODO What enhancements rely on knowing what other files in the folder look like?
+
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -17,7 +18,7 @@ class File:
 
     def __init__(self, filepath: Path):
         self.filepath = filepath
-        self.filename = self.filepath.name
+        self.filename = self.filepath.name  # TODO Remove this here and create own filename class or have all the filename handling in the folder class?
         self.tags_imported: Dict[str, str | bytes | POPM] = self.import_tags_as_dict()  # TODO Hier auf die Main-Method verweisen, welche den obigen groben Ablauf abbildet.
         self.tags_beautified = self.validate_and_beautify_tags()
 
@@ -35,11 +36,11 @@ class File:
 
         return tags_dict
 
-    def validate_and_beautify_tags(self):
+    def validate_and_beautify_tags(self) -> TagsImportedModel:
         """TODO Docstring"""
         tags = TagsImportedModel(**self.tags_imported)
-        tags.TPE1, tags.TPE2 = self.check_alternative_fields(tags.TPE1, tags.TPE2)
-        tags.TDRC, tags.TDRL = self.check_alternative_fields(tags.TDRC, tags.TDRL)
+        tags.TPE1, tags.TPE2 = self.check_secondary_tag_fields(tags.TPE1, tags.TPE2)
+        tags.TDRC, tags.TDRL = self.check_secondary_tag_fields(tags.TDRC, tags.TDRL)
         tags.TALB = StringBeautifier.beautify_string(tags.TALB)
         tags.TIT2 = StringBeautifier.beautify_string(tags.TIT2)
         tags.TPE1 = StringBeautifier.beautify_string(tags.TPE1, remove_leading_the=True)
@@ -51,9 +52,9 @@ class File:
         return tags
 
     @staticmethod
-    def check_alternative_fields(main_field: Any, helper_field: Any) -> Tuple[Any, None]:
-        """If there is no main_field, use the helper_field instead. helper_field is emptied anyway afterwards.
-        E.g. there is no track artist but an album artist. Then the album artist is used as track artist."""
+    def check_secondary_tag_fields(main_field: Any, helper_field: Any) -> Tuple[Any, None]:
+        """If there is no main_field (like track artist), use the helper_field (like album artist) instead. helper_field is emptied anyway afterwards."""
+
         if main_field is None and helper_field is not None:
             main_field = helper_field
 
@@ -147,13 +148,14 @@ class File:
 
     def beautify_filename(self):
         pass
+
         # TODO Use another Filename class?
 
 
 if __name__ == "__main__":
 
     abc = File(
-        filepath=Path("input/aaaaaaaMP3/0000 Boy - little numbers.mp3"),
+        filepath=Path("input/aMP3/0000 Boy - little numbers.mp3"),
     )
 
     print(abc.tags_imported)
