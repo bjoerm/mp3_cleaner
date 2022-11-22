@@ -338,7 +338,7 @@ class StringHelper:
             return track_name
 
         else:
-            track_name_without_suffix = at_least_two_sets_of_brackets.group(1).strip()  # Note that this would end with a space without the strip().
+            track_name_without_suffixes = at_least_two_sets_of_brackets.group(1).strip()  # Note that this would end with a space without the strip().
             suffixes_untouched_order = at_least_two_sets_of_brackets.group(2)  # This is one single string.
 
             suffixes_untouched_order = regex.findall(r"(\(.+?\))", suffixes_untouched_order, regex.IGNORECASE)  # Turn the single string into a list where each item is a string in brackets.
@@ -369,7 +369,7 @@ class StringHelper:
 
             defined_suffixes_ordered = f'{defined_suffixes_ordered} {undefined_suffixes or ""} {live_suffix or ""}'
 
-            track_name_ordered = track_name_without_suffix + defined_suffixes_ordered
+            track_name_ordered = track_name_without_suffixes + defined_suffixes_ordered
 
             track_name_ordered = regex.sub(r"\s+", " ", track_name_ordered).strip()
 
