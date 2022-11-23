@@ -2,9 +2,9 @@ from typing import Dict
 
 import pytest
 
-from tags_model import TagsImportedModel
+from tags_model import TagsImportModel
 
-# TODO There should also be tests for the ImportedTagsModel in total as this also only needs a dict.
+# TODO There should be more tests for the ImportedTagsModel in total as this also only needs a dict.
 
 
 @pytest.mark.parametrize(
@@ -13,7 +13,7 @@ from tags_model import TagsImportedModel
 )
 def test_extract_number_from_slash_format(name, input, expected_output):
     """Testing the extraction (and conversion into int) of only the current part of a track or disc number, leaving out the number of total tracks/discs."""
-    assert TagsImportedModel.extract_number_from_slash_format(input) == expected_output, name
+    assert TagsImportModel.extract_number_from_slash_format(input) == expected_output, name
 
 
 @pytest.mark.parametrize(
@@ -21,7 +21,7 @@ def test_extract_number_from_slash_format(name, input, expected_output):
     [["Normal", "2000", 2000], ["Normal", "01-01-2000", 2000], ["Normal", "2000-01-01", 2000], ["Normal", "01.01.2000", 2000], ["Int", 2000, 2000], ["Shorter Number", "1", None], ["Shorter Number", "10", None], ["Shorter Number", "100", None]],
 )
 def test_extract_year(name, input, expected_output):
-    assert TagsImportedModel.extract_year(input) == expected_output, name
+    assert TagsImportModel.extract_year(input) == expected_output, name
 
 
 @pytest.mark.parametrize(
@@ -35,4 +35,4 @@ def test_extract_year(name, input, expected_output):
 def test_validated_tpe1(name, input, expected_output):
     input_dict = {"TPE1": input}
 
-    assert TagsImportedModel(**input_dict).TPE1 == expected_output, name
+    assert TagsImportModel(**input_dict).TPE1 == expected_output, name
