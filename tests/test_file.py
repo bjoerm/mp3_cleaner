@@ -1,6 +1,8 @@
 import pytest
 
-from file import File
+from mp3_file import MP3File
+
+# from mp3_file import MP3File
 
 
 @pytest.mark.parametrize(
@@ -17,7 +19,7 @@ from file import File
     ],
 )
 def test_check_alternative_fields(name, main_field, helper_field, expected_output):
-    assert File.check_fallback_tag_fields(main_field=main_field, helper_field=helper_field) == (expected_output, None), name
+    assert MP3File.check_fallback_tag_fields(main_field=main_field, helper_field=helper_field) == (expected_output, None), name
 
 
 @pytest.mark.parametrize(
@@ -33,7 +35,7 @@ def test_check_alternative_fields(name, main_field, helper_field, expected_outpu
     ],
 )
 def test_check_alternative_fields(name, arist_in, track_in, artist_out, track_out):
-    assert File.check_feat_in_artist(album_artist=arist_in, track=track_in) == (artist_out, track_out), name
+    assert MP3File.check_feat_in_artist(album_artist=arist_in, track=track_in) == (artist_out, track_out), name
 
 
 @pytest.mark.parametrize(
@@ -47,7 +49,7 @@ def test_check_alternative_fields(name, arist_in, track_in, artist_out, track_ou
     ],
 )
 def test_extract_suffixes(name, input_track, output_track, output_suffix):
-    assert File._extract_suffixes(track_name=input_track) == (output_track, output_suffix), name
+    assert MP3File._extract_suffixes(track_name=input_track) == (output_track, output_suffix), name
 
 
 @pytest.mark.parametrize(
@@ -61,4 +63,4 @@ def test_extract_suffixes(name, input_track, output_track, output_suffix):
     ],
 )
 def test_sort_track_name_suffixes(name, input, expected_output):
-    assert File.sort_track_name_suffixes(track_name=input) == expected_output, name
+    assert MP3File.sort_track_name_suffixes(track_name=input) == expected_output, name
