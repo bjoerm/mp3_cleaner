@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, StrictBytes, conint, constr, validator
 from beautify_single_string import StringBeautifier
 
 
-class TagsImportedModel(BaseModel):
+class TagsImportModel(BaseModel):
     """This Pydantic model defines the accepted tags. Any tag that is not listed below will be discarded.
 
     It also already does some first beautifications over the fields, defined in the validators below.
@@ -50,10 +50,28 @@ class TagsImportedModel(BaseModel):
         anystr_strip_whitespace = True  # This only refers to leading and trailing whitespace for str & byte types.
 
 
+class TagsExportModel(BaseModel):
+    """Tags how they shall be exported.
+    Compared to the imported tags:
+    - Helper tags like album artist are no longer present.
+    - Some tags are now mandatory.
+    - Minor type changes.
+    """
+
+    APIC: Optional[StrictBytes] = Field(description="Attached picture")
+    POPM: Optional[Any] = Field(description="Popularimeter. This frame keys a rating (out of 255) and a play count to an email address.")
+    TPE1: constr(min_length=1) = Field(description="Track artist")
+    TIT2: constr(min_length=1) = Field(description="Track")
+    TALB: Optional[constr(min_length=1)] = Field(description="Album")
+    TDRC: Optional[conint(ge=1000)] = Field(description="Recording year")
+    TPOS: Optional[constr(min_length=1)] = Field(description="Disc number")
+    TRCK: Optional[constr(min_length=1)] = Field(description="Track Number")
+
+
 if __name__ == "__main__":
 
     example = {"TPE1": "   the track    artist", "TPE2": "the album artist ", "TIT2": "track", "TDRC": "01-01-2000"}
 
-    tags = TagsImportedModel(**example)
+    tags = TagsImportModel(**example)
     print(tags)
     print(tags.dict(exclude_none=True))
