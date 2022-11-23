@@ -9,7 +9,7 @@ from mutagen.id3 import APIC, ID3, POPM
 from mutagen.mp3 import MP3  # Alternative to ID3 and ID3NoHeaderError.
 
 from beautify_single_string import StringBeautifier
-from tags_model import TagsImportedModel
+from tags_model import TagsExportModel, TagsImportModel
 
 
 @dataclass
@@ -19,7 +19,9 @@ class MP3File:
     filepath: Path
     filename: str = field(init=False)
     tags_raw: Dict[str, str | bytes | POPM] = field(init=False)
-    tags: TagsImportedModel = field(init=False)
+    tags: TagsImportModel = field(init=False)
+    leading_zeros_track: Optional[int] = field(init=False)
+    leading_zeros_album: Optional[int] = field(init=False)
 
     def __post_init__(self):
         self.filename = self.filepath.name  # TODO Remove this here and create own filename class or have all the filename handling in the folder class?
@@ -40,20 +42,22 @@ class MP3File:
 
         return tags_dict
 
-    def validate_and_beautify_tags(self) -> TagsImportedModel:
+    def validate_and_beautify_tags(self) -> TagsExportModel:
         """TODO Docstring"""
-        tags = TagsImportedModel(**self.tags_raw)
-        tags.TPE1, tags.TPE2 = self.check_fallback_tag_fields(tags.TPE1, tags.TPE2)
-        tags.TDRC, tags.TDRL = self.check_fallback_tag_fields(tags.TDRC, tags.TDRL)
-        tags.TALB = StringBeautifier.beautify_string(tags.TALB)
-        tags.TIT2 = StringBeautifier.beautify_string(tags.TIT2)
-        tags.TPE1 = StringBeautifier.beautify_string(tags.TPE1, remove_leading_the=True)
-        tags.TPE2 = StringBeautifier.beautify_string(tags.TPE2, remove_leading_the=True)
-        tags.TPE1, tags.TIT2 = self.check_feat_in_artist(album_artist=tags.TPE1, track=tags.TIT2)
+        tags_import = TagsImportModel(**self.tags_raw)
+        tags_import.TPE1, tags_import.TPE2 = self.check_fallback_tag_fields(tags_import.TPE1, tags_import.TPE2)
+        tags_import.TDRC, tags_import.TDRL = self.check_fallback_tag_fields(tags_import.TDRC, tags_import.TDRL)
+        tags_import.TALB = StringBeautifier.beautify_string(tags_import.TALB)
+        tags_import.TIT2 = StringBeautifier.beautify_string(tags_import.TIT2)
+        tags_import.TPE1 = StringBeautifier.beautify_string(tags_import.TPE1, remove_leading_the=True)
+        tags_import.TPE2 = StringBeautifier.beautify_string(tags_import.TPE2, remove_leading_the=True)
+        tags_import.TPE1, tags_import.TIT2 = self.check_feat_in_artist(album_artist=tags_import.TPE1, track=tags_import.TIT2)
 
-        tags.TIT2 = self.sort_track_name_suffixes(tags.TIT2)
+        tags_import.TIT2 = self.sort_track_name_suffixes(tags_import.TIT2)
 
-        return tags
+        tags_export = TagsExportModel(**tags_import.dict(exclude_none=True))
+
+        return tags_export
 
     @staticmethod
     def check_fallback_tag_fields(main_field: Any, helper_field: Any) -> Tuple[Any, None]:
@@ -142,6 +146,20 @@ class MP3File:
         text = text.lower()  # Uniquely transforming the word to lowercase.
 
         return text
+
+    def beautify_track_and_album_number(self, leading_zeros_track: Optional[int], leading_zeros_album: Optional[int]):
+        self.tags.TRCK = self._add_leading_zeros(number_current=self.tags.TRCK, leading_zeros=leading_zeros_track)
+        self.tags.TPOS = self._add_leading_zeros(number_current=self.tags.TPOS, leading_zeros=leading_zeros_album)
+
+    @staticmethod
+    def _add_leading_zeros(number_current: Optional[int], leading_zeros: Optional[int]) -> Optional[str]:
+
+        if leading_zeros is None or number_current is None:
+            number_beautified = None
+        else:
+            number_beautified = str(number_current).zfill(leading_zeros)
+
+        return number_beautified
 
     def validate_tags_prior_update(self):
         # TODO Via Pydantic it should be checked whether the output is still according to the desired form. Should a new class be written for that?
