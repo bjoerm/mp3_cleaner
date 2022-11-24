@@ -16,11 +16,11 @@ class Folder:
     folder_main_input: Path
     folder_main_output: Path
     folder_full_output: Path = field(init=False)
-    folder_child_output: str = field(init=False)
+    folder_child_output: str = field(init=False)  # TODO Ask Bodo whether one should do this as extra function that is then used, when needed instead of using self.folder_child_output at these places.
     unwanted_files: List[str]
     mp3_filepaths: List[str] = field(init=False)
     mp3_files: List[MP3File] = field(init=False)
-    has_only_one_artist: Optional[bool] = field(init=False)
+    folder_has_same_artist: Optional[bool] = field(init=False)
 
     def __post_init__(self):
         self.folder_full_output = self.generate_output_folder()
@@ -34,6 +34,21 @@ class Folder:
 
         self.unify_folder_wide_tags()
 
+        self.write_tags()
+
+    def generate_output_folder(self):
+        """Generate the name of the output folder and create that folder."""
+        folder_main_input = str(self.folder_main_input)
+        folder_main_output = str(self.folder_main_output)
+        folder_full_input = str(self.folder_full_input)
+
+        folder_full_output = regex.sub(folder_main_input, folder_main_output, folder_full_input)  # TODO It would be nice if this would use absolute folders to work if input and output were on different drives.
+        folder_full_output = Path(folder_full_output)
+
+        folder_full_output.mkdir(parents=True, exist_ok=True)
+
+        return folder_full_output
+
     def copy_to_output_folder(self):
         copytree(src=self.folder_full_input, dst=self.folder_full_output, ignore=ignore_patterns(*self.unwanted_files), dirs_exist_ok=True)  # Unwanted files won't be copied. One could also remove dirs_exist_ok to get an error as the output should ideally be empty before mp3 cleaning
 
@@ -45,9 +60,8 @@ class Folder:
 
     def unify_folder_wide_tags(self):
         """Beautify the tags that rely on information from album/folder level."""
-
         self.unify_track_and_album_numbers()
-        self.has_only_one_artist = self.check_artist_uniqueness(artists=[file.tags.TPE1 for file in self.mp3_files])
+        self.folder_has_same_artist = self.check_artist_uniqueness(artists=[file.tags.TPE1 for file in self.mp3_files])
 
         # TODO Continue here with checks for Nones. [file.tags.TDRC for file in self.mp3_files]
 
@@ -105,18 +119,10 @@ class Folder:
     # self.beautify_filenames()
     # self.beautify_folders()
 
-    def generate_output_folder(self):
-        """Generate the name of the output folder and create that folder."""
-        folder_main_input = str(self.folder_main_input)
-        folder_main_output = str(self.folder_main_output)
-        folder_full_input = str(self.folder_full_input)
+    def write_tags(self):
 
-        folder_full_output = regex.sub(folder_main_input, folder_main_output, folder_full_input)  # TODO It would be nice if this would use absolute folders to work if input and output were on different drives.
-        folder_full_output = Path(folder_full_output)
-
-        folder_full_output.mkdir(parents=True, exist_ok=True)
-
-        return folder_full_output
+        for file in self.mp3_files:
+            file.write_beautified_tags_to_file()
 
 
 if __name__ == "__main__":

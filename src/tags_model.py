@@ -27,9 +27,12 @@ class TagsImportModel(BaseModel):
     def extract_number_from_slash_format(cls, value):
         """Some tags not only show the current track or disc number but also add to that the total track numbers.
         E.g. '4/10' for track 4 from an album that has 10 tracks in total. This removes the '/10' from that example."""
-        # TODO Do I need a skip here if these fields are None?
+
+        if value is None:
+            return value
 
         value = int(regex.search(pattern=r"^[0-9]+", string=str(value))[0])  # TODO Do I really want this as Int? Or briefly as Int for deletion of any leading zeros? And then back as str as it will be filled with leading zeros later again?
+
         return value
 
     @validator("TDRC", "TDRC", pre=True)
@@ -39,6 +42,7 @@ class TagsImportModel(BaseModel):
             return value
 
         value = regex.search(pattern=r"(18|19|20|21)\d{2}", string=str(value))  # This is a bit stricter than just \d{4}.
+
         if value is None:
             return None
 
@@ -58,8 +62,8 @@ class TagsExportModel(BaseModel):
     - Minor type changes.
     """
 
-    APIC: Optional[StrictBytes] = Field(description="Attached picture")
-    POPM: Optional[Any] = Field(description="Popularimeter. This frame keys a rating (out of 255) and a play count to an email address.")
+    APIC: Optional[StrictBytes] = Field(alias="APIC:", description="Attached picture")
+    POPM: Optional[Any] = Field(alias="POPM:no@email", description="Popularimeter. This frame keys a rating (out of 255) and a play count to an email address.")
     TPE1: constr(min_length=1) = Field(description="Track artist")
     TIT2: constr(min_length=1) = Field(description="Track")
     TALB: Optional[constr(min_length=1)] = Field(description="Album")
@@ -72,6 +76,8 @@ if __name__ == "__main__":
 
     example = {"TPE1": "   the track    artist", "TPE2": "the album artist ", "TIT2": "track", "TDRC": "01-01-2000"}
 
-    tags = TagsImportModel(**example)
-    print(tags)
-    print(tags.dict(exclude_none=True))
+    tags_import = TagsImportModel(**example)
+    print(tags_import)
+
+    tags_export = TagsExportModel(**tags_import.dict(exclude_none=True))
+    print(tags_export.dict(exclude_none=True))

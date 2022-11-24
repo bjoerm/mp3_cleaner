@@ -18,21 +18,27 @@ class MP3File:
 
     filepath: Path
     filename: str = field(init=False)
-    tags_raw: Dict[str, str | bytes | POPM] = field(init=False)
-    tags: TagsImportModel = field(init=False)
+    tags_id3_mutagen: ID3 = field(init=False)
+    tags: TagsExportModel = field(init=False)
     leading_zeros_track: Optional[int] = field(init=False)
     leading_zeros_album: Optional[int] = field(init=False)
 
     def __post_init__(self):
         self.filename = self.filepath.name  # TODO Remove this here and create own filename class or have all the filename handling in the folder class?
-        self.tags_raw = self.import_tags_as_dict()  # TODO Hier auf die Main-Method verweisen, welche den obigen groben Ablauf abbildet.
-        self.tags = self.validate_and_beautify_tags()
+        self.tags_id3_mutagen = ID3(self.filepath)  # TODO Have this more elaborated to deal with the case of no tags in file.
+        self.tags = self.convert_validate_and_beautify_tags()
 
-    def import_tags_as_dict(self) -> Dict[str, str | bytes | POPM]:
-        """Import all ID3 tags from the MP3 file as dict. Also converting as much fields as possible from ID3 classes into normal str or other base Python objects."""
-        tags_imported = ID3(self.filepath)
+    def convert_validate_and_beautify_tags(self) -> TagsExportModel:
+        tags_import = self._convert_tags_to_dict(tags_id3_mutagen=self.tags_id3_mutagen)
+        tags_export = self._validate_and_beautify_tags(tags_import=tags_import)
 
-        tags_dict = dict(tags_imported)
+        return tags_export
+
+    @staticmethod
+    def _convert_tags_to_dict(tags_id3_mutagen: ID3) -> Dict[str, str | bytes | POPM]:
+        """Convert the fields from the mutagen ID3 class into a dictionary. Also converting as many fields as possible into normal str or other base Python objects."""
+
+        tags_dict = dict(tags_id3_mutagen)
 
         for k in tags_dict:
             if hasattr(tags_dict[k], "text"):
@@ -42,20 +48,21 @@ class MP3File:
 
         return tags_dict
 
-    def validate_and_beautify_tags(self) -> TagsExportModel:
+    def _validate_and_beautify_tags(self, tags_import: Dict[str, str | bytes | POPM]) -> TagsExportModel:
         """TODO Docstring"""
-        tags_import = TagsImportModel(**self.tags_raw)
-        tags_import.TPE1, tags_import.TPE2 = self.check_fallback_tag_fields(tags_import.TPE1, tags_import.TPE2)
-        tags_import.TDRC, tags_import.TDRL = self.check_fallback_tag_fields(tags_import.TDRC, tags_import.TDRL)
-        tags_import.TALB = StringBeautifier.beautify_string(tags_import.TALB)
-        tags_import.TIT2 = StringBeautifier.beautify_string(tags_import.TIT2)
-        tags_import.TPE1 = StringBeautifier.beautify_string(tags_import.TPE1, remove_leading_the=True)
-        tags_import.TPE2 = StringBeautifier.beautify_string(tags_import.TPE2, remove_leading_the=True)
-        tags_import.TPE1, tags_import.TIT2 = self.check_feat_in_artist(album_artist=tags_import.TPE1, track=tags_import.TIT2)
 
-        tags_import.TIT2 = self.sort_track_name_suffixes(tags_import.TIT2)
+        tags = TagsImportModel(**tags_import)
+        tags.TPE1, tags.TPE2 = self.check_fallback_tag_fields(tags.TPE1, tags.TPE2)
+        tags.TDRC, tags.TDRL = self.check_fallback_tag_fields(tags.TDRC, tags.TDRL)
+        tags.TALB = StringBeautifier.beautify_string(tags.TALB)
+        tags.TIT2 = StringBeautifier.beautify_string(tags.TIT2)
+        tags.TPE1 = StringBeautifier.beautify_string(tags.TPE1, remove_leading_the=True)
+        tags.TPE2 = StringBeautifier.beautify_string(tags.TPE2, remove_leading_the=True)
+        tags.TPE1, tags.TIT2 = self.check_feat_in_artist(album_artist=tags.TPE1, track=tags.TIT2)
 
-        tags_export = TagsExportModel(**tags_import.dict(exclude_none=True))
+        tags.TIT2 = self.sort_track_name_suffixes(tags.TIT2)
+
+        tags_export = TagsExportModel(**tags.dict(exclude_none=True, by_alias=True))  # by_alias to carry the odd naming the keys APIC: and POPM:no@email over.
 
         return tags_export
 
@@ -161,12 +168,36 @@ class MP3File:
 
         return number_beautified
 
-    def validate_tags_prior_update(self):
-        # TODO Via Pydantic it should be checked whether the output is still according to the desired form. Should a new class be written for that?
-        pass
-
     def write_beautified_tags_to_file(self):
-        pass
+
+        # Final validation and conversion to dict:
+        tags = TagsExportModel(**self.tags.dict(exclude_none=True, by_alias=True))
+        tags = tags.dict(exclude_none=True, by_alias=True)  # by_alias to carry the odd naming the keys APIC: and POPM:no@email over.
+
+        self.tags_id3_mutagen.delete()
+
+        self._add_tags_to_id3_object(tags=tags)
+
+        self.tags_id3_mutagen.save(v1=0, v2_version=4)
+
+    def _add_tags_to_id3_object(self, tags: Dict[str, str | bytes | POPM]):
+        """
+        Save beautified tags to id3 object. This function takes only on row from df_iteration at a time.
+        """
+
+        for key, value in tags.items():
+
+            if key in ("POPM:no@email", "APIC:"):  # Does not have a text field and thus a bit different structure.
+                self.tags_id3_mutagen.add(value)
+                pass
+                # exec(f'id3.add({value})')
+
+            elif key in ("TALB", "TDRC", "TIT2", "TPE1", "TPE2", "TPOS", "TRCK"):  # These fields (all but rating), have a text parameter which can be added the same way.
+                exec(f'self.tags_id3_mutagen.add({key}(encoding = 3, text = "{value}"))')  # encoding = 3 = UTF8 # Executes the following string as Python command. The f in the beginning marks this as "f string". See https://www.python.org/dev/peps/pep-0498/
+
+            else:
+                # This else condition should not be reached. It is used to raise an alert, when new tag types are entered in the global variables but not yet defined here.
+                raise NameError("It seems like a new key was added to options but not added to the handling above in this method.")
 
     def beautify_filename(self):
         pass
@@ -181,7 +212,7 @@ if __name__ == "__main__":
         filepath=Path("input/aMP3/0000 Boy - little numbers.mp3"),
     )
 
-    print(abc.tags_raw)
+    print(abc.tags_id3_mutagen)
     print(abc.tags)
 
     pass
