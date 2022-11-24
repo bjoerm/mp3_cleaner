@@ -135,6 +135,6 @@ if __name__ == "__main__":
     with open("options.toml", "rb") as f:
         config = tomllib.load(f)
 
-    abc = Folder(folder_full_input=Path("input/aMP3/"), folder_main_input=Path("input/"), folder_main_output=Path("output/"), unwanted_files=config["unwanted_files"])
+    abc = Folder(folder_full_input=Path("data/Wikimedia Commons/"), folder_main_input=Path("data/"), folder_main_output=Path("output/"), unwanted_files=config["unwanted_files"])
     abc.mp3_files[0].tags
     abc.folder_full_output
