@@ -20,7 +20,7 @@ class Folder:
     unwanted_files: List[str]
     mp3_filepaths: List[str] = field(init=False)
     mp3_files: List[MP3File] = field(init=False)
-    folder_has_same_artist: Optional[bool] = field(init=False)
+    folder_has_same_artist: Optional[bool] = field(init=False)  # TODO Does this need to be its own variable? No, if this is only used once for renaming of files and folders.
 
     def __post_init__(self):
         self.folder_full_output = self.generate_output_folder()
@@ -61,9 +61,17 @@ class Folder:
     def unify_folder_wide_tags(self):
         """Beautify the tags that rely on information from album/folder level."""
         self.unify_track_and_album_numbers()
-        self.folder_has_same_artist = self.check_artist_uniqueness(artists=[file.tags.TPE1 for file in self.mp3_files])
 
-        # TODO Continue here with checks for Nones. [file.tags.TDRC for file in self.mp3_files]
+        # TODO Should these really be class variables? Or just local variables inside e.g. a renaming files and folder method?
+        self.folder_has_same_artist = self.check_tag_uniformity(tag=[file.tags.TPE1 for file in self.mp3_files])
+        self.folder_has_same_disc_number = self.check_tag_uniformity(tag=[file.tags.TPOS for file in self.mp3_files])
+        self.folder_has_same_album = self.check_tag_uniformity(tag=[file.tags.TALB for file in self.mp3_files])
+        self.folder_has_same_date = self.check_tag_uniformity(tag=[file.tags.TDRC for file in self.mp3_files])
+
+        self.has_each_file_a_track_number = self.check_tag_uniformity(tag=[file.tags.TRCK for file in self.mp3_files]) is not None  # Using the effect that None is returned, if a None is detected.
+        self.has_each_file_a_disc_number = self.check_tag_uniformity(tag=[file.tags.TPOS for file in self.mp3_files]) is not None
+
+        # TODO Maybe a check whether it is a single file in the folder? This should affect the filename as well.
 
     def unify_track_and_album_numbers(self):
         leading_zeros_track = self.calculate_leading_zeros(numbers=[file.tags.TRCK for file in self.mp3_files])
@@ -78,17 +86,16 @@ class Folder:
             file.beautify_track_and_album_number(leading_zeros_track=leading_zeros_track, leading_zeros_album=leading_zeros_album)
 
     @staticmethod
-    def check_artist_uniqueness(artists: List[Optional[str]]) -> Optional[bool]:
-        # TODO Maybe rewrite this so that not a boolean is returned, but the artist name or None is returned instead. Maybe even a generalised "extract_and_check_uniqueness" method can be used for artist, year, album title?
-        # TODO Write unittest!
-        if None in artists:
-            raise ValueError("At least one file is without artist tag.")
+    def check_tag_uniformity(tag: List[Optional[str | int]]) -> Optional[bool]:
+        if None in tag:
+            # TODO Print a warning in this case, although it is hard to be descriptives here if e.g. all entries are Nones.
+            return None
 
-        artists_unique = set(artists)
+        tag_unique = set(tag)
 
-        if len(artists_unique) == 1:
+        if len(tag_unique) == 1:
             return True
-        elif len(artists_unique) > 1:
+        elif len(tag_unique) > 1:
             return False
         else:
             raise ValueError("This shouldn't happen.")
@@ -112,10 +119,8 @@ class Folder:
             return length_string
 
     # One the album level:
-    ## self.check_missing_years()  # Log a warning if any of the Files lacks a year, track number, artist, title, if all/some (?) of the other songs have that field.
-    # Validate the tags one more (with an output Pydantic class)
-    # self.convert_pydantic_tags_to_mutagen_object (maybe this is not even needed and all can be directly handled in the write method below)
-    # self.write_beautified_tags()
+    ## Check whether all files have the exact same tags present. If there are deviations, this might already be a hint to not rename anything. But this might be a bit too strict however...
+
     # self.beautify_filenames()
     # self.beautify_folders()
 

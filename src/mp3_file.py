@@ -20,7 +20,7 @@ class MP3File:
     filepath: Path
     filename: str = field(init=False)
     tags_id3_mutagen: ID3 = field(init=False)
-    tags: TagsExportModel = field(init=False)
+    tags: TagsExportModel = field(init=False)  # TODO Ask Bodo how to deal with variables that might be updated during the course of the script. E.g. dict first than Pydantic model than dict again.
     leading_zeros_track: Optional[int] = field(init=False)
     leading_zeros_album: Optional[int] = field(init=False)
 
