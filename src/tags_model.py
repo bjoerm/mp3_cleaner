@@ -1,9 +1,14 @@
-from typing import Any, Optional
+from typing import Optional
 
 import regex
-from pydantic import BaseModel, Field, StrictBytes, conint, constr, validator
+from pydantic import BaseModel, Field, StrictBytes, StrictStr, conint, constr, validator
 
-from beautify_single_string import StringBeautifier
+
+class APICModel(BaseModel):
+    """Defines the content of the APIC."""
+
+    mime: StrictStr  # Not (yet?) optional as it should always be present alongside data.
+    data: StrictBytes
 
 
 class TagsImportModel(BaseModel):
@@ -12,8 +17,8 @@ class TagsImportModel(BaseModel):
     It also already does some first beautifications over the fields, defined in the validators below.
     """
 
-    APIC: Optional[StrictBytes] = Field(alias="APIC:", description="Attached picture")
-    POPM: Optional[Any] = Field(alias="POPM:no@email", description="Popularimeter. This frame keys a rating (out of 255) and a play count to an email address.")
+    APIC: Optional[APICModel] = Field(alias="APIC:", description="Attached picture")
+    POPM: Optional[conint(ge=0, le=255)] = Field(alias="POPM:no@email", description="Popularimeter. This frame keys a rating (out of 255). The playcount that can be in POPM is omitted.")
     TPE1: Optional[constr(min_length=1)] = Field(description="Track artist")
     TPE2: Optional[constr(min_length=1)] = Field(description="Album artist. Only used as helper for TPE1.")
     TIT2: Optional[constr(min_length=1)] = Field(description="Track")
@@ -31,7 +36,7 @@ class TagsImportModel(BaseModel):
         if value is None:
             return value
 
-        value = int(regex.search(pattern=r"^[0-9]+", string=str(value))[0])  # TODO Do I really want this as Int? Or briefly as Int for deletion of any leading zeros? And then back as str as it will be filled with leading zeros later again?
+        value = int(regex.search(pattern=r"^[0-9]+", string=str(value))[0])
 
         return value
 
@@ -56,18 +61,18 @@ class TagsImportModel(BaseModel):
 
 class TagsExportModel(BaseModel):
     """Tags how they shall be exported.
-    Compared to the imported tags:
+    Compared to the imported tags Pydantic model:
     - Helper tags like album artist are no longer present.
     - Some tags are now mandatory.
     - Minor type changes.
     """
 
-    APIC: Optional[StrictBytes] = Field(alias="APIC:", description="Attached picture")
-    POPM: Optional[Any] = Field(alias="POPM:no@email", description="Popularimeter. This frame keys a rating (out of 255) and a play count to an email address.")
+    APIC: Optional[APICModel] = Field(description="Attached picture")
+    POPM: Optional[conint(ge=0, le=255)] = Field(description="Popularimeter. This frame keys a rating (out of 255). The playcount that can be in POPM is omitted.")
     TPE1: constr(min_length=1) = Field(description="Track artist")
     TIT2: constr(min_length=1) = Field(description="Track")
     TALB: Optional[constr(min_length=1)] = Field(description="Album")
-    TDRC: Optional[conint(ge=1000)] = Field(description="Recording year")
+    TDRC: Optional[constr(min_length=4, max_length=4)] = Field(description="Recording year")
     TPOS: Optional[constr(min_length=1)] = Field(description="Disc number")
     TRCK: Optional[constr(min_length=1)] = Field(description="Track Number")
 
