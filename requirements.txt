@@ -15,14 +15,8 @@ colorama==0.4.6
     #   click
     #   pytest
     #   tqdm
-cramjam==2.6.2
-    # via fastparquet
-fastparquet==2022.11.0
+flake8==6.0.0
     # via -r requirements.in
-flake8==5.0.4
-    # via -r requirements.in
-fsspec==2022.11.0
-    # via fastparquet
 iniconfig==1.1.1
     # via pytest
 isort==5.10.1
@@ -33,41 +27,25 @@ mutagen==1.46.0
     # via -r requirements.in
 mypy-extensions==0.4.3
     # via black
-numpy==1.23.4
-    # via
-    #   fastparquet
-    #   pandas
 packaging==21.3
-    # via
-    #   fastparquet
-    #   pytest
-pandas==1.5.1
-    # via fastparquet
+    # via pytest
 pathspec==0.10.2
     # via black
 platformdirs==2.5.4
     # via black
 pluggy==1.0.0
     # via pytest
-pycodestyle==2.9.1
+pycodestyle==2.10.0
     # via flake8
 pydantic==1.10.2
     # via -r requirements.in
-pyflakes==2.5.0
+pyflakes==3.0.1
     # via flake8
 pyparsing==3.0.9
     # via packaging
 pytest==7.2.0
     # via -r requirements.in
-python-dateutil==2.8.2
-    # via pandas
-pytz==2022.6
-    # via pandas
 regex==2022.10.31
-    # via -r requirements.in
-six==1.16.0
-    # via python-dateutil
-toml==0.10.2
     # via -r requirements.in
 tqdm==4.64.1
     # via -r requirements.in

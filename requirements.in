@@ -4,7 +4,6 @@
 # pip-sync
 
 black
-fastparquet
 flake8
 isort
 mutagen
