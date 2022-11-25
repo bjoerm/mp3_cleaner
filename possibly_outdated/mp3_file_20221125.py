@@ -1,3 +1,5 @@
+# TODO What enhancements rely on knowing what other files in the folder look like?
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
@@ -11,34 +13,34 @@ from beautify_single_string import StringBeautifier
 from tags_models import TagsExportModel, TagsImportModel
 
 
-class MP3FileTags:
-    def __init__(self, filepath) -> None:
-        self.tags_id3_mutagen: ID3 = ID3(filepath)
-        self.tags_beautified: TagsExportModel
+@dataclass
+class MP3File:
+    """This class reads all tags of a file, extracts the relevant informations and only keeps accepted fields. The latter is done via Pydantic."""
 
-    def beautify_tags_isolated(self):
-        """Beautifies the tags with information found in this file. Thus, "isolated" as it does not (yet) look at information from other files in the folder."""
+    filepath: Path
+    filename: str = field(init=False)
+    tags_id3_mutagen: ID3 = field(init=False)
+    tags: TagsExportModel = field(init=False)  # TODO Ask Bodo how to deal with variables that might be updated during the course of the script. E.g. dict first than Pydantic model than dict again.
+    leading_zeros_track: Optional[int] = field(init=False)
+    leading_zeros_album: Optional[int] = field(init=False)
 
-        tags_dict = self._convert_tags_to_dict()
+    def __post_init__(self):
+        self.filename = self.filepath.name  # TODO Remove this here and create own filename class or have all the filename handling in the folder class?
+        self.tags_id3_mutagen = ID3(self.filepath)  # TODO Have this more elaborated to deal with the case of no tags in file.
+        self.tags = self.convert_validate_and_beautify_tags()
 
-        tags = TagsImportModel(**tags_dict)
-        tags.TPE1, tags.TPE2 = self._check_fallback_tag_fields(tags.TPE1, tags.TPE2)
-        tags.TDRC, tags.TDRL = self._check_fallback_tag_fields(tags.TDRC, tags.TDRL)
-        tags.TALB = StringBeautifier.beautify_string(tags.TALB)
-        tags.TIT2 = StringBeautifier.beautify_string(tags.TIT2)
-        tags.TPE1 = StringBeautifier.beautify_string(tags.TPE1, remove_leading_the=True)
-        tags.TPE2 = StringBeautifier.beautify_string(tags.TPE2, remove_leading_the=True)
-        tags.TPE1, tags.TIT2 = self._check_feat_in_artist(album_artist=tags.TPE1, track=tags.TIT2)
+    def convert_validate_and_beautify_tags(self) -> TagsExportModel:
+        tags_import = self._convert_tags_to_dict(tags_id3_mutagen=self.tags_id3_mutagen)
+        tags_export = self._validate_and_beautify_tags(tags_import=tags_import)
 
-        tags.TIT2 = self._sort_track_name_suffixes(tags.TIT2)
+        return tags_export
 
-        self.tags_beautified = TagsExportModel(**tags.dict(exclude_none=True))
-
-    def _convert_tags_to_dict(self) -> Dict[str, str | int | Dict[str, str | bytes]]:
+    @staticmethod
+    def _convert_tags_to_dict(tags_id3_mutagen: ID3) -> Dict[str, str | int | Dict[str, str | bytes]]:
         """Extract the relevant parts for each tag from the mutagen ID3 class into a dictionary. That means that tags are reduced to normal strings or other base Python objects."""
 
         # Convert
-        tags_dict = dict(self.tags_id3_mutagen)
+        tags_dict = dict(tags_id3_mutagen)
 
         # Extract
         for k in tags_dict:
@@ -55,8 +57,26 @@ class MP3FileTags:
 
         return tags_dict
 
+    def _validate_and_beautify_tags(self, tags_import: Dict[str, str | int | Dict[str, str | bytes]]) -> TagsExportModel:
+        """TODO Docstring"""
+
+        tags = TagsImportModel(**tags_import)
+        tags.TPE1, tags.TPE2 = self.check_fallback_tag_fields(tags.TPE1, tags.TPE2)
+        tags.TDRC, tags.TDRL = self.check_fallback_tag_fields(tags.TDRC, tags.TDRL)
+        tags.TALB = StringBeautifier.beautify_string(tags.TALB)
+        tags.TIT2 = StringBeautifier.beautify_string(tags.TIT2)
+        tags.TPE1 = StringBeautifier.beautify_string(tags.TPE1, remove_leading_the=True)
+        tags.TPE2 = StringBeautifier.beautify_string(tags.TPE2, remove_leading_the=True)
+        tags.TPE1, tags.TIT2 = self.check_feat_in_artist(album_artist=tags.TPE1, track=tags.TIT2)
+
+        tags.TIT2 = self.sort_track_name_suffixes(tags.TIT2)
+
+        tags_export = TagsExportModel(**tags.dict(exclude_none=True))
+
+        return tags_export
+
     @staticmethod
-    def _check_fallback_tag_fields(main_field: Any, helper_field: Any) -> Tuple[Any, None]:
+    def check_fallback_tag_fields(main_field: Any, helper_field: Any) -> Tuple[Any, None]:
         """If there is no main_field (like track artist), use the helper_field (like album artist) instead. helper_field is emptied anyway afterwards."""
 
         if main_field is None and helper_field is not None:
@@ -65,7 +85,7 @@ class MP3FileTags:
         return main_field, None
 
     @staticmethod
-    def _check_feat_in_artist(album_artist: Optional[str], track: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
+    def check_feat_in_artist(album_artist: Optional[str], track: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
         """
         Deal with the case of featuring information being in the track artist field by moving it from the track artist to the track name.
         Needs be executed after the normal string beautification.
@@ -90,7 +110,7 @@ class MP3FileTags:
         return album_artist, track
 
     @classmethod
-    def _sort_track_name_suffixes(cls, track_name: Optional[str]) -> Optional[str]:
+    def sort_track_name_suffixes(cls, track_name: Optional[str]) -> Optional[str]:
         """Put any track names with multiple suffixes like (... Remix), (Acoustic), (Live ...), (Feat. ...) into an adequate order."""  # TODO If I only set Live at the end, then I don't need to over do it here.
         if track_name is None:
             return track_name
@@ -144,8 +164,8 @@ class MP3FileTags:
         return text
 
     def beautify_track_and_album_number(self, leading_zeros_track: Optional[int], leading_zeros_album: Optional[int]):
-        self.tags_beautified.TRCK = self._add_leading_zeros(number_current=self.tags_beautified.TRCK, leading_zeros=leading_zeros_track)
-        self.tags_beautified.TPOS = self._add_leading_zeros(number_current=self.tags_beautified.TPOS, leading_zeros=leading_zeros_album)
+        self.tags.TRCK = self._add_leading_zeros(number_current=self.tags.TRCK, leading_zeros=leading_zeros_track)
+        self.tags.TPOS = self._add_leading_zeros(number_current=self.tags.TPOS, leading_zeros=leading_zeros_album)
 
     @staticmethod
     def _add_leading_zeros(number_current: Optional[int], leading_zeros: Optional[int]) -> Optional[str]:
@@ -160,7 +180,7 @@ class MP3FileTags:
     def write_beautified_tags_to_file(self):
 
         # Final validation and conversion to dict:
-        tags = TagsExportModel(**self.tags_beautified.dict(exclude_none=True))
+        tags = TagsExportModel(**self.tags.dict(exclude_none=True))
         tags = tags.dict(exclude_none=True)
 
         self.tags_id3_mutagen.delete()  # Delete all existing tags from the mutagen id3 object inside this class.
@@ -173,10 +193,11 @@ class MP3FileTags:
         """
         Save beautified tags to the mutagen id3 object. This function takes only on row from df_iteration at a time.
         """
-        encoding_value = 3  # 1 = UTF16, 3 = UTF8
 
-        # TODO Try structural pattern matching here!
         for key, value in tags.items():
+
+            encoding_value = 3  # 1 = UTF16, 3 = UTF8
+
             if key == "APIC":
                 self.tags_id3_mutagen.add(APIC(mime=value["mime"], data=value["data"]))
 
@@ -204,20 +225,6 @@ class MP3FileTags:
             else:
                 raise NameError("This else condition should not be reached. Check the Pydantic classes.")
 
-
-class MP3FileName:
-    def __init__(self, filepath: Path) -> None:
-        self.filepath = filepath
-        self.filename_initial: str = self.filepath.name
-        self.filename_beautified: str
-        # TODO Continue at this class.
-
-
-class MP3File:
-    def __init__(self, filepath) -> None:
-        self.tags = MP3FileTags(filepath=filepath)
-        self.name = MP3FileName(filepath=filepath)
-
     def beautify_filename(self):
         pass
 
@@ -228,6 +235,7 @@ if __name__ == "__main__":
         filepath=Path("data/wikimedia_commons/warnsignal_train_with_some_tags.mp3"),
     )
 
-    print(abc.tags.tags_id3_mutagen)
+    print(abc.tags_id3_mutagen)
+    print(abc.tags)
 
     pass

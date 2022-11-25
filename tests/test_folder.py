@@ -16,7 +16,7 @@ from folder import Folder
     ],
 )
 def test_calculate_leading_zeros(name, numbers, expected_output):
-    assert Folder.calculate_leading_zeros(numbers=numbers) == expected_output, name
+    assert Folder._calculate_leading_zeros(numbers=numbers) == expected_output, name
 
 
 @pytest.mark.parametrize(

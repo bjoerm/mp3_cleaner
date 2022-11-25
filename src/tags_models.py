@@ -69,7 +69,7 @@ class TagsExportModel(BaseModel):
 
     APIC: Optional[APICModel] = Field(description="Attached picture")
     POPM: Optional[conint(ge=0, le=255)] = Field(description="Popularimeter. This frame keys a rating (out of 255). The playcount that can be in POPM is omitted.")
-    TPE1: constr(min_length=1) = Field(description="Track artist")
+    TPE1: constr(min_length=1) = Field(description="Track artist")  # TODO Sort the mandatory entries to the top.
     TIT2: constr(min_length=1) = Field(description="Track")
     TALB: Optional[constr(min_length=1)] = Field(description="Album")
     TDRC: Optional[constr(min_length=4, max_length=4)] = Field(description="Recording year")

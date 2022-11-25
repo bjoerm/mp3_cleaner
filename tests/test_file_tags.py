@@ -1,6 +1,6 @@
 import pytest
 
-from mp3_file import MP3File
+from mp3_file import MP3FileTags
 
 # from mp3_file import MP3File
 
@@ -19,7 +19,7 @@ from mp3_file import MP3File
     ],
 )
 def test_check_fallback_tag_fields(name, main_field, helper_field, expected_output):
-    assert MP3File.check_fallback_tag_fields(main_field=main_field, helper_field=helper_field) == (expected_output, None), name
+    assert MP3FileTags._check_fallback_tag_fields(main_field=main_field, helper_field=helper_field) == (expected_output, None), name
 
 
 @pytest.mark.parametrize(
@@ -35,7 +35,7 @@ def test_check_fallback_tag_fields(name, main_field, helper_field, expected_outp
     ],
 )
 def test_check_feat_in_artist(name, arist_in, track_in, artist_out, track_out):
-    assert MP3File.check_feat_in_artist(album_artist=arist_in, track=track_in) == (artist_out, track_out), name
+    assert MP3FileTags._check_feat_in_artist(album_artist=arist_in, track=track_in) == (artist_out, track_out), name
 
 
 @pytest.mark.parametrize(
@@ -49,7 +49,7 @@ def test_check_feat_in_artist(name, arist_in, track_in, artist_out, track_out):
     ],
 )
 def test_extract_suffixes(name, input_track, output_track, output_suffix):
-    assert MP3File._extract_suffixes(track_name=input_track) == (output_track, output_suffix), name
+    assert MP3FileTags._extract_suffixes(track_name=input_track) == (output_track, output_suffix), name
 
 
 @pytest.mark.parametrize(
@@ -63,7 +63,7 @@ def test_extract_suffixes(name, input_track, output_track, output_suffix):
     ],
 )
 def test_sort_track_name_suffixes(name, input, expected_output):
-    assert MP3File.sort_track_name_suffixes(track_name=input) == expected_output, name
+    assert MP3FileTags._sort_track_name_suffixes(track_name=input) == expected_output, name
 
 
 @pytest.mark.parametrize(
@@ -82,4 +82,4 @@ def test_sort_track_name_suffixes(name, input, expected_output):
     ],
 )
 def test_add_leading_zeros(name, number_current, leading_zeros, expected_output):
-    assert MP3File._add_leading_zeros(number_current=number_current, leading_zeros=leading_zeros) == expected_output, name
+    assert MP3FileTags._add_leading_zeros(number_current=number_current, leading_zeros=leading_zeros) == expected_output, name

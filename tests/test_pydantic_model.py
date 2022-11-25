@@ -2,9 +2,10 @@ from typing import Dict
 
 import pytest
 
-from tags_model import TagsImportModel
+from tags_models import TagsImportModel
 
 # TODO There should be more tests for the ImportedTagsModel in total as this also only needs a dict.
+# TODO Add TagsExportModel
 
 
 @pytest.mark.parametrize(
