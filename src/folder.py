@@ -9,6 +9,7 @@ import regex
 import tomllib
 
 from mp3_file import MP3File
+from tags_models import TagsExportModel
 
 
 # TODO Ask Bodo this is a good case for using a dataclass. TODO #2: Maybe even better than as Pydantic dataclass that only accepts defined input.
@@ -29,8 +30,45 @@ class FolderName:
         self.folderpath_inital = folderpath.absolute()
         self.folderpath_beautified: Path
 
-    def beautify_and_write_foldername(self):
+    def beautify_and_write_foldername(
+        self,
+        tags_beautified: TagsExportModel,
+        has_each_file_a_disc_number: bool,
+        folder_has_same_album: Optional[bool],
+        folder_has_same_artist: Optional[bool],
+        folder_has_same_date: Optional[bool],
+        folder_has_same_disc_number: Optional[bool],
+    ):
+        foldername_beautified = self.generate_beautified_foldername(
+            tag_artist=tags_beautified.TPE1,
+            tag_album_title=tags_beautified.TALB,
+            tag_disc=tags_beautified.TPOS,
+            tag_date=tags_beautified.TDRC,
+            has_each_file_a_disc_number=has_each_file_a_disc_number,
+            folder_has_same_album=folder_has_same_album,
+            folder_has_same_artist=folder_has_same_artist,
+            folder_has_same_date=folder_has_same_date,
+            folder_has_same_disc_number=folder_has_same_disc_number,
+        )
+
+        self.folderpath_beautified = self.folderpath_inital.parent / foldername_beautified
+
+        self.folderpath_inital.rename(self.folderpath_beautified)
+
+    @staticmethod
+    def generate_beautified_foldername(
+        tag_artist: Optional[str],
+        tag_album_title: Optional[str],
+        tag_disc: Optional[str],
+        tag_date: Optional[str],
+        has_each_file_a_disc_number: bool,
+        folder_has_same_album: Optional[bool],
+        folder_has_same_artist: Optional[bool],
+        folder_has_same_date: Optional[bool],
+        folder_has_same_disc_number: Optional[bool],
+    ) -> str:
         pass
+        return "WIP MVP"
 
 
 class Folder:
@@ -38,7 +76,7 @@ class Folder:
         self.folder_full_output: Path = self.generate_output_folder(folder_full_input=folder_full_input, folder_main_input=folder_main_input, folder_main_output=folder_main_output)
         self.folder_child_output: str = self.folder_full_output.name
         self.descriptive: FolderDescription
-        self.name = FolderName(folderpath=folder_full_input)
+        self.name = FolderName(folderpath=self.folder_full_output)
 
         self.copy_to_output_folder(folder_full_input=folder_full_input, unwanted_files=unwanted_files)
 
@@ -54,7 +92,14 @@ class Folder:
 
         self.beautify_and_write_filenames()
 
-        self.name.beautify_and_write_foldername()
+        self.name.beautify_and_write_foldername(
+            tags_beautified=self.mp3_files[0].tags.tags_beautified,  # Simply using the values from the first file for the album name.
+            has_each_file_a_disc_number=self.descriptive.has_each_file_a_disc_number,
+            folder_has_same_album=self.descriptive.folder_has_same_album,
+            folder_has_same_artist=self.descriptive.folder_has_same_artist,
+            folder_has_same_date=self.descriptive.folder_has_same_date,
+            folder_has_same_disc_number=self.descriptive.folder_has_same_disc_number,
+        )
 
     @staticmethod
     def generate_output_folder(folder_main_input: Path, folder_main_output: Path, folder_full_input: Path) -> Path:
@@ -133,7 +178,7 @@ class Folder:
     def check_tag_uniformity(tag: List[Optional[str | int]]) -> Optional[bool]:
         if None in tag:
             # TODO Print a warning in this case, although it is hard to be descriptives here if e.g. all entries are Nones.
-            return None
+            return None  # TODO Think whether returning a None here leads to any advantage over returning False in the case of missing tags.
 
         tag_unique = set(tag)
 
