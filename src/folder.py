@@ -1,4 +1,5 @@
 import glob
+import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 from shutil import copytree, ignore_patterns
@@ -13,19 +14,31 @@ from mp3_file import MP3File
 # TODO Ask Bodo this is a good case for using a dataclass. TODO #2: Maybe even better than as Pydantic dataclass that only accepts defined input.
 @dataclass
 class FolderDescription:
-    folder_has_same_artist: Optional[bool] = field(init=False)
-    folder_has_same_disc_number: Optional[bool] = field(init=False)
+    only_single_mp3_file: bool = field(init=False)
     folder_has_same_album: Optional[bool] = field(init=False)
+    folder_has_same_artist: Optional[bool] = field(init=False)
     folder_has_same_date: Optional[bool] = field(init=False)
-    has_each_file_a_track_number: Optional[bool] = field(init=False)
-    has_each_file_a_disc_number: Optional[bool] = field(init=False)
+    folder_has_same_disc_number: Optional[bool] = field(init=False)
+    has_each_file_a_disc_number: bool = field(init=False)
+    has_each_file_a_track_number: bool = field(init=False)
+
+
+# TODO Ask Bodo whether this should be a dataclass?
+class FolderName:
+    def __init__(self, folderpath: Path) -> None:
+        self.folderpath_inital = folderpath.absolute()
+        self.folderpath_beautified: Path
+
+    def beautify_and_write_foldername(self):
+        pass
 
 
 class Folder:
     def __init__(self, folder_full_input: Path, folder_main_input: Path, folder_main_output: Path, unwanted_files: List[str]) -> None:
-
         self.folder_full_output: Path = self.generate_output_folder(folder_full_input=folder_full_input, folder_main_input=folder_main_input, folder_main_output=folder_main_output)
         self.folder_child_output: str = self.folder_full_output.name
+        self.descriptive: FolderDescription
+        self.name = FolderName(folderpath=folder_full_input)
 
         self.copy_to_output_folder(folder_full_input=folder_full_input, unwanted_files=unwanted_files)
 
@@ -35,10 +48,13 @@ class Folder:
         self.beautify_tags_isolated_per_file()
         self.beautify_track_and_album_numbers()
 
-        self.descriptive = FolderDescription()
         self.extract_information_from_tags()
 
         self.write_tags()
+
+        self.beautify_and_write_filenames()
+
+        self.name.beautify_and_write_foldername()
 
     @staticmethod
     def generate_output_folder(folder_main_input: Path, folder_main_output: Path, folder_full_input: Path) -> Path:
@@ -59,6 +75,7 @@ class Folder:
 
     def fetch_mp3_filepaths(self) -> List[str]:
         return glob.glob(f"{str(self.folder_full_output)}/*.mp3", recursive=False)  # Recursive=True would mess up some album wide defined methods in this class.
+        # TODO Add support for other cases of writing .mp3. Also unify it to always be in smaller letters.
 
     def init_mp3_file_classes(self) -> List[MP3File]:
         return [MP3File(filepath=Path(i)) for i in self.mp3_filepaths]
@@ -98,6 +115,11 @@ class Folder:
             return length_string
 
     def extract_information_from_tags(self):
+        """Init a class that stores folder wide information from analyzing the tags."""
+
+        self.descriptive = FolderDescription()
+
+        self.descriptive.only_single_mp3_file = len(self.mp3_files) == 1
 
         self.descriptive.folder_has_same_artist = self.check_tag_uniformity(tag=[file.tags.tags_beautified.TPE1 for file in self.mp3_files])
         self.descriptive.folder_has_same_disc_number = self.check_tag_uniformity(tag=[file.tags.tags_beautified.TPOS for file in self.mp3_files])
@@ -106,8 +128,6 @@ class Folder:
 
         self.descriptive.has_each_file_a_track_number = self.check_tag_uniformity(tag=[file.tags.tags_beautified.TRCK for file in self.mp3_files]) is not None  # Using the effect that None is returned, if a None is detected.
         self.descriptive.has_each_file_a_disc_number = self.check_tag_uniformity(tag=[file.tags.tags_beautified.TPOS for file in self.mp3_files]) is not None
-
-        # TODO Maybe a check whether it is a single file in the folder? This should affect the filename as well.
 
     @staticmethod
     def check_tag_uniformity(tag: List[Optional[str | int]]) -> Optional[bool]:
@@ -124,16 +144,19 @@ class Folder:
         else:
             raise ValueError("This shouldn't happen.")
 
-    # TODO One the album level:
-    ## Check whether all files have the exact same tags present. If there are deviations, this might already be a hint to not rename anything. But this might be a bit too strict however...
-
-    # self.beautify_filenames()
-    # self.beautify_folders()
-
     def write_tags(self):
-
         for file in self.mp3_files:
             file.tags.write_beautified_tags_to_file()
+
+    def beautify_and_write_filenames(self):
+        for file in self.mp3_files:
+            file.name.beautify_and_write_filename(
+                tags_beautified=file.tags.tags_beautified,
+                only_single_mp3_file=self.descriptive.only_single_mp3_file,
+                folder_has_same_artist=self.descriptive.folder_has_same_artist,
+                has_each_file_a_disc_number=self.descriptive.has_each_file_a_disc_number,
+                has_each_file_a_track_number=self.descriptive.has_each_file_a_track_number,
+            )
 
 
 if __name__ == "__main__":
@@ -141,6 +164,11 @@ if __name__ == "__main__":
     with open("options.toml", "rb") as f:
         config = tomllib.load(f)
 
-    abc = Folder(folder_full_input=Path("data/wikimedia_commons/"), folder_main_input=Path("data/"), folder_main_output=Path("output/"), unwanted_files=config["unwanted_files"])
+    main_input = Path("data/")
+    main_ouput = Path("output/")
+
+    shutil.rmtree(main_ouput)
+
+    abc = Folder(folder_full_input=Path("data/wikimedia_commons/"), folder_main_input=main_input, folder_main_output=main_ouput, unwanted_files=config["unwanted_files"])
     abc.mp3_files[0].tags
     abc.folder_full_output

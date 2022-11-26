@@ -2,8 +2,6 @@ import pytest
 
 from mp3_file import MP3FileTags
 
-# from mp3_file import MP3File
-
 
 @pytest.mark.parametrize(
     "name, main_field, helper_field, expected_output",
