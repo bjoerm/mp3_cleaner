@@ -1,3 +1,5 @@
+# TODO Handle case when files are in the main input folder level and not in a sub folder.
+
 import glob
 import shutil
 from dataclasses import dataclass, field
@@ -39,7 +41,9 @@ class FolderName:
         folder_has_same_date: Optional[bool],
         folder_has_same_disc_number: Optional[bool],
     ):
+
         foldername_beautified = self.generate_beautified_foldername(
+            foldername_initial=self.folderpath_inital.name,
             tag_artist=tags_beautified.TPE1,
             tag_album_title=tags_beautified.TALB,
             tag_disc=tags_beautified.TPOS,
@@ -57,6 +61,7 @@ class FolderName:
 
     @staticmethod
     def generate_beautified_foldername(
+        foldername_initial: str,
         tag_artist: Optional[str],
         tag_album_title: Optional[str],
         tag_disc: Optional[str],
@@ -67,8 +72,13 @@ class FolderName:
         folder_has_same_date: Optional[bool],
         folder_has_same_disc_number: Optional[bool],
     ) -> str:
-        pass
-        return "WIP MVP"
+        # Edge case: Folder has different albums -> no change.
+        if folder_has_same_album is False:  # TODO What about None? Should this be included? Or just ensure that this can only be True/False and not None?
+            return foldername_initial
+
+        # TODO Continue here.
+
+        return f"WIP MVP - [{tag_artist}] - {tag_album_title} ({tag_disc}) ({tag_date})"
 
 
 class Folder:

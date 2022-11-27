@@ -245,7 +245,7 @@ class MP3FileName:
         folder_has_same_artist: Optional[bool],
         has_each_file_a_disc_number: bool,
         has_each_file_a_track_number: bool,
-    ):
+    ) -> str:
 
         disc_track_number = cls._generate_disc_track_number(has_each_file_a_disc_number=has_each_file_a_disc_number, has_each_file_a_track_number=has_each_file_a_track_number, tag_disc=tag_disc, tag_track=tag_track)
 
@@ -263,7 +263,7 @@ class MP3FileName:
         return f"{filename_beautified}.mp3"  # Note that I am hardcoding here the file extension.
 
     @staticmethod
-    def _generate_disc_track_number(has_each_file_a_disc_number: bool, has_each_file_a_track_number: bool, tag_disc: Optional[str], tag_track: Optional[str]):
+    def _generate_disc_track_number(has_each_file_a_disc_number: bool, has_each_file_a_track_number: bool, tag_disc: Optional[str], tag_track: Optional[str]) -> str:
 
         if has_each_file_a_track_number is True:
             if has_each_file_a_disc_number is True:
