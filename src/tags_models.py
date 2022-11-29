@@ -35,18 +35,18 @@ class TagsImportModel(BaseModel):
 
         if value is None:
             return value
-
-        value = int(regex.search(pattern=r"^[0-9]+", string=str(value))[0])
+        else:
+            value = int(regex.search(pattern=r"^[0-9]+", string=str(value))[0])
 
         return value
 
-    @validator("TDRC", "TDRC", pre=True)
+    @validator("TDRC", "TDRL", pre=True)
     def extract_year(cls, value):
         """Extract only the year and omit any other information on the precise date."""
         if value is None:
             return value
-
-        value = regex.search(pattern=r"(18|19|20|21)\d{2}", string=str(value))  # This is a bit stricter than just \d{4}.
+        else:
+            value = regex.search(pattern=r"(18|19|20)\d{2}", string=str(value))  # This is a bit stricter than just \d{4}.
 
         if value is None:
             return None
@@ -70,7 +70,7 @@ class TagsExportModel(BaseModel):
     TPE1: constr(min_length=1) = Field(description="Track artist")  # TODO Add error message for missing TPE1 and TIT2.
     TIT2: constr(min_length=1) = Field(description="Track")
     APIC: Optional[APICModel] = Field(description="Attached picture")
-    POPM: Optional[conint(ge=0, le=255)] = Field(description="Popularimeter. This frame keys a rating (out of 255). The playcount that can be in POPM is omitted.")
+    POPM: Optional[conint(ge=0, le=255)] = Field(description="Popularimeter. Rating from 0 to 255.")
     TALB: Optional[constr(min_length=1)] = Field(description="Album")
     TDRC: Optional[constr(min_length=4, max_length=4)] = Field(description="Recording year")
     TPOS: Optional[constr(min_length=1)] = Field(description="Disc number")

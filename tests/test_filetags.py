@@ -1,6 +1,6 @@
 import pytest
 
-from mp3_file import MP3FileTags
+from mp3filetags import MP3FileTags
 
 
 @pytest.mark.parametrize(
@@ -81,3 +81,49 @@ def test_sort_track_name_suffixes(name, input, expected_output):
 )
 def test_add_leading_zeros(name, number_current, leading_zeros, expected_output):
     assert MP3FileTags._add_leading_zeros(number_current=number_current, leading_zeros=leading_zeros) == expected_output, name
+
+
+@pytest.mark.parametrize(
+    "name, foldername, expected_output",
+    [
+        ["No cd number", "No cd Number", None],
+        ["A cd number", "Folder name (CD1)", "1"],
+        ["A cd number", "Folder name (CD 2)", "2"],
+        ["A cd number", "Folder name CD3", "3"],
+        ["Underscores", "CD_3", "3"],
+        ["Underscores", "_CD_3", "3"],
+        ["A cd number", "Folder name CD 4", "4"],
+        ["A disc number", "Folder name (Disc1)", "1"],
+        ["A disc number", "Folder name (Disc 2)", "2"],
+        ["A disc number", "Folder name Disc3", "3"],
+        ["A disc number", "Folder name Disc 4", "4"],
+        ["No cd number", "The Best CD", None],
+        ["No cd number", "The Best CD from 2000", None],
+        ["No cd number", "The Best 1 CD from 2000", None],
+        ["Possible Edge Case", "ACDC 2", None],
+        ["Possible Edge Case", "ACDC 2 CD3", "3"],
+        ["Possible Edge Case", "ACDC 2 CD3 (2004)", "3"],
+        ["Possible Edge Case", "ACD 2", None],
+        ["None", None, None],
+    ],
+)
+def test_find_disc_number_in_foldername(name, foldername, expected_output):
+    assert MP3FileTags._find_disc_number_in_foldername(foldername=foldername) == expected_output, name
+
+
+@pytest.mark.parametrize(
+    "name, folder_has_same_disc_number, disc_number, foldername, expected_output",
+    [
+        ["None", False, None, "Foldername", None],
+        ["Disc 1 - Same Tags in Folder", True, "1", "Foldername", None],
+        ["Disc 1 - Different Tags in Folder", False, "1", "Foldername", "1"],
+        ["Disc 1 - Same Tags in Folder but Foldername", True, "1", "Foldername (CD1)", "1"],
+        ["Disc 1 - Same Tags in Folder but Foldername", True, "1", "Foldername CD1", "1"],
+        ["Disc 2 - Same Tags in Folder", True, "2", "Foldername", "2"],
+        ["Disc 2 - Different Tags in Folder", False, "2", "Foldername", "2"],
+        ["Disc in Tag but not Foldername", False, "2", "Foldername", "2"],
+        ["Disc in Foldername", False, None, "Foldername (CD1)", "1"],
+    ],
+)
+def test_improve_disc_number(name, folder_has_same_disc_number, disc_number, foldername, expected_output):
+    assert MP3FileTags._improve_disc_number(folder_has_same_disc_number=folder_has_same_disc_number, disc_number=disc_number, foldername=foldername) == expected_output, name

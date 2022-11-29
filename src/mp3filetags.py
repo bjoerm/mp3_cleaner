@@ -1,5 +1,3 @@
-from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import regex
@@ -28,7 +26,6 @@ class MP3FileTags:
         tags.TPE1 = StringBeautifier.beautify_string(tags.TPE1, remove_leading_the=True)
         tags.TPE2 = StringBeautifier.beautify_string(tags.TPE2, remove_leading_the=True)
         tags.TPE1, tags.TIT2 = self._check_feat_in_artist(album_artist=tags.TPE1, track=tags.TIT2)
-
         tags.TIT2 = self._sort_track_name_suffixes(tags.TIT2)
 
         self.tags_beautified = TagsExportModel(**tags.dict(exclude_none=True))
@@ -142,17 +139,56 @@ class MP3FileTags:
 
         return text
 
-    def beautify_track_and_album_number(self, leading_zeros_track: Optional[int], leading_zeros_album: Optional[int]):
+    @classmethod
+    def _improve_disc_number(cls, disc_number: Optional[str], foldername: str, folder_has_same_disc_number: bool) -> Optional[str]:
+        """Tries to remove the disc number from single disc albums. Also looks for disc number in the foldername, if there is no disc number already provided."""
+
+        disc_number_in_foldername = cls._find_disc_number_in_foldername(foldername=foldername)
+
+        if disc_number is None:
+            if disc_number_in_foldername is None:
+                return
+
+            if disc_number_in_foldername is not None:
+                return disc_number_in_foldername  # Even disc 1 from a "cd1" is kept. Reason: Any sane person would only write cd1, if there were more than 1 disc.
+
+        elif int(disc_number) == 1:
+            if disc_number_in_foldername is not None or folder_has_same_disc_number is False:
+                return disc_number
+
+            else:
+                return
+
+        else:
+            return disc_number
+
+    @staticmethod
+    def _find_disc_number_in_foldername(foldername: str) -> Optional[str]:
+
+        if foldername is None:
+            return None
+
+        found_disc_number = regex.search(pattern=r"(\A|\W|\_)(cd|disc)(\s*|\_)\K\d+", string=foldername, flags=regex.IGNORECASE)  # TODO Brackets are already included in \W. Only underscores need to be manually added (again).
+
+        if found_disc_number:
+            return found_disc_number.group()
+        else:
+            return
+
+    def add_leading_zeros_track_and_album_number(self, leading_zeros_track: Optional[int], leading_zeros_album: Optional[int]):
+
         self.tags_beautified.TRCK = self._add_leading_zeros(number_current=self.tags_beautified.TRCK, leading_zeros=leading_zeros_track)
         self.tags_beautified.TPOS = self._add_leading_zeros(number_current=self.tags_beautified.TPOS, leading_zeros=leading_zeros_album)
 
     @staticmethod
-    def _add_leading_zeros(number_current: Optional[int], leading_zeros: Optional[int]) -> Optional[str]:
+    def _add_leading_zeros(number_current: Optional[str], leading_zeros: Optional[int]) -> Optional[str]:
 
-        if leading_zeros is None or number_current is None:
+        if leading_zeros is None and number_current is None:
             number_beautified = None
+        if leading_zeros is None and number_current is not None:
+            number_beautified = number_current
         else:
-            number_beautified = str(number_current).zfill(leading_zeros)
+            number_beautified = number_current.zfill(leading_zeros)
 
         return number_beautified
 
@@ -202,93 +238,3 @@ class MP3FileTags:
 
             else:
                 raise NameError("This else condition should not be reached. Check the Pydantic classes.")
-
-
-# TODO Ask Bodo whether this should be a dataclass?
-class MP3FileName:
-    def __init__(self, filepath: Path) -> None:
-        self.filepath_inital = filepath.absolute()
-        self.filepath_beautified: Path
-
-    def beautify_and_write_filename(
-        self,
-        tags_beautified: TagsExportModel,
-        only_single_mp3_file: bool,
-        folder_has_same_artist: Optional[bool],
-        has_each_file_a_disc_number: bool,
-        has_each_file_a_track_number: bool,
-    ):
-
-        filename_beautified = self.generate_beautified_filename(
-            tag_artist=tags_beautified.TPE1,
-            tag_title=tags_beautified.TIT2,
-            tag_disc=tags_beautified.TPOS,
-            tag_track=tags_beautified.TRCK,
-            only_single_mp3_file=only_single_mp3_file,
-            folder_has_same_artist=folder_has_same_artist,
-            has_each_file_a_disc_number=has_each_file_a_disc_number,
-            has_each_file_a_track_number=has_each_file_a_track_number,
-        )
-
-        self.filepath_beautified = self.filepath_inital.parent / filename_beautified
-
-        self.filepath_inital.rename(self.filepath_beautified)
-
-    @classmethod
-    def generate_beautified_filename(
-        cls,
-        tag_artist: Optional[str],
-        tag_title: Optional[str],
-        tag_disc: Optional[str],
-        tag_track: Optional[str],
-        only_single_mp3_file: bool,
-        folder_has_same_artist: Optional[bool],
-        has_each_file_a_disc_number: bool,
-        has_each_file_a_track_number: bool,
-    ) -> str:
-
-        disc_track_number = cls._generate_disc_track_number(has_each_file_a_disc_number=has_each_file_a_disc_number, has_each_file_a_track_number=has_each_file_a_track_number, tag_disc=tag_disc, tag_track=tag_track)
-
-        filename_beautified = None
-
-        if only_single_mp3_file is True:
-            filename_beautified = f"[{tag_artist}] - {tag_title}"
-
-        elif folder_has_same_artist is True:
-            filename_beautified = f"[{tag_artist}] - {disc_track_number}{tag_title}"
-
-        elif folder_has_same_artist is False:
-            filename_beautified = f"{disc_track_number}[{tag_artist}] - {tag_title}"
-
-        return f"{filename_beautified}.mp3"  # Note that I am hardcoding here the file extension.
-
-    @staticmethod
-    def _generate_disc_track_number(has_each_file_a_disc_number: bool, has_each_file_a_track_number: bool, tag_disc: Optional[str], tag_track: Optional[str]) -> str:
-
-        if has_each_file_a_track_number is True:
-            if has_each_file_a_disc_number is True:
-                disc_track_number = f"{tag_disc}{tag_track} - "
-            elif has_each_file_a_disc_number is False:
-                disc_track_number = f"{tag_track} - "
-
-        elif has_each_file_a_track_number is False:
-            disc_track_number = ""
-
-        return disc_track_number
-
-
-class MP3File:
-    def __init__(self, filepath) -> None:
-        self.tags = MP3FileTags(filepath=filepath)
-        self.name = MP3FileName(filepath=filepath)
-
-
-if __name__ == "__main__":
-
-    abc = MP3File(
-        filepath=Path("data/wikimedia_commons/warnsignal_train_with_some_tags.mp3"),
-    )
-
-    print(abc.tags.tags_id3_mutagen)
-
-    pass
