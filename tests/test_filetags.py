@@ -67,16 +67,16 @@ def test_sort_track_name_suffixes(name, input, expected_output):
 @pytest.mark.parametrize(
     "name, number_current, leading_zeros, expected_output",
     [
-        ["General", 1, 1, "1"],
-        ["General", 1, 2, "01"],
-        ["General", 1, 3, "001"],
-        ["General", 2, 1, "2"],
-        ["General", 2, 2, "02"],
-        ["General", 2, 3, "002"],
-        ["General", 10, 2, "10"],
-        ["General", 10, 3, "010"],
-        ["None", 1, None, None],
-        ["Edge Case that shouldn't be possible", 10, 1, "10"],
+        ["General", "1", 1, "1"],
+        ["General", "1", 2, "01"],
+        ["General", "1", 3, "001"],
+        ["General", "2", 1, "2"],
+        ["General", "2", 2, "02"],
+        ["General", "2", 3, "002"],
+        ["General", "10", 2, "10"],
+        ["General", "10", 3, "010"],
+        ["None", "1", None, None],
+        ["Edge Case that shouldn't be possible", "10", 1, "10"],
     ],
 )
 def test_add_leading_zeros(name, number_current, leading_zeros, expected_output):

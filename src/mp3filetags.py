@@ -186,10 +186,8 @@ class MP3FileTags:
     @staticmethod
     def _add_leading_zeros(number_current: Optional[str], leading_zeros: Optional[int]) -> Optional[str]:
 
-        if leading_zeros is None and number_current is None:
+        if leading_zeros is None or number_current is None:
             number_beautified = None
-        if leading_zeros is None and number_current is not None:
-            number_beautified = number_current
         else:
             number_beautified = number_current.zfill(leading_zeros)
 
