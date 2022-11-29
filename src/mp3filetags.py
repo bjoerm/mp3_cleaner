@@ -88,6 +88,9 @@ class MP3FileTags:
     @classmethod
     def _sort_track_name_suffixes(cls, track_name: Optional[str]) -> Optional[str]:
         """Put any track names with multiple suffixes like (... Remix), (Acoustic), (Live ...), (Feat. ...) into an adequate order."""  # TODO If I only set Live at the end, then I don't need to over do it here.
+
+        # TODO Write unittests for this. Is it also possible to make this a bit shorter and more elegant?
+
         if track_name is None:
             return track_name
 
@@ -134,7 +137,7 @@ class MP3FileTags:
         Gets rid of not needed characters like non-alphanumeric characters and capitalization from a string.
         """
 
-        text = regex.sub(pattern=r"[^0-9a-zA-Z\s]+", repl="", string=text)  # Removing any non-alphanumeric characters.
+        text = regex.sub(pattern=r"[^0-9a-zA-Z\s]+", repl="", string=text)  # Removing any non-alphanumeric characters.  # TODO Add unittest what this does to German Umlaute. Maybe \u0080-\uFFFF needs to be added into the regex.
         text = text.lower()  # Uniquely transforming the word to lowercase.
 
         return text
