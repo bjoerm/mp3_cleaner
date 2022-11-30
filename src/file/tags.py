@@ -4,8 +4,8 @@ import regex
 from mutagen.id3 import ID3
 from mutagen.id3._frames import APIC, POPM, TALB, TDRC, TIT2, TPE1, TPOS, TRCK
 
-from beautify_single_string import StringBeautifier
-from tags_models import TagsExportModel, TagsImportModel
+from pydantic_models.tag_models import TagsExportModel, TagsImportModel
+from strings.beautify_single_string import StringBeautifier
 
 
 class MP3FileTags:
@@ -195,47 +195,39 @@ class MP3FileTags:
 
     def write_beautified_tags_to_file(self):
 
-        # Final validation and conversion to dict:
-        tags = TagsExportModel(**self.tags_beautified.dict(exclude_none=True))
-        tags = tags.dict(exclude_none=True)
+        # Final validation:
+        self.tags_beautified = TagsExportModel(**self.tags_beautified.dict(exclude_none=True))
 
         self.tags_id3_mutagen.delete()  # Delete all existing tags from the mutagen id3 object inside this class.
 
-        self._add_tags_to_id3_object(tags=tags)
+        self._add_tags_to_id3_object()
 
         self.tags_id3_mutagen.save(v1=0, v2_version=4)
 
-    def _add_tags_to_id3_object(self, tags: Dict[str, str | int | Dict[str, str | bytes]]):
+    def _add_tags_to_id3_object(self):
         """
         Save beautified tags to the mutagen id3 object. This function takes only on row from df_iteration at a time.
         """
         encoding_value = 3  # 1 = UTF16, 3 = UTF8
 
-        # TODO Try structural pattern matching here!
-        for key, value in tags.items():
-            if key == "APIC":
-                self.tags_id3_mutagen.add(APIC(mime=value["mime"], data=value["data"]))
-
+        for key, value in self.tags_beautified:
+            if value is None:
+                continue
+            elif key == "APIC":
+                self.tags_id3_mutagen.add(APIC(mime=value.mime, data=value.data))
             elif key == "POPM":
                 self.tags_id3_mutagen.add(POPM(email="no@email", rating=value))
-
             elif key == "TPE1":
                 self.tags_id3_mutagen.add(TPE1(encoding=encoding_value, text=value))
-
             elif key == "TIT2":
                 self.tags_id3_mutagen.add(TIT2(encoding=encoding_value, text=value))
-
             elif key == "TALB":
                 self.tags_id3_mutagen.add(TALB(encoding=encoding_value, text=value))
-
             elif key == "TDRC":
                 self.tags_id3_mutagen.add(TDRC(encoding=encoding_value, text=value))
-
             elif key == "TPOS":
                 self.tags_id3_mutagen.add(TPOS(encoding=encoding_value, text=value))
-
             elif key == "TRCK":
                 self.tags_id3_mutagen.add(TRCK(encoding=encoding_value, text=value))
-
             else:
-                raise NameError("This else condition should not be reached. Check the Pydantic classes.")
+                raise ValueError(f"Unknown key: {key}. Check the Pydantic classes.")

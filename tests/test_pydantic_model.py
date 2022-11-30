@@ -1,8 +1,6 @@
-from typing import Dict
-
 import pytest
 
-from tags_models import TagsImportModel
+from pydantic_models.tag_models import TagsImportModel
 
 # TODO There should be more tests for the ImportedTagsModel in total as this also only needs a dict.
 # TODO Add TagsExportModel

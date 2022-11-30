@@ -3,7 +3,7 @@ from typing import Optional
 
 import regex
 
-from tags_models import TagsExportModel
+from pydantic_models.tag_models import TagsExportModel
 
 
 # TODO Ask Bodo whether this should be a dataclass?

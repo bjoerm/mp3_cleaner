@@ -3,6 +3,8 @@
 # pip-compile --upgrade requirements.in --resolver=backtracking
 # pip-sync
 
+# TODO Move into pyproject.toml.
+
 black
 flake8
 isort

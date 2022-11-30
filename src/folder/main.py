@@ -4,41 +4,20 @@ import glob
 import logging
 import shutil
 from pathlib import Path
-from shutil import copytree, ignore_patterns
 from typing import List, Optional
 
-import regex
 import tomllib
 
-from folderdescription import FolderDescription
-from foldername import FolderName
-from mp3file import MP3File
-
-
-class FolderPreparation:
-    @staticmethod
-    def generate_output_folder(folder_main_input: Path, folder_main_output: Path, folder_full_input: Path) -> Path:
-        """Generate the name of the output folder and create that folder."""
-        folder_main_input_abs = folder_main_input.absolute().as_posix()
-        folder_main_output_abs = folder_main_output.absolute().as_posix()
-        folder_full_input_abs = folder_full_input.absolute().as_posix()
-
-        folder_full_output = regex.sub(folder_main_input_abs, folder_main_output_abs, folder_full_input_abs)  # TODO It would be nice if this would use absolute folders to work if input and output were on different drives.
-        folder_full_output = Path(folder_full_output)
-
-        folder_full_output.mkdir(parents=True, exist_ok=True)
-
-        return folder_full_output
-
-    @staticmethod
-    def copy_to_output_folder(folder_full_input: Path, folder_full_output: Path, unwanted_files: List[str]):
-        copytree(src=folder_full_input, dst=folder_full_output, ignore=ignore_patterns(*unwanted_files), dirs_exist_ok=True)  # Unwanted files won't be copied. One could also remove dirs_exist_ok to get an error as the output should ideally be empty before mp3 cleaning
+from file.main import MP3File
+from folder.description import FolderDescription
+from folder.name import FolderName
+from folder.preparation import FolderPreparation
 
 
 class Folder:
     def __init__(self, folder_full_input: Path, folder_main_input: Path, folder_main_output: Path, unwanted_files: List[str]) -> None:
         self.folder_full: Path
-        self.mp3_filepaths: List[str]
+        self.mp3_filepaths: List[Path]
         self.mp3_files: List[MP3File]
         self.description: FolderDescription
         self.name: FolderName
@@ -73,12 +52,16 @@ class Folder:
             is_score_or_soundtrack=self.description.is_score_or_soundtrack,
         )
 
-    def fetch_mp3_filepaths(self) -> List[str]:
-        return glob.glob(f"{str(self.folder_full)}/*.mp3", recursive=False)  # Recursive=True would mess up some album wide defined methods in this class.
-        # TODO Add support for other cases of writing .mp3. Also unify it to always be in smaller letters.
+    def fetch_mp3_filepaths(self) -> List[Path]:
+        mp3_files = [f for f in self.folder_full.glob("*.mp3")]  # This is not recursive (and that is intended as any folder with mp3 files gets its own folder class).
+
+        if len(mp3_files) == 0:
+            raise ValueError("No .mp3 files were found. This shouldn't be possible.")
+
+        return mp3_files
 
     def init_mp3_file_classes(self) -> List[MP3File]:
-        return [MP3File(filepath=Path(i)) for i in self.mp3_filepaths]
+        return [MP3File(filepath=i) for i in self.mp3_filepaths]
 
     def beautify_tags_isolated_per_file(self):
         for file in self.mp3_files:
@@ -137,7 +120,7 @@ class Folder:
 
 if __name__ == "__main__":
 
-    with open("options.toml", "rb") as f:
+    with open("config.toml", "rb") as f:
         config = tomllib.load(f)
 
     main_input = Path("data/")

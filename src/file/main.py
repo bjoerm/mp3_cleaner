@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from mp3filename import MP3FileName
-from mp3filetags import MP3FileTags
+from file.name import MP3FileName
+from file.tags import MP3FileTags
 
 
 class MP3File:

@@ -1,6 +1,7 @@
 from typing import Optional
 
 import regex
+
 from pydantic import BaseModel, Field, StrictBytes, StrictStr, conint, constr, validator
 
 

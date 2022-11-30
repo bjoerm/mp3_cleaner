@@ -7,7 +7,7 @@
 
 from typing import List, Optional
 
-from tags_models import TagsExportModel
+from pydantic_models.tag_models import TagsExportModel
 
 
 class FolderDescription:
