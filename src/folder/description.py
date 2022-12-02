@@ -1,30 +1,29 @@
-# TODO Add functionality to remove the disc number if
-# - All track have the same disc number.
-# - That shared disc number is =1.
-# - And the album title does not contain the letters "cd" followed by an integer or space then integer.
-
-# TODO Beware of case where cd xy is in album title but not in disc number. Do that already in Pydantic???
-
+from dataclasses import InitVar, field
 from typing import List, Optional
+
+from pydantic import StrictBool
+from pydantic.dataclasses import dataclass
 
 from pydantic_models.tag_models import TagsExportModel
 
 
+@dataclass
 class FolderDescription:
-    """Class that stores folder wide information from analyzing the tags of all files."""
+    """Class that storesfrom analyzing the tags of all files in the folder."""
 
-    def __init__(self, beautified_tags: List[TagsExportModel]) -> None:
-        self.only_single_mp3_file: bool
-        self.folder_has_same_album: bool
-        self.folder_has_same_artist: bool
-        self.folder_has_same_date: bool
-        self.folder_has_same_disc_number: bool
-        self.has_each_file_an_album: bool
-        self.has_each_file_a_date: bool
-        self.has_each_file_a_disc_number: bool
-        self.has_each_file_a_track_number: bool
-        self.is_score_or_soundtrack: bool
+    beautified_tags: InitVar[Optional[List[TagsExportModel]]]
+    only_single_mp3_file: StrictBool = field(init=False)
+    folder_has_same_album: StrictBool = field(init=False)
+    folder_has_same_artist: StrictBool = field(init=False)
+    folder_has_same_date: StrictBool = field(init=False)
+    folder_has_same_disc_number: StrictBool = field(init=False)
+    has_each_file_an_album: StrictBool = field(init=False)
+    has_each_file_a_date: StrictBool = field(init=False)
+    has_each_file_a_disc_number: StrictBool = field(init=False)
+    has_each_file_a_track_number: StrictBool = field(init=False)
+    is_score_or_soundtrack: StrictBool = field(init=False)
 
+    def __post_init__(self, beautified_tags) -> None:
         self.only_single_mp3_file = len(beautified_tags) == 1
 
         self.folder_has_same_artist = self._check_tag_uniformity(tag=[tags.TPE1 for tags in beautified_tags])
