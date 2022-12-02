@@ -1,3 +1,24 @@
+# How-to update requirements.txt:
+# pip install pip-tools
+# pip-compile --upgrade --resolver=backtracking -o requirements.txt pyproject.toml
+# Dev: pip-compile --upgrade --extra dev --resolver=backtracking -o dev_requirements.txt pyproject.toml
+# pip-sync
+
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "mp3_cleaner"
+version = "0.1"
+dependencies = ["mutagen", "pydantic", "regex", "tqdm"]
+
+[project.optional-dependencies]
+dev = ["black", "flake8", "isort", "pytest"]
+
+
 [tool.black]
 line-length = 200
 
