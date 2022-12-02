@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Optional
 
@@ -32,7 +33,7 @@ class MP3FileName:
 
         self.filepath_beautified = self.filepath_inital.parent / filename_beautified
 
-        self.filepath_inital.rename(self.filepath_beautified)
+        self.rename_file()
 
     @classmethod
     def generate_beautified_filename(
@@ -75,3 +76,14 @@ class MP3FileName:
             disc_track_number = ""
 
         return disc_track_number
+
+    def rename_file(self):
+        if self.filepath_inital == self.filepath_beautified:
+            logging.debug(f"File {str(self.filepath_inital)} was already beautiful. ;-)")
+
+        elif self.filepath_beautified.is_file() is False:
+            # Default case: Beautified file does not yet exist.
+            self.filepath_inital.rename(self.filepath_beautified)
+
+        elif self.filepath_beautified.is_file():
+            raise ValueError(f"File {str(self.filepath_beautified)} already existed.")

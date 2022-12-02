@@ -110,7 +110,7 @@ class FolderName:
             logging.debug(f"Folder {str(self.folderpath_inital)} was already beautiful. ;-)")
 
         elif self.folderpath_beautified.is_dir() is False:
-            # Default: Beautified folder does not yet exist.
+            # Default case: Beautified folder does not yet exist.
             self.folderpath_inital.rename(self.folderpath_beautified)
 
         elif self.folderpath_beautified.is_dir():
