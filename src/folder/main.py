@@ -1,6 +1,5 @@
 # TODO Handle case when files are in the main input folder level and not in a sub folder.
 
-import glob
 import logging
 import shutil
 from pathlib import Path
