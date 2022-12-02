@@ -12,31 +12,18 @@ class FolderName:
         self.folderpath_inital = folderpath.absolute()
         self.folderpath_beautified: Path
 
-    def beautify_and_write_foldername(
-        self,
-        tags_beautified: TagsExportModel,
-        has_each_file_a_date: bool,
-        has_each_file_a_disc_number: bool,
-        folder_has_same_album: bool,
-        folder_has_same_artist: bool,
-        folder_has_same_date: bool,
-        folder_has_same_disc_number: bool,
-        is_score_or_soundtrack: bool,
-    ):
+    def beautify_and_write_foldername(self, tags_beautified: TagsExportModel, folder_description: FolderDescription):
 
         foldername_beautified = self.generate_beautified_foldername(
             foldername_initial=self.folderpath_inital.name,
             tag_artist=tags_beautified.TPE1,
             tag_album_name=tags_beautified.TALB,
-            tag_disc=tags_beautified.TPOS,
             tag_date=tags_beautified.TDRC,
-            has_each_file_a_date=has_each_file_a_date,
-            has_each_file_a_disc_number=has_each_file_a_disc_number,
-            folder_has_same_album=folder_has_same_album,
-            folder_has_same_artist=folder_has_same_artist,
-            folder_has_same_date=folder_has_same_date,
-            folder_has_same_disc_number=folder_has_same_disc_number,
-            is_score_or_soundtrack=is_score_or_soundtrack,
+            has_each_file_a_date=folder_description.has_each_file_a_date,
+            folder_has_same_album=folder_description.folder_has_same_album,
+            folder_has_same_artist=folder_description.folder_has_same_artist,
+            folder_has_same_date=folder_description.folder_has_same_date,
+            is_score_or_soundtrack=folder_description.is_score_or_soundtrack,
         )
 
         self.folderpath_beautified = self.folderpath_inital.parent / foldername_beautified
@@ -49,14 +36,11 @@ class FolderName:
         foldername_initial: str,
         tag_artist: str,
         tag_album_name: Optional[str],
-        tag_disc: Optional[str],
         tag_date: Optional[str],
         has_each_file_a_date: bool,
-        has_each_file_a_disc_number: bool,
         folder_has_same_album: bool,
         folder_has_same_artist: bool,
         folder_has_same_date: bool,
-        folder_has_same_disc_number: bool,
         is_score_or_soundtrack: bool,
     ) -> str:
 

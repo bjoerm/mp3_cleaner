@@ -41,16 +41,7 @@ class Folder:
 
         self.beautify_and_write_filenames()
 
-        self.name.beautify_and_write_foldername(
-            tags_beautified=self.mp3_files[0].tags.tags_beautified,  # Using the first file for the album name as there won't be any changes if there are different album names.
-            has_each_file_a_date=self.description.has_each_file_a_date,
-            has_each_file_a_disc_number=self.description.has_each_file_a_disc_number,
-            folder_has_same_album=self.description.folder_has_same_album,
-            folder_has_same_artist=self.description.folder_has_same_artist,
-            folder_has_same_date=self.description.folder_has_same_date,
-            folder_has_same_disc_number=self.description.folder_has_same_disc_number,
-            is_score_or_soundtrack=self.description.is_score_or_soundtrack,
-        )
+        self.name.beautify_and_write_foldername(tags_beautified=self.mp3_files[0].tags.tags_beautified, folder_description=self.description)  # Using the first file for the folder name as there won't be any changes if there are different album names.
 
     def fetch_mp3_filepaths(self) -> List[Path]:
         mp3_files = [f for f in self.folder_full.glob("*.mp3")]  # This is not recursive (and that is intended as any folder with mp3 files gets its own folder class).
