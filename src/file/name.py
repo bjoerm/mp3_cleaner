@@ -84,5 +84,9 @@ class MP3FileName:
             # Default case: Beautified file does not yet exist.
             self.filepath_inital.rename(self.filepath_beautified)
 
-        elif self.filepath_beautified.is_file():
-            raise ValueError(f"File {str(self.filepath_beautified)} already existed.")
+        self._log_changed_file_names()
+
+    def _log_changed_file_names(self):
+        if self.filepath_inital.name != self.filepath_beautified.name:
+            with open("log_changed_track_names.log", mode="a", encoding="utf-8") as file:
+                file.write(f"{self.filepath_inital.name} →\n{self.filepath_beautified.name}\n")

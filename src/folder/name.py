@@ -116,3 +116,11 @@ class FolderName:
             logging.warning(f"Folder {str(self.folderpath_beautified)} already existed. Beautified files from {str(self.folderpath_inital)} are copied into that folder.")
             shutil.copytree(src=self.folderpath_inital, dst=self.folderpath_beautified, dirs_exist_ok=True)
             shutil.rmtree(self.folderpath_inital)
+
+
+        self._log_changed_folder_names()
+
+    def _log_changed_folder_names(self):
+        if self.folderpath_inital.name != self.folderpath_beautified.name:
+            with open("log_changed_folders.log", mode="a", encoding="utf-8") as file:
+                file.write(f"{self.folderpath_inital.name} →\n{self.folderpath_beautified.name}\n")
