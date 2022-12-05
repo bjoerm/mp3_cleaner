@@ -1,0 +1,28 @@
+input_path = "input"   # Default: "input"
+output_path = "output" # Default: "output"
+
+do_clean_output_folder = true # Default: true
+
+# Files and filetypes from the input folder that shall be omitted for the output folder.
+# Only provide the end of the file(type) here.
+unwanted_files = [
+    "*.7z",
+    "*.db",
+    "*.DS_Store",
+    "*.exe",
+    "*.htm",
+    "*.html",
+    "*.ini",
+    "*.m3u",
+    "*.m3u8",
+    "*.nfo",
+    "*.pdf",
+    "*.pls",
+    "*.rar",
+    "*.sfv",
+    "*.txt",
+    "*.url",
+    "*.zip",
+    "AlbumArtSmall.jpg",
+    "thumbs.db",
+]

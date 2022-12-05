@@ -1,52 +1,56 @@
-# TODO Add functionality that prevents folder renames in cases when there are files with tags and without at the same time. As of now cases with not tags are just dropped and are thus overlooked in later checks for Nones (in the rename folder part for example).
-# TODO Instead of having a single session log. Maybe have a global .parquet log file that is expanded after each run.
-# TODO Think about converting "cd strings" (like "cd1") from the path into disc number tags. That would help the file beautification and recude manual work. But might be bad in case where "cd" is not referring to a cd number.
-# TODO Finish tests about filenames (and foldernames).
-# TODO Have option to switch renaming files on and off. Also a switch for folders. And for album art tags.
-# TODO Add case to "_check_obsolescence_of_album_artist" where album artist is "VA" or similar. Or simply delete album artist whenever there is a track artist.
-# TODO _deal_with_special_words_and_bands should create brackets, so it should make "Artist - Title Live" to "Artist - Title (Live)". Same for "Remix" and "Feat.". This will be a bit complicated for cases like "Live in London", "Remix by" and of course "Feat.".
-# TODO If disc number is 1/1 remove it.
-# TODO Does not need to write the disc number to the folder name, if there are multiple disc names within the same folder. Currently it write CD1 there.
-# TODO It seems like file names are not beautified, if the first or first x entries are already in the desired beautified format. This is problematic, if later entries are not beautified yet.
-# TODO Script should also work if input only consists of a single file that is not in a folder.
-# TODO Rename (Original Motion Picture Soundtrack) into (Score).
-# TODO There seems to be an error, when the track numbers in a folder can/do reach three digits (so more than 100 files). It will currently only fill one leading zero.
-
-
+import logging
+import shutil
 from datetime import datetime
+from pathlib import Path
+from typing import List
 
-import toml
+import tomllib
+from tqdm.contrib.concurrent import thread_map
 
-from environment import DataPreparer
-from tag_management import TagManager
+from folder.main import Folder
+from pydantic_models.config_model import Config
 
 
-def main():
-    # Load options
-    cfg = toml.load("options.toml", _dict=dict)
+def mp3_cleaner():
+    """Run this function after setting up the config.toml to clean and beautify"""
 
-    # Set up environment, convert mp3 files to have a lowercase file extension and get list of mp3 files and their folder.
-    files_and_folders = DataPreparer.prepare_input(
-        input_path=cfg.get("input_path"),
-        wip_path=cfg.get("wip_path"),
-        log_path=cfg.get("log_path"),
-        overwrite_previous_output=cfg.get("overwrite_previous_output"),
-        unwanted_files=cfg.get("unwanted_files"),
-    )
+    with open("src/config.toml", "rb") as f:
+        config = tomllib.load(f)
+    config = Config(**config)
 
-    # Improve the MP3 ID3 tags in the specified folder(s).
-    TagManager.improve_tags(
-        selected_id3_fields=cfg.get("selected_id3_fields"),
-        files_and_folders=files_and_folders,
-        suffix_keywords=cfg.get("suffix_keywords"),
-    )
+    if config.do_clean_output_folder is True and config.output_path.absolute().is_dir():
+        shutil.rmtree(config.output_path.absolute())
+
+    mp3_folders = _find_mp3_folders(input_path=config.input_path)
+
+    def worker(folder_i: int):
+        """Works on one folder at a time. Thus, can be used in parallel."""
+        Folder(folder_full_input=mp3_folders[folder_i], folder_main_input=config.input_path, folder_main_output=config.output_path, unwanted_files=config.unwanted_files)
+
+    thread_map(worker, range(len(mp3_folders)), desc="Folders", unit=" folders")  # Uses all cores. Number of parallel workers can be limited via max_workers.
+
+
+def _find_mp3_folders(input_path: Path) -> List[Path]:
+
+    mp3_files = [file for file in input_path.glob("**/*.mp3")]  # **/* is recursive. Each folder with mp3 files will enter a seperate Folder class.
+
+    mp3_folders = []
+    for file in mp3_files:
+        mp3_folders.append(Path(file).parent)
+
+    unique_mp3_folders = list(set(mp3_folders))
+    unique_mp3_folders.sort()
+
+    return unique_mp3_folders
 
 
 if __name__ == "__main__":
     start_time = datetime.now()
     print(f'Script started at {start_time.strftime("%H:%M:%S")}.')
 
-    main()
+    mp3_cleaner()
 
     finish_time = datetime.now()
-    print(f'Script finished at {finish_time.strftime("%H:%M:%S")}.\nTook {int((finish_time - start_time).total_seconds())} seconds.')
+    print(f'Script finished at {finish_time.strftime("%H:%M:%S")}.\nTook {round((finish_time - start_time).total_seconds(), 1)} seconds.')
+
+    logging.info("End of script reached.")

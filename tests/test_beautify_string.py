@@ -2,9 +2,7 @@
 
 # TODO Could this whole bunch of tests be made simpler by using Pytest parameters? Yes: https://docs.pytest.org/en/reorganize-docs/new-docs/user/parametrize.html
 
-import pytest
-
-from src.beautify_single_string import StringBeautifier, StringHelper
+from strings.beautify_single_string import StringBeautifier
 
 
 def test_string_beautification():
@@ -233,24 +231,3 @@ def test_string_capitalize_string():
     assert StringBeautifier._capitalize_string("91st") == "91st"
     assert StringBeautifier._capitalize_string("30th") == "30th"
     assert StringBeautifier._capitalize_string("") == ""
-
-
-@pytest.fixture
-def suffix_keywords():
-    return ["remix", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]
-
-
-def test_sort_track_name_suffixes(suffix_keywords):
-    assert StringHelper.sort_track_name_suffixes("abc", suffix_keywords) == "abc"
-    assert StringHelper.sort_track_name_suffixes("ABC", suffix_keywords) == "ABC"
-    assert StringHelper.sort_track_name_suffixes("abc def", suffix_keywords) == "abc def"
-    assert StringHelper.sort_track_name_suffixes("abc (abc)", suffix_keywords) == "abc (abc)"
-    assert StringHelper.sort_track_name_suffixes("(abc) abc", suffix_keywords) == "(abc) abc"
-    assert StringHelper.sort_track_name_suffixes("(abc)", suffix_keywords) == "(abc)"
-    assert StringHelper.sort_track_name_suffixes("abc (abc) (def)", suffix_keywords) == "abc (abc) (def)"
-    assert StringHelper.sort_track_name_suffixes("abc (def) (abc)", suffix_keywords) == "abc (def) (abc)"
-    assert StringHelper.sort_track_name_suffixes("abc (abc) (abc)", suffix_keywords) == "abc (abc) (abc)"
-    assert StringHelper.sort_track_name_suffixes("abc (prod abc) (prod def) (prod ghi)", suffix_keywords) == "abc (prod abc) (prod def) (prod ghi)"
-    assert StringHelper.sort_track_name_suffixes("abc (abc) (abc) (abc) (abc) (def) (def) (def) (ghi) (ghi) (jkl)", suffix_keywords) == "abc (abc) (abc) (abc) (abc) (def) (def) (def) (ghi) (ghi) (jkl)"  # Edge case.
-    assert StringHelper.sort_track_name_suffixes("abc (Live) (Remix by abc)", suffix_keywords) == "abc (Remix by abc) (Live)"
-    assert StringHelper.sort_track_name_suffixes("abc (Live) (def) (Remix by abc)", suffix_keywords) == "abc (Remix by abc) (def) (Live)"
