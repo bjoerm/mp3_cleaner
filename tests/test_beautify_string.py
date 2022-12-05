@@ -2,8 +2,6 @@
 
 # TODO Could this whole bunch of tests be made simpler by using Pytest parameters? Yes: https://docs.pytest.org/en/reorganize-docs/new-docs/user/parametrize.html
 
-import pytest
-
 from strings.beautify_single_string import StringBeautifier
 
 
