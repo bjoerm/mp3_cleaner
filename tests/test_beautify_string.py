@@ -233,8 +233,3 @@ def test_string_capitalize_string():
     assert StringBeautifier._capitalize_string("91st") == "91st"
     assert StringBeautifier._capitalize_string("30th") == "30th"
     assert StringBeautifier._capitalize_string("") == ""
-
-
-@pytest.fixture
-def suffix_keywords():
-    return ["remix", "feat", "skit", "produced", "cut", "cutted", "bonus", "part", "pt", "live"]

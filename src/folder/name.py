@@ -108,15 +108,14 @@ class FolderName:
         if self.folderpath_inital == self.folderpath_beautified:
             logging.debug(f"Folder {str(self.folderpath_inital)} was already beautiful. ;-)")
 
-        elif self.folderpath_beautified.is_dir() is False:
-            # Default case: Beautified folder does not yet exist.
-            self.folderpath_inital.rename(self.folderpath_beautified)
-
         elif self.folderpath_beautified.is_dir():
             logging.warning(f"Folder {str(self.folderpath_beautified)} already existed. Beautified files from {str(self.folderpath_inital)} are copied into that folder.")
             shutil.copytree(src=self.folderpath_inital, dst=self.folderpath_beautified, dirs_exist_ok=True)
             shutil.rmtree(self.folderpath_inital)
 
+        elif self.folderpath_beautified.is_dir() is False:
+            # This is the default case: Beautified folder does not yet exist.
+            self.folderpath_inital.rename(self.folderpath_beautified)
 
         self._log_changed_folder_names()
 

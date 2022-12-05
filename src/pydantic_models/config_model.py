@@ -1,11 +1,14 @@
 from pathlib import Path
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, DirectoryPath, StrictBool
 
 
 class Config(BaseModel):
-    input_path: Path
+    input_path: DirectoryPath
     output_path: Path
-    clean_output_folder: bool
+    do_clean_output_folder: StrictBool
     unwanted_files: List[str]
+
+    class Config:
+        extra = "forbid"

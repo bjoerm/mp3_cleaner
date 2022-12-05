@@ -80,8 +80,11 @@ class MP3FileName:
         if self.filepath_inital == self.filepath_beautified:
             logging.debug(f"File {str(self.filepath_inital)} was already beautiful. ;-)")
 
+        elif self.filepath_beautified.is_file():
+            raise ValueError(f"File {str(self.filepath_beautified)} already existed.")
+
         elif self.filepath_beautified.is_file() is False:
-            # Default case: Beautified file does not yet exist.
+            # This is the default case: Beautified file does not yet exist.
             self.filepath_inital.rename(self.filepath_beautified)
 
         self._log_changed_file_names()

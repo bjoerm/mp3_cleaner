@@ -1,7 +1,6 @@
 from typing import Optional
 
 import regex
-
 from pydantic import BaseModel, Field, StrictBytes, StrictStr, conint, constr, validator
 
 
@@ -68,7 +67,7 @@ class TagsExportModel(BaseModel):
     - Minor type changes.
     """
 
-    TPE1: constr(min_length=1) = Field(description="Track artist")  # TODO Add error message for missing TPE1 and TIT2.
+    TPE1: constr(min_length=1) = Field(description="Track artist")
     TIT2: constr(min_length=1) = Field(description="Track")
     APIC: Optional[APICModel] = Field(description="Attached picture")
     POPM: Optional[conint(ge=0, le=255)] = Field(description="Popularimeter. Rating from 0 to 255.")
@@ -77,10 +76,15 @@ class TagsExportModel(BaseModel):
     TPOS: Optional[constr(min_length=1)] = Field(description="Disc number")
     TRCK: Optional[constr(min_length=1)] = Field(description="Track Number")
 
+    class Config:
+        arbitrary_types_allowed = True
+        anystr_strip_whitespace = True  # This only refers to leading and trailing whitespace for str & byte types.
+        extra = "forbid"
+
 
 if __name__ == "__main__":
 
-    example = {"TPE1": "   the track    artist", "TPE2": "the album artist ", "TIT2": "track", "TDRC": "01-01-2000"}
+    example = {"TPE1": "   the track    artist", "TPE2": " the album artist ", "TIT2": "track", "TDRC": "01-01-2000"}
 
     tags_import = TagsImportModel(**example)
     print(tags_import)

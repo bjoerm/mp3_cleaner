@@ -1,9 +1,10 @@
-input_path = "data"    # "input" # TODO This could be an argument.
-output_path = "output" # "output" # TODO This could be an argument.
+input_path = "input"   # Default: "input"
+output_path = "output" # Default: "output"
 
-clean_output_folder = true # TODO This currently won't work if set to false as it will run into errors as the folder already exists.
+do_clean_output_folder = true # Default: true
 
-# Files and filetypes that shall be deleted.
+# Files and filetypes from the input folder that shall be omitted for the output folder.
+# Only provide the end of the file(type) here.
 unwanted_files = [
     "*.7z",
     "*.db",
@@ -24,23 +25,4 @@ unwanted_files = [
     "*.zip",
     "AlbumArtSmall.jpg",
     "thumbs.db",
-] # Only provide the end of the file(type) here.
-
-# Keywords that exist as track/filename suffixes. The order of the list will be the order in which these suffixes are sorted.
-# TODO Are those still needed?
-suffix_keywords = [
-    "remix",
-    "acoustic",
-    "instrumental",
-    "skit",
-    "produced",
-    "cut",
-    "cutted",
-    "short",
-    "shorter",
-    "bonus",
-    "part",
-    "pt",
-    "feat",
-    "live",
 ]
