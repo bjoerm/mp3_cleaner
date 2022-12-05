@@ -13,3 +13,4 @@ Beautifies ID3 tags, filenames and foldernames of MP3 audio files.
 A test MP3 file can be found under [data](/data/wikimedia_commons/warnsignal_train_with_some_tags.mp3). It is from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:BVG_Warnsignal_U-Bahn.mp3).
 
 TODO Add more. ;-)
+Update from 2022-11: The script is currently being refactored into a better written form. Check the [development branch](https://github.com/bjoerm/mp3_cleaner/tree/2022_refactoring_oop) for current status.
