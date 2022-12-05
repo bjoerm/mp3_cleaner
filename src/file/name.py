@@ -5,7 +5,6 @@ from typing import Optional
 from pydantic_models.tag_models import TagsExportModel
 
 
-# TODO Ask Bodo whether this should be a dataclass?
 class MP3FileName:
     def __init__(self, filepath: Path) -> None:
         self.filepath_inital = filepath.absolute()

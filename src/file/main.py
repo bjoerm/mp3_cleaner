@@ -12,10 +12,8 @@ class MP3File:
 
 if __name__ == "__main__":
 
-    abc = MP3File(
+    somefile = MP3File(
         filepath=Path("data/wikimedia_commons/warnsignal_train_with_some_tags.mp3"),
     )
 
-    print(abc.tags.tags_id3_mutagen)
-
-    pass
+    print(somefile.tags.tags_id3_mutagen)

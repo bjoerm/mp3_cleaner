@@ -1,5 +1,3 @@
-# TODO Handle case when files are in the main input folder level and not in a sub folder.
-
 import logging
 import shutil
 from pathlib import Path
@@ -16,13 +14,12 @@ from folder.preparation import FolderPreparation
 class Folder:
     def __init__(self, folder_full_input: Path, folder_main_input: Path, folder_main_output: Path, unwanted_files: List[str]) -> None:
         self.folder_full: Path
-        self.mp3_filepaths: List[Path]
+        self.mp3_filepaths: List[Path]  # Contains only .mp3 files.
         self.mp3_files: List[MP3File]
         self.description: FolderDescription
         self.name: FolderName
 
         self.folder_full = FolderPreparation.generate_output_folder(folder_full_input=folder_full_input, folder_main_input=folder_main_input, folder_main_output=folder_main_output)
-
         FolderPreparation.copy_to_output_folder(folder_full_input=folder_full_input, folder_full_output=self.folder_full, unwanted_files=unwanted_files)
 
         self.name = FolderName(folderpath=self.folder_full)
@@ -119,8 +116,8 @@ if __name__ == "__main__":
     if main_ouput.is_dir():
         shutil.rmtree(main_ouput)
 
-    abc = Folder(folder_full_input=Path("data/wikimedia_commons/"), folder_main_input=main_input, folder_main_output=main_ouput, unwanted_files=config["unwanted_files"])
-    abc.mp3_files[0].tags
-    abc.folder_full
+    somefolder = Folder(folder_full_input=Path(main_input / "wikimedia_commons"), folder_main_input=main_input, folder_main_output=main_ouput, unwanted_files=config["unwanted_files"])
+    somefolder.mp3_files[0].tags
+    somefolder.folder_full
 
     logging.info("End of script reached.")  # TODO Add proper logging. Also replace old print statements...

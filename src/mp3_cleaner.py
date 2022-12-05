@@ -1,6 +1,3 @@
-# TODO Add a pydantic class for the folder that has a list (with at least one entry of tagsexported class). That would also detect errors.
-# TODO Think about a logging.
-
 import logging
 import shutil
 from datetime import datetime
@@ -22,7 +19,7 @@ def main():
     if config.clean_output_folder is True and config.output_path.absolute().is_dir():
         shutil.rmtree(config.output_path.absolute())
 
-    mp3_folders = _find_mp3_folders(input_path=config.input_path)  # TODO .absolute()?
+    mp3_folders = _find_mp3_folders(input_path=config.input_path)
 
     def worker(folder_i: int):
         """Works on a folder at a time. Thus, can be used in parallel."""

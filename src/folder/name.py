@@ -9,7 +9,6 @@ from folder.description import FolderDescription
 from pydantic_models.tag_models import TagsExportModel
 
 
-# TODO Ask Bodo whether this should be a dataclass?
 class FolderName:
     def __init__(self, folderpath: Path) -> None:
         self.folderpath_inital = folderpath.absolute()

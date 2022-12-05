@@ -9,6 +9,7 @@ class FolderPreparation:
     @staticmethod
     def generate_output_folder(folder_main_input: Path, folder_main_output: Path, folder_full_input: Path) -> Path:
         """Generate the name of the output folder and create that folder."""
+
         folder_main_input_abs = folder_main_input.absolute().as_posix()
         folder_main_output_abs = folder_main_output.absolute().as_posix()
         folder_full_input_abs = folder_full_input.absolute().as_posix()
