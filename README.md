@@ -1,4 +1,4 @@
-[![Build, Lint and Pytest](https://github.com/bjoerm/mp3_cleaner/actions/workflows/build_lint_test.yml/badge.svg)](https://github.com/bjoerm/mp3_cleaner/actions/workflows/build_lint_test.yml)
+[![Build, Lint and Pytest](https://github.com/bjoerm/mp3_cleaner/actions/workflows/build_lint_test.yml/badge.svg)](https://github.com/bjoerm/mp3_cleaner/actions/workflows/build_test_lint.yml)
 
 # MP3 Cleaner
 Beautifies ID3 tags, filenames and foldernames of MP3 audio files.
