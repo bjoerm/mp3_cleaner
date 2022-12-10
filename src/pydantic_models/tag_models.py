@@ -54,6 +54,14 @@ class TagsImportModel(BaseModel):
         else:
             return int(value[0])  # The first found term.
 
+    @validator("TALB", pre=True)
+    def unify_score_suffix(cls, value):
+        if value is None:
+            return value
+        else:
+            value = value.replace("(Original Motion Picture Score)", "(Score)")
+            return value
+
     class Config:
         arbitrary_types_allowed = True
         anystr_strip_whitespace = True  # This only refers to leading and trailing whitespace for str & byte types.
