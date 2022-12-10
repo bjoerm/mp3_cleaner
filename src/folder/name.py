@@ -50,16 +50,16 @@ class FolderName:
             # Edge case: No album title.
             return foldername_initial
 
-        if folder_has_same_album is False:
+        elif folder_has_same_album is False:
             # Edge case: Folder has different albums -> no change.
-            # TODO What about None? Should this be included? Or just cange it so that folder_has_same_album can only be True/False and not None?
             return foldername_initial
 
-        first_part = cls._generate_first_part(artist=tag_artist, album_name=tag_album_name, folder_has_same_artist=folder_has_same_artist, is_score_or_soundtrack=is_score_or_soundtrack)
+        else:
+            first_part = cls._generate_first_part(artist=tag_artist, album_name=tag_album_name, folder_has_same_artist=folder_has_same_artist, is_score_or_soundtrack=is_score_or_soundtrack)
 
-        suffix_date = cls._generate_date_suffix(date=tag_date, folder_has_same_date=folder_has_same_date, has_each_file_a_date=has_each_file_a_date)
+            suffix_date = cls._generate_date_suffix(date=tag_date, folder_has_same_date=folder_has_same_date, has_each_file_a_date=has_each_file_a_date)
 
-        return f"[{first_part}] - {tag_album_name}{suffix_date}"
+            return f"[{first_part}] - {tag_album_name}{suffix_date}"
 
     @classmethod
     def _generate_first_part(cls, artist: str, album_name: str, folder_has_same_artist: bool, is_score_or_soundtrack: bool) -> str:
