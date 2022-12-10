@@ -66,7 +66,7 @@ class FolderDescription:
         if folder_has_same_album is False or album_name is None:
             return False
 
-        if album_name.endswith(("(Score)", "(Soundtrack)")):
+        if album_name.endswith(("(Score)", "(Expanded Score)", "(Soundtrack)")):
             return True
 
         else:

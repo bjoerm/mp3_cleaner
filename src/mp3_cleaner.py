@@ -17,8 +17,11 @@ def mp3_cleaner():
         config = tomllib.load(f)
     config = Config(**config)
 
-    if config.do_clean_output_folder is True and config.output_path.absolute().is_dir():
-        shutil.rmtree(config.output_path.absolute())
+    if config.do_clean_output_folder is True:
+        if config.output_path.absolute().is_dir():
+            shutil.rmtree(config.output_path.absolute())
+        for log in ["log_changed_folders.log", "log_changed_track_names.log"]:
+            Path(log).unlink(missing_ok=True)
 
     mp3_folders = _find_mp3_folders(input_path=config.input_path)
 
