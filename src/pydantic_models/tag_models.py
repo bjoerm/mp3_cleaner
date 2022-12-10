@@ -60,6 +60,7 @@ class TagsImportModel(BaseModel):
             return value
         else:
             value = value.replace("(Original Motion Picture Score)", "(Score)")
+            value = value.replace("(O.S.T.)", "(Soundtrack)")
             return value
 
     class Config:
