@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import regex
 from mutagen.id3 import ID3
@@ -30,7 +30,7 @@ class MP3FileTags:
 
         self.tags_beautified = TagsExportModel(**tags.dict(exclude_none=True))
 
-    def _convert_tags_to_dict(self) -> Dict[str, str | int | Dict[str, str | bytes]]:
+    def _convert_tags_to_dict(self) -> dict[str, str | int | dict[str, str | bytes]]:
         """Extract the relevant parts for each tag from the mutagen ID3 class into a dictionary. That means that tags are reduced to normal strings or other base Python objects."""
 
         # Convert

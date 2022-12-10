@@ -1,5 +1,5 @@
 from dataclasses import InitVar, field
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import StrictBool
 from pydantic.dataclasses import dataclass
@@ -11,7 +11,7 @@ from pydantic_models.tag_models import TagsExportModel
 class FolderDescription:
     """Class that storesfrom analyzing the tags of all files in the folder."""
 
-    beautified_tags: InitVar[Optional[List[TagsExportModel]]]
+    beautified_tags: InitVar[Optional[list[TagsExportModel]]]
     only_single_mp3_file: StrictBool = field(init=False)
     folder_has_same_album: StrictBool = field(init=False)
     folder_has_same_artist: StrictBool = field(init=False)
@@ -39,7 +39,7 @@ class FolderDescription:
         self.is_score_or_soundtrack = self._check_album_is_score_or_soundtrack(folder_has_same_album=self.folder_has_same_album, album_name=beautified_tags[0].TALB)
 
     @staticmethod
-    def _check_tag_uniformity(tag: List[Optional[str | int]]) -> bool:
+    def _check_tag_uniformity(tag: list[Optional[str | int]]) -> bool:
         if None in tag:
             # TODO Print a warning in this case, although it is hard to be descriptives which tag is meant as inside this function it is hard to say what tag entered it.
             return False
@@ -54,7 +54,7 @@ class FolderDescription:
             raise ValueError("This shouldn't happen.")
 
     @staticmethod
-    def _check_presence_in_all_tags(tag: List[Optional[str | int]]) -> bool:
+    def _check_presence_in_all_tags(tag: list[Optional[str | int]]) -> bool:
         if None in tag:
             # TODO Print a warning in this case, although it is hard to be descriptives which tag is meant as inside this function it is hard to say what tag entered it.
             return False

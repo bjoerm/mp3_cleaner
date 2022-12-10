@@ -1,6 +1,5 @@
 from pathlib import Path
 from shutil import copytree, ignore_patterns
-from typing import List
 
 import regex
 
@@ -22,5 +21,5 @@ class FolderPreparation:
         return folder_full_output
 
     @staticmethod
-    def copy_to_output_folder(folder_full_input: Path, folder_full_output: Path, unwanted_files: List[str]):
+    def copy_to_output_folder(folder_full_input: Path, folder_full_output: Path, unwanted_files: list[str]):
         copytree(src=folder_full_input, dst=folder_full_output, ignore=ignore_patterns(*unwanted_files), dirs_exist_ok=True)  # Unwanted files won't be copied. One could also remove dirs_exist_ok to get an error as the output should ideally be empty before mp3 cleaning

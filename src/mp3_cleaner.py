@@ -2,7 +2,6 @@ import logging
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import List
 
 import tomllib
 from tqdm.contrib.concurrent import thread_map
@@ -30,7 +29,7 @@ def mp3_cleaner():
     thread_map(worker, range(len(mp3_folders)), desc="Folders", unit=" folders")  # Uses all cores. Number of parallel workers can be limited via max_workers.
 
 
-def _find_mp3_folders(input_path: Path) -> List[Path]:
+def _find_mp3_folders(input_path: Path) -> list[Path]:
 
     mp3_files = [file for file in input_path.glob("**/*.mp3")]  # **/* is recursive. Each folder with mp3 files will enter a seperate Folder class.
 

@@ -9,7 +9,7 @@ class StringBeautifier:
     """
 
     @classmethod
-    def beautify_string(cls, text: Optional[str], remove_leading_the: bool = False) -> str:
+    def beautify_string(cls, text: Optional[str], remove_leading_the: bool = False) -> Optional[str]:
         """
         This method beautifies strings. It removes not needed whitespaces, deals with special characters and some other things. It also capitalizes the string to appear more uniform.
         """

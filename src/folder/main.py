@@ -1,7 +1,7 @@
 import logging
 import shutil
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import tomllib
 
@@ -12,10 +12,10 @@ from folder.preparation import FolderPreparation
 
 
 class Folder:
-    def __init__(self, folder_full_input: Path, folder_main_input: Path, folder_main_output: Path, unwanted_files: List[str]) -> None:
+    def __init__(self, folder_full_input: Path, folder_main_input: Path, folder_main_output: Path, unwanted_files: list[str]) -> None:
         self.folder_full: Path
-        self.mp3_filepaths: List[Path]  # Contains only .mp3 files.
-        self.mp3_files: List[MP3File]
+        self.mp3_filepaths: list[Path]  # Contains only .mp3 files.
+        self.mp3_files: list[MP3File]
         self.description: FolderDescription
         self.name: FolderName
 
@@ -39,7 +39,7 @@ class Folder:
 
         self.name.beautify_and_write_foldername(tags_beautified=self.mp3_files[0].tags.tags_beautified, folder_description=self.description)  # Using the first file for the folder name as there won't be any changes if there are different album names.
 
-    def fetch_mp3_filepaths(self) -> List[Path]:
+    def fetch_mp3_filepaths(self) -> list[Path]:
         mp3_files = [f for f in self.folder_full.glob("*.mp3")]  # This is not recursive (and that is intended as any folder with mp3 files gets its own folder class).
 
         if len(mp3_files) == 0:
@@ -47,7 +47,7 @@ class Folder:
 
         return mp3_files
 
-    def init_mp3_file_classes(self) -> List[MP3File]:
+    def init_mp3_file_classes(self) -> list[MP3File]:
         return [MP3File(filepath=i) for i in self.mp3_filepaths]
 
     def beautify_tags_isolated_per_file(self):
@@ -73,7 +73,7 @@ class Folder:
             )
 
     @staticmethod
-    def _calculate_leading_zeros(numbers: List[Optional[str]]) -> Optional[int]:
+    def _calculate_leading_zeros(numbers: list[Optional[str]]) -> Optional[int]:
         """Calculates the highest disc or track number that was encountered. If any number is missing (=None) or the highest number is 1, then None will be returned."""
 
         if None in numbers:
