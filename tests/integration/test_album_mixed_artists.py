@@ -21,7 +21,7 @@ def test_album_mixed_artists(tmp_path):  # tmp_path comes from pytest (https://d
 
     filenames = []
 
-    for i in range(0, 3):
+    for i in range(0, 4):
         filenames.append(album_mixed.mp3_files[i].name.filepath_beautified.name)
 
     filenames.sort()

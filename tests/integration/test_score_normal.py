@@ -21,7 +21,7 @@ def test_score_normal(tmp_path):  # tmp_path comes from pytest (https://docs.pyt
 
     filenames = []
 
-    for i in range(0, 3):
+    for i in range(0, 4):
         filenames.append(score_normal.mp3_files[i].name.filepath_beautified.name)
 
     filenames.sort()
