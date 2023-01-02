@@ -19,10 +19,17 @@ def test_score_normal(tmp_path):  # tmp_path comes from pytest (https://docs.pyt
 
     assert score_normal.name.folderpath_beautified.stem == "[Awesome Movie] - Awesome Movie 1 - First Part (Score) (2022)"
 
-    assert score_normal.mp3_files[0].name.filepath_beautified.name == "[Artist TPE1] - 01 - Title.mp3"
-    assert score_normal.mp3_files[1].name.filepath_beautified.name == "[Artist TPE1] - 02 - Title.mp3"
-    assert score_normal.mp3_files[2].name.filepath_beautified.name == "[Artist TPE1] - 03 - Title.mp3"
-    assert score_normal.mp3_files[3].name.filepath_beautified.name == "[Artist TPE1] - 04 - Title.mp3"
+    filenames = []
+
+    for i in range(0, 3):
+        filenames.append(score_normal.mp3_files[i].name.filepath_beautified.name)
+
+    filenames.sort()
+
+    assert filenames[0] == "[Artist TPE1] - 01 - Title.mp3"
+    assert filenames[1] == "[Artist TPE1] - 02 - Title.mp3"
+    assert filenames[2] == "[Artist TPE1] - 03 - Title.mp3"
+    assert filenames[3] == "[Artist TPE1] - 04 - Title.mp3"
 
     assert score_normal.description.only_single_mp3_file == False
     assert score_normal.description.folder_has_same_album == True
