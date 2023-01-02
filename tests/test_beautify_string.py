@@ -2,232 +2,308 @@
 
 # TODO Could this whole bunch of tests be made simpler by using Pytest parameters? Yes: https://docs.pytest.org/en/reorganize-docs/new-docs/user/parametrize.html
 
+import pytest
+
 from strings.beautify_single_string import StringBeautifier
 
 
-def test_string_beautification():
+@pytest.mark.parametrize(
+    "name, input, expected_output",
+    [
+        ["Empty String", "", ""],
+        ["Empty String", " ", ""],
+        ["Accents", "Test's test's test`s test´s", "Test's Test's Test's Test's"],
+        ["Edge Cases", "Ac/Dc AC/DC ac/dc guns 'n' roses", "ACDC ACDC ACDC Guns 'n' Roses"],
+        ["Spaces", " lost in      space  Lost in Space ", "Lost In Space Lost In Space"],
+        ["Question mark", "where to? what now???", "Where To What Now"],
+        ["Question mark", "?!?", "!"],
+        ["Connected words", "I'am", "I'am"],
+        ["Slash", "data/now data\\yesterday", "Data-Now Data-Yesterday"],
+        ["Featuring", "A feat. B C featuring D E feat F", "A Feat. B C Feat. D E Feat F"],
+        ["Part", "New Song Pt. 4 pt. 5 pt 6", "New Song Part 4 Part 5 Pt 6"],
+        ["Word contains capital letter - but not at beginning", "abC dEF ghi j5L", "abC dEF Ghi j5L"],
+        ["&", "m&m M&m", "M&M M&m"],
+        ["Comma and space", "abc,def", "Abc, Def"],
+        ["Comma and space", "10,5", "10,5"],
+        ["Comma and space", "Abc,10", "Abc, 10"],
+        ["Comma and space", "10,Abc", "10, Abc"],
+        ["Comma and space", "10,abc", "10, Abc"],
+        ["Remix suffix", "Nice Track REMIX", "Nice Track Remix"],
+        ["Remix suffix", "Nice Track (REMIX)", "Nice Track (Remix)"],
+        ["Remix suffix", "Nice Track LIVE", "Nice Track Live"],
+        ["Remix suffix", "Nice Track (LIVE)", "Nice Track (Live)"],
+        ["Feat.", " Featuring Test", "Feat. Test"],
+        ["Feat.", "Featuring Test", "Feat. Test"],
+        ["Feat.", "Bomb Featuring Test", "Bomb Feat. Test"],
+        ["Part", " Pt. 2", "Part 2"],
+        ["Part", "Pt. 2", "Part 2"],
+        ["Part", "Bomb Pt. 2", "Bomb Part 2"],
+        ["Roman letters", "test III", "Test III"],
+        ["Umlaut", "äh", "Äh"],
+        ["Umlaut", "äh !", "Äh !"],
+        ["Accents", "your's", "Your's"],
+        ["Quotations", '"123"', "'123'"],
+        ["Quotations", '"abc"', "'Abc'"],
+        ["Quotations", "'abc'", "'Abc'"],
+        ["Numbers", "1st", "1st"],
+        ["Numbers", "2nd", "2nd"],
+        ["Numbers", "3rd", "3rd"],
+        ["Numbers", "4th", "4th"],
+        ["Numbers", "34th", "34th"],
+        ["Numbers", "91st", "91st"],
+        ["Numbers", "30th", "30th"],
+        ["Alphanumeric", "st1", "St1"],
+        ["Alphanumeric", "r2d2", "R2D2"],
+        ["Some title", "The sound of you and me", "The Sound Of You And Me"],
+        ["Accents", "we're", "We're"],
+        ["Accents", "We're", "We're"],
+        ["Accents", "we´re", "We're"],
+        ["Accents", "We´re", "We're"],
+        ["Accents", "We`re", "We're"],
+        ["Hyphen", "BG-EE", "BG-EE"],
+        ["None", None, None],
+    ],
+)
+def test_string_beautification(name, input, expected_output):
     """
     This tests the main/public method for beautifying strings. It contains all the (private) methods related to strings.
     """
-    assert StringBeautifier.beautify_string("") == ""
-    assert StringBeautifier.beautify_string("Test's test's test`s test´s") == "Test's Test's Test's Test's", "Test accents"
-    assert StringBeautifier.beautify_string("Ac/Dc AC/DC ac/dc guns 'n' roses") == "ACDC ACDC ACDC Guns 'n' Roses", "Test edge cases"
-    assert StringBeautifier.beautify_string(" lost in      space  Lost in Space ") == "Lost In Space Lost In Space", "Test spaces"
-    assert StringBeautifier.beautify_string("where to? what now???") == "Where To What Now", "Question mark"
-    assert StringBeautifier.beautify_string("?!?") == "!", "Question mark"
-    assert StringBeautifier.beautify_string("I'am") == "I'am", "Test connected words"
-    assert StringBeautifier.beautify_string("data/now data\\yesterday") == "Data-Now Data-Yesterday", "Test slash"
-    assert StringBeautifier.beautify_string("A feat. B C featuring D E feat F") == "A Feat. B C Feat. D E Feat F", "Test Featuring"
-    assert StringBeautifier.beautify_string("New Song Pt. 4 pt. 5 pt 6") == "New Song Part 4 Part 5 Pt 6", "Test Part"
-    assert StringBeautifier.beautify_string("abC dEF ghi j5L") == "abC dEF Ghi j5L", "Test word contains capital letter - but not at beginning"
-    assert StringBeautifier.beautify_string("m&m M&m") == "M&M M&m", "Test &"
-    assert StringBeautifier.beautify_string("baum,stamm") == "Baum, Stamm", "Test comma and space"
-    assert StringBeautifier.beautify_string("10,5") == "10,5", "Test comma and space"
-    assert StringBeautifier.beautify_string("Gerd,10") == "Gerd, 10", "Test comma and space"
-    assert StringBeautifier.beautify_string("10,Gerd") == "10, Gerd", "Test comma and space"
-    assert StringBeautifier.beautify_string("10,gerd") == "10, Gerd", "Test comma and space"
-    assert StringBeautifier.beautify_string(" ") == "", "Test empty 1"
-    assert StringBeautifier.beautify_string("") == "", "Test empty 2"
-    assert StringBeautifier.beautify_string("Nice Track REMIX") == "Nice Track Remix", "Test Remix suffix 1"
-    assert StringBeautifier.beautify_string("Nice Track (REMIX)") == "Nice Track (Remix)", "Test Remix suffix 2"
-    assert StringBeautifier.beautify_string("Nice Track LIVE") == "Nice Track Live", "Test Live suffix 1"
-    assert StringBeautifier.beautify_string("Nice Track (LIVE)") == "Nice Track (Live)", "Test Live suffix 2"
-    assert StringBeautifier.beautify_string(" Featuring Test") == "Feat. Test", "Test Feat. 1"
-    assert StringBeautifier.beautify_string("Featuring Test") == "Feat. Test", "Test Feat. 2"
-    assert StringBeautifier.beautify_string("Bomb Featuring Test") == "Bomb Feat. Test", "Test Feat. 3"
-    assert StringBeautifier.beautify_string(" Pt. 2") == "Part 2", "Test Part 1"
-    assert StringBeautifier.beautify_string("Pt. 2") == "Part 2", "Test Part 2"
-    assert StringBeautifier.beautify_string("Bomb Pt. 2") == "Bomb Part 2", "Test Part 3"
-    assert StringBeautifier.beautify_string("test III") == "Test III"
-    assert StringBeautifier.beautify_string("äh") == "Äh"
-    assert StringBeautifier.beautify_string("äh !") == "Äh !"
-    assert StringBeautifier.beautify_string("your's") == "Your's"
-    assert StringBeautifier.beautify_string('"123"') == "'123'"
-    assert StringBeautifier.beautify_string('"abc"') == "'Abc'"
-    assert StringBeautifier.beautify_string("'abc'") == "'Abc'"
-    assert StringBeautifier.beautify_string("1st") == "1st"
-    assert StringBeautifier.beautify_string("2nd") == "2nd"
-    assert StringBeautifier.beautify_string("3rd") == "3rd"
-    assert StringBeautifier.beautify_string("4th") == "4th"
-    assert StringBeautifier.beautify_string("34th") == "34th"
-    assert StringBeautifier.beautify_string("91st") == "91st"
-    assert StringBeautifier.beautify_string("30th") == "30th"
-    assert StringBeautifier.beautify_string("st1") == "St1"
-    assert StringBeautifier.beautify_string("r2d2") == "R2D2"
-    assert StringBeautifier.beautify_string("The sound of you and me") == "The Sound Of You And Me"
-    assert StringBeautifier.beautify_string("we're") == "We're"
-    assert StringBeautifier.beautify_string("We're") == "We're"
-    assert StringBeautifier.beautify_string("we´re") == "We're"
-    assert StringBeautifier.beautify_string("We´re") == "We're"
-    assert StringBeautifier.beautify_string("We`re") == "We're"
-    assert StringBeautifier.beautify_string("BG-EE") == "BG-EE"
-    assert StringBeautifier.beautify_string(None) is None, "Test none"
+    assert StringBeautifier.beautify_string(input) == expected_output, name
 
 
-def test_string_beautification_leading_the(remove_leading_the=True):  # Switch this to True to easily test it also for that case.
-    assert StringBeautifier.beautify_string("", remove_leading_the=remove_leading_the) == ""
-    assert StringBeautifier.beautify_string("The Beatles ", remove_leading_the=remove_leading_the) == "Beatles", "Test Leading The"
-    assert StringBeautifier.beautify_string(" The Beatles ", remove_leading_the=remove_leading_the) == "Beatles", "Test Leading The"
-    assert StringBeautifier.beautify_string("TheBeatles ", remove_leading_the=remove_leading_the) == "TheBeatles", "Test Leading The"
-    assert StringBeautifier.beautify_string("The-Beatles ", remove_leading_the=remove_leading_the) == "The-Beatles", "Test Leading The"
-    assert StringBeautifier.beautify_string(None, remove_leading_the=remove_leading_the) is None, "Test none"
-    assert StringBeautifier.beautify_string("The", remove_leading_the=remove_leading_the) == "The", "Test for a band named 'The'"
+@pytest.mark.parametrize(
+    "name, input, expected_output",
+    [
+        ["Empty String", "", ""],
+        ["Empty String", " ", ""],
+        ["The", "The Beatles ", "Beatles"],
+        ["The", " The Beatles ", "Beatles"],
+        ["Concat", "TheBeatles ", "TheBeatles"],
+        ["Hyphen", "The-Beatles ", "The-Beatles"],
+        ["None", None, None],
+        ["A band named 'The'", "The", "The"],
+    ],
+)
+def test_string_beautification_leading_the(name, input, expected_output, remove_leading_the=True):
+    assert StringBeautifier.beautify_string(input, remove_leading_the=remove_leading_the) == expected_output, name
 
 
-def test_string_remove_whitespaces():
-    assert StringBeautifier._remove_not_needed_whitespaces("") == ""
-    assert StringBeautifier._remove_not_needed_whitespaces(" lost in      space  Lost In Space ") == "lost in space Lost In Space", "Test spaces"
-    assert StringBeautifier._remove_not_needed_whitespaces(" Test") == "Test"
-    assert StringBeautifier._remove_not_needed_whitespaces("Test ") == "Test"
-    assert StringBeautifier._remove_not_needed_whitespaces(" Test ") == "Test"
-    assert StringBeautifier._remove_not_needed_whitespaces(" 123 456 ") == "123 456"
-    assert StringBeautifier._remove_not_needed_whitespaces(" ") == ""
-    assert StringBeautifier._remove_not_needed_whitespaces("  ") == ""
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["", ""],
+        [" lost in      space  Lost In Space ", "lost in space Lost In Space"],
+        [" Test", "Test"],
+        ["Test ", "Test"],
+        [" Test ", "Test"],
+        [" 123 456 ", "123 456"],
+        [" ", ""],
+        ["  ", ""],
+    ],
+)
+def test_string_remove_whitespaces(input, expected_output):
+    assert StringBeautifier._remove_not_needed_whitespaces(input) == expected_output
 
 
-def test_string_unify_quotation_marks_and_accents():
-    assert StringBeautifier._unify_quotation_marks_and_accents("") == ""
-    assert StringBeautifier._unify_quotation_marks_and_accents('"Great Song"') == "'Great Song'", "Quotation marks"
-    assert StringBeautifier._unify_quotation_marks_and_accents("Tim´s") == "Tim's", "Accents"
-    assert StringBeautifier._unify_quotation_marks_and_accents("Tim`s") == "Tim's", "Accents"
+@pytest.mark.parametrize(
+    "name, input, expected_output",
+    [
+        ["Empty string", "", ""],
+        ["Quotation marks", '"Great Song"', "'Great Song'"],
+        ["Double single quotation marks", "''Great Song''", "'Great Song'"],
+        ["Accents", "Tim´s", "Tim's"],
+        ["Accents", "Tim`s", "Tim's"],
+    ],
+)
+def test_string_unify_quotation_marks_and_accents(name, input, expected_output):
+    assert StringBeautifier._unify_quotation_marks_and_accents(input) == expected_output, name
 
 
-def test_string_beautify_colons():
-    assert StringBeautifier._beautify_colons("") == ""
-    assert StringBeautifier._beautify_colons("Deus Ex: Human Revolution") == "Deus Ex - Human Revolution", "Colon followed by whitespace"
-    assert StringBeautifier._beautify_colons("He: Hello") == "He - Hello", "Colon followed by whitespace"
-    assert StringBeautifier._beautify_colons("Deus : Ex") == "Deus - Ex"
-    assert StringBeautifier._beautify_colons("Deus: Ex") == "Deus - Ex"
-    assert StringBeautifier._beautify_colons("Über:Über") == "Über-Über"
-    assert StringBeautifier._beautify_colons("Über: Über") == "Über - Über"
-    assert StringBeautifier._beautify_colons("Ü: Ü") == "Ü - Ü"
-    assert StringBeautifier._beautify_colons("ß: ß") == "ß - ß"
-    assert StringBeautifier._beautify_colons("é: é") == "é - é"
-    assert StringBeautifier._beautify_colons("Deus:Ex") == "Deus-Ex", "Colon followed by non-whitespace 1"
-    assert StringBeautifier._beautify_colons("12:34") == "12-34", "Colon followed by non-whitespace 2"
-    assert StringBeautifier._beautify_colons("Folge 34: Test") == "Folge 34 - Test"
-    assert StringBeautifier._beautify_colons(" : ") == " - ", "Colon surrounded by whitespace"
-    assert StringBeautifier._beautify_colons(":Ex") == "-Ex", "Colon surrounded by whitespace"
-    assert StringBeautifier._beautify_colons("Ex:") == "Ex-", "Colon surrounded by whitespace"
-    assert StringBeautifier._beautify_colons("Ex:") == "Ex-", "Colon surrounded by whitespace"
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["", ""],
+        ["Deus Ex: Human Revolution", "Deus Ex - Human Revolution"],
+        ["He: Hello", "He - Hello"],
+        ["Deus : Ex", "Deus - Ex"],
+        ["Deus: Ex", "Deus - Ex"],
+        ["Über:Über", "Über-Über"],
+        ["Über: Über", "Über - Über"],
+        ["Ü: Ü", "Ü - Ü"],
+        ["ß: ß", "ß - ß"],
+        ["é: é", "é - é"],
+        ["Deus:Ex", "Deus-Ex"],
+        ["12:34", "12-34"],
+        ["Folge 34: Test", "Folge 34 - Test"],
+        [" : ", " - "],
+        [":Ex", "-Ex"],
+        ["Ex:", "Ex-"],
+        ["Ex:", "Ex-"],
+    ],
+)
+def test_string_beautify_colons(input, expected_output):
+    assert StringBeautifier._beautify_colons(input) == expected_output
 
 
-def test_enforce_round_brackets():
-    assert StringBeautifier._enforce_round_brackets("(Test)") == "(Test)"
-    assert StringBeautifier._enforce_round_brackets("(Test]") == "(Test)"
-    assert StringBeautifier._enforce_round_brackets("[Test]") == "(Test)"
-    assert StringBeautifier._enforce_round_brackets("[[Test]]") == "(Test)"
-    assert StringBeautifier._enforce_round_brackets("{Test}") == "(Test)"
-    assert StringBeautifier._enforce_round_brackets("⟨Test⟩") == "(Test)"
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["(Test)", "(Test)"],
+        ["(Test]", "(Test)"],
+        ["[Test]", "(Test)"],
+        ["[[Test]]", "(Test)"],
+        ["{Test}", "(Test)"],
+        ["⟨Test⟩", "(Test)"],
+    ],
+)
+def test_enforce_round_brackets(input, expected_output):
+    assert StringBeautifier._enforce_round_brackets(input) == expected_output
 
 
-def test_unify_hyphens():
-    assert StringBeautifier._unify_hyphens("Test-Case") == "Test-Case"
-    assert StringBeautifier._unify_hyphens("Test―Case") == "Test-Case"
-    assert StringBeautifier._unify_hyphens("Test‒Case") == "Test-Case"
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["Test-Case", "Test-Case"],
+        ["Test―Case", "Test-Case"],
+        ["Test‒Case", "Test-Case"],
+    ],
+)
+def test_unify_hyphens(input, expected_output):
+    assert StringBeautifier._unify_hyphens(input) == expected_output
 
 
-def test_string_replace_special_characters():
-    assert StringBeautifier._replace_special_characters("") == ""
-    assert StringBeautifier._replace_special_characters(";") == ","
-    assert StringBeautifier._replace_special_characters("tl;dr") == "tl,dr"
-    assert StringBeautifier._replace_special_characters("\\") == "-"
-    assert StringBeautifier._replace_special_characters("abc\\def") == "abc-def"
-    assert StringBeautifier._replace_special_characters("/") == "-"
-    assert StringBeautifier._replace_special_characters("abc/def") == "abc-def"
-    assert StringBeautifier._replace_special_characters("?") == ""
-    assert StringBeautifier._replace_special_characters("WTF?") == "WTF"
-    assert StringBeautifier._replace_special_characters("&") == "&"  # Nothing changed here.
-    assert StringBeautifier._replace_special_characters("C&A") == "C&A"  # Nothing changed here.
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["", ""],
+        [";", ","],
+        ["tl;dr", "tl,dr"],
+        ["\\", "-"],
+        ["abc\\def", "abc-def"],
+        ["/", "-"],
+        ["abc/def", "abc-def"],
+        ["?", ""],
+        ["WTF?", "WTF"],
+        ["&", "&"],
+        ["C&A", "C&A"],
+    ],
+)
+def test_string_replace_special_characters(input, expected_output):
+    assert StringBeautifier._replace_special_characters(input) == expected_output
 
 
-def test_string_fill_missing_space_after_comma():
-    assert StringBeautifier._fill_missing_space_after_comma("") == ""
-    assert StringBeautifier._fill_missing_space_after_comma("baum,stamm") == "baum, stamm"
-    assert StringBeautifier._fill_missing_space_after_comma("10,5") == "10,5"
-    assert StringBeautifier._fill_missing_space_after_comma("5,neu") == "5, neu"
-    assert StringBeautifier._fill_missing_space_after_comma("neu,5") == "neu, 5"
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["", ""],
+        ["baum,stamm", "baum, stamm"],
+        ["10,5", "10,5"],
+        ["5,neu", "5, neu"],
+        ["neu,5", "neu, 5"],
+    ],
+)
+def test_string_fill_missing_space_after_comma(input, expected_output):
+    assert StringBeautifier._fill_missing_space_after_comma(input) == expected_output
 
 
-def test_string_remove_leading_the():
-    assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="") == ""
-    assert StringBeautifier._remove_leading_the(remove_leading_the=False, text="") == ""
-    assert StringBeautifier._remove_leading_the(remove_leading_the=False, text="The Beatles") == "The Beatles"
-    assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="The Beatles") == "Beatles"
-    assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="The-Beatles") == "The-Beatles"
-    assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="Therapy") == "Therapy"
-    assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="The 182") == "182"
-    assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="T H E") == "T H E"
-    assert StringBeautifier._remove_leading_the(remove_leading_the=True, text="The") == "The"
+@pytest.mark.parametrize(
+    "remove_leading_the, input, expected_output",
+    [
+        [True, "", ""],
+        [False, "", ""],
+        [False, "The Beatles", "The Beatles"],
+        [True, "The Beatles", "Beatles"],
+        [True, "TheBeatles", "TheBeatles"],
+        [True, "The-Beatles", "The-Beatles"],
+        [True, "Therapy", "Therapy"],
+        [True, "The 182", "182"],
+        [True, "T H E", "T H E"],
+        [True, "The", "The"],
+    ],
+)
+def test_string_remove_leading_the(remove_leading_the, input, expected_output):
+    assert StringBeautifier._remove_leading_the(remove_leading_the=remove_leading_the, text=input) == expected_output
 
 
-def test_string_deal_with_special_words():
-    assert StringBeautifier._deal_with_special_words_and_bands("") == ""
-    assert StringBeautifier._deal_with_special_words_and_bands(" Featuring ") == " Feat. "
-    assert StringBeautifier._deal_with_special_words_and_bands("Featuring ") == "Feat. "
-    assert StringBeautifier._deal_with_special_words_and_bands("Featuring") == "Featuring"
-    assert StringBeautifier._deal_with_special_words_and_bands("(Featuring)") == "(Featuring)"
-    assert StringBeautifier._deal_with_special_words_and_bands("(Featuring abc)") == "(Feat. abc)"
-    assert StringBeautifier._deal_with_special_words_and_bands(" FEATURING ") == " Feat. "
-    assert StringBeautifier._deal_with_special_words_and_bands("Test Featuring") == "Test Featuring"
-    assert StringBeautifier._deal_with_special_words_and_bands(" Pt. 1 ") == " Part 1 "
-    assert StringBeautifier._deal_with_special_words_and_bands(" Pt. 1") == " Part 1"
-    assert StringBeautifier._deal_with_special_words_and_bands("Pt. 1 ") == "Part 1 "
-    assert StringBeautifier._deal_with_special_words_and_bands("Pt. 1") == "Part 1"
-    assert StringBeautifier._deal_with_special_words_and_bands("pt. 1") == "Part 1"
-    assert StringBeautifier._deal_with_special_words_and_bands("copt. 1") == "copt. 1"
-    assert StringBeautifier._deal_with_special_words_and_bands("remix") == "Remix"
-    assert StringBeautifier._deal_with_special_words_and_bands("REMIX") == "Remix"
-    assert StringBeautifier._deal_with_special_words_and_bands("cremeremix") == "cremeremix"
-    assert StringBeautifier._deal_with_special_words_and_bands("best remix") == "best Remix"
-    assert StringBeautifier._deal_with_special_words_and_bands("(remix)") == "(Remix)"
-    assert StringBeautifier._deal_with_special_words_and_bands(" (remix)") == " (Remix)"
-    assert StringBeautifier._deal_with_special_words_and_bands("(best remix)") == "(best Remix)"
-    assert StringBeautifier._deal_with_special_words_and_bands("live") == "Live"
-    assert StringBeautifier._deal_with_special_words_and_bands("(live)") == "(Live)"
-    assert StringBeautifier._deal_with_special_words_and_bands("LIVE") == "Live"
-    assert StringBeautifier._deal_with_special_words_and_bands("sunlive") == "sunlive"
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["", ""],
+        [" Featuring ", " Feat. "],
+        ["Featuring ", "Feat. "],
+        ["Featuring", "Featuring"],
+        ["(Featuring)", "(Featuring)"],
+        ["(Featuring abc)", "(Feat. abc)"],
+        [" FEATURING ", " Feat. "],
+        ["Test Featuring", "Test Featuring"],
+        [" Pt. 1 ", " Part 1 "],
+        [" Pt. 1", " Part 1"],
+        ["Pt. 1 ", "Part 1 "],
+        ["Pt. 1", "Part 1"],
+        ["pt. 1", "Part 1"],
+        ["copt. 1", "copt. 1"],
+        ["remix", "Remix"],
+        ["REMIX", "Remix"],
+        ["cremeremix", "cremeremix"],
+        ["best remix", "best Remix"],
+        ["(remix)", "(Remix)"],
+        [" (remix)", " (Remix)"],
+        ["(best remix)", "(best Remix)"],
+        ["live", "Live"],
+        ["(live)", "(Live)"],
+        ["LIVE", "Live"],
+        ["sunlive", "sunlive"],
+    ],
+)
+def test_string_deal_with_special_words(input, expected_output):
+    assert StringBeautifier._deal_with_special_words_and_bands(input) == expected_output
 
 
-def test_string_capitalize_string():
+@pytest.mark.parametrize(
+    "input, expected_output",
+    [
+        ["test's", "Test's"],
+        ["Bernd's", "Bernd's"],
+        ["test'N", "test'N"],
+        ["test'S", "test'S"],
+        ["Bernd's Great Song", "Bernd's Great Song"],
+        ["Bernd's Great Song", "Bernd's Great Song"],
+        ["DMX", "DMX"],
+        ["DMX is testing", "DMX Is Testing"],
+        ["bmX bike", "bmX Bike"],
+        ["data-now data-yesterday", "Data-Now Data-Yesterday"],
+        ["Data-Now", "Data-Now"],  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
+        ["Data-now", "Data-now"],  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
+        ["data-Now", "data-Now"],  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
+        ["m+m", "M+M"],
+        ["M+m", "M+m"],
+        ["A-ha", "A-ha"],
+        ["A-Ha", "A-Ha"],
+        ["a-Ha", "a-Ha"],
+        ["a-ha", "A-Ha"],
+        ["self-destruct", "Self-Destruct"],
+        ["ärzte", "Ärzte"],
+        ["bÄrzte", "bÄrzte"],
+        ["Capone 'n' Noreaga", "Capone 'n' Noreaga"],
+        ["Guns 'n' Roses", "Guns 'n' Roses"],
+        ["+44", "+44"],
+        ["your's", "Your's"],
+        ["you're", "You're"],
+        ["we're", "We're"],
+        ["We're", "We're"],
+        ["The sound of you and me", "The Sound Of You And Me"],
+        ["1st", "1st"],
+        ["2nd", "2nd"],
+        ["3rd", "3rd"],
+        ["4th", "4th"],
+        ["34th", "34th"],
+        ["91st", "91st"],
+        ["30th", "30th"],
+        ["", ""],
+    ],
+)
+def test_string_capitalize_string(input, expected_output):
     """
     Remember that this shall not touch a string (part (surrounded by spaces)), if that has already any capital letter in it.
     """
-    assert StringBeautifier._capitalize_string("test's") == "Test's"
-    assert StringBeautifier._capitalize_string("Bernd's") == "Bernd's"
-    assert StringBeautifier._capitalize_string("test'N") == "test'N"
-    assert StringBeautifier._capitalize_string("test'S") == "test'S"
-    assert StringBeautifier._capitalize_string("Bernd's Great Song") == "Bernd's Great Song"
-    assert StringBeautifier._capitalize_string("Bernd's Great Song") == "Bernd's Great Song"
-    assert StringBeautifier._capitalize_string("DMX") == "DMX"
-    assert StringBeautifier._capitalize_string("DMX is testing") == "DMX Is Testing"
-    assert StringBeautifier._capitalize_string("bmX bike") == "bmX Bike"
-    assert StringBeautifier._capitalize_string("data-now data-yesterday") == "Data-Now Data-Yesterday"
-    assert StringBeautifier._capitalize_string("Data-Now") == "Data-Now"  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
-    assert StringBeautifier._capitalize_string("Data-now") == "Data-now"  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
-    assert StringBeautifier._capitalize_string("data-Now") == "data-Now"  # Shall return this as it follows the rule to not touch the string, if there is a capital letter somehwere.
-    assert StringBeautifier._capitalize_string("m+m") == "M+M"
-    assert StringBeautifier._capitalize_string("M+m") == "M+m"
-    assert StringBeautifier._capitalize_string("A-ha") == "A-ha"
-    assert StringBeautifier._capitalize_string("A-Ha") == "A-Ha"
-    assert StringBeautifier._capitalize_string("a-Ha") == "a-Ha"
-    assert StringBeautifier._capitalize_string("a-ha") == "A-Ha"
-    assert StringBeautifier._capitalize_string("self-destruct") == "Self-Destruct"
-    assert StringBeautifier._capitalize_string("ärzte") == "Ärzte"
-    assert StringBeautifier._capitalize_string("bÄrzte") == "bÄrzte"
-    assert StringBeautifier._capitalize_string("Capone 'n' Noreaga") == "Capone 'n' Noreaga"
-    assert StringBeautifier._capitalize_string("Guns 'n' Roses") == "Guns 'n' Roses"
-    assert StringBeautifier._capitalize_string("+44") == "+44"
-    assert StringBeautifier._capitalize_string("your's") == "Your's"
-    assert StringBeautifier._capitalize_string("you're") == "You're"
-    assert StringBeautifier._capitalize_string("we're") == "We're"
-    assert StringBeautifier._capitalize_string("We're") == "We're"
-    assert StringBeautifier._capitalize_string("The sound of you and me") == "The Sound Of You And Me"
-    assert StringBeautifier._capitalize_string("1st") == "1st"
-    assert StringBeautifier._capitalize_string("2nd") == "2nd"
-    assert StringBeautifier._capitalize_string("3rd") == "3rd"
-    assert StringBeautifier._capitalize_string("4th") == "4th"
-    assert StringBeautifier._capitalize_string("34th") == "34th"
-    assert StringBeautifier._capitalize_string("91st") == "91st"
-    assert StringBeautifier._capitalize_string("30th") == "30th"
-    assert StringBeautifier._capitalize_string("") == ""
+    assert StringBeautifier._capitalize_string(input) == expected_output
