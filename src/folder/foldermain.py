@@ -5,10 +5,10 @@ from typing import Optional
 
 import tomllib
 
-from file.main import MP3File
-from folder.description import FolderDescription
-from folder.name import FolderName
-from folder.preparation import FolderPreparation
+from file.filemain import MP3File
+from folder.folderdescription import FolderDescription
+from folder.foldername import FolderName
+from folder.folderpreparation import FolderPreparation
 
 
 class Folder:

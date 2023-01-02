@@ -1,6 +1,6 @@
 import pytest
 
-from folder.description import FolderDescription
+from folder.folderdescription import FolderDescription
 
 
 @pytest.mark.parametrize(

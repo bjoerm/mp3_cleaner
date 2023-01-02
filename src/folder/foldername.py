@@ -5,7 +5,7 @@ from typing import Optional
 
 import regex
 
-from folder.description import FolderDescription
+from folder.folderdescription import FolderDescription
 from pydantic_models.tag_models import TagsExportModel
 
 

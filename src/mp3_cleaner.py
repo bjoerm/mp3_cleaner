@@ -1,3 +1,4 @@
+import gc
 import logging
 import shutil
 from datetime import datetime
@@ -6,7 +7,7 @@ from pathlib import Path
 import tomllib
 from tqdm.contrib.concurrent import thread_map
 
-from folder.main import Folder
+from folder.foldermain import Folder
 from pydantic_models.config_model import Config
 
 
@@ -28,6 +29,8 @@ def mp3_cleaner():
     def worker(folder_i: int):
         """Works on one folder at a time. Thus, can be used in parallel."""
         Folder(folder_full_input=mp3_folders[folder_i], folder_main_input=config.input_path, folder_main_output=config.output_path, unwanted_files=config.unwanted_files)
+
+        gc.collect()
 
     thread_map(worker, range(len(mp3_folders)), desc="Folders", unit=" folders")  # Uses all cores. Number of parallel workers can be limited via max_workers.
 

@@ -1,6 +1,6 @@
 import pytest
 
-from file.name import MP3FileName
+from file.filename import MP3FileName
 
 
 @pytest.mark.parametrize(
