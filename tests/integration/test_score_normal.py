@@ -11,9 +11,11 @@ def test_score_normal(tmp_path):  # tmp_path comes from pytest (https://docs.pyt
 
     with open("src/config.toml", "rb") as f:
         config = tomllib.load(f)
+    config["input_path"] = Path("tests/data/")
+
     config = Config(**config)
 
-    score_normal = Folder(folder_full_input=Path("tests/data/score_normal"), folder_main_input=Path("tests/data/"), folder_main_output=tmp_path, unwanted_files=config.unwanted_files)
+    score_normal = Folder(folder_full_input=Path("tests/data/score_normal"), folder_main_input=config.input_path, folder_main_output=tmp_path, unwanted_files=config.unwanted_files)
 
     assert score_normal.name.folderpath_beautified.stem == "[Awesome Movie] - Awesome Movie 1 - First Part (Score) (2022)"
 

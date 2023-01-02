@@ -11,9 +11,11 @@ def test_album_normal(tmp_path):  # tmp_path comes from pytest (https://docs.pyt
 
     with open("src/config.toml", "rb") as f:
         config = tomllib.load(f)
+    config["input_path"] = Path("tests/data/")
+
     config = Config(**config)
 
-    album_normal = Folder(folder_full_input=Path("tests/data/album_normal"), folder_main_input=Path("tests/data/"), folder_main_output=tmp_path, unwanted_files=config.unwanted_files)
+    album_normal = Folder(folder_full_input=Path("tests/data/album_normal"), folder_main_input=config.input_path, folder_main_output=tmp_path, unwanted_files=config.unwanted_files)
 
     assert album_normal.name.folderpath_beautified.stem == "[Artist TPE1] - Testing Normal Album (2022)"
 
