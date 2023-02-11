@@ -13,6 +13,7 @@ from strings.beautify_single_string import StringBeautifier
         ["Empty String", "", ""],
         ["Empty String", " ", ""],
         ["Accents", "Test's test's test`s test´s", "Test's Test's Test's Test's"],
+        ["Accents", "''Face'''", "'Face'"],
         ["Edge Cases", "Ac/Dc AC/DC ac/dc guns 'n' roses", "ACDC ACDC ACDC Guns 'n' Roses"],
         ["Spaces", " lost in      space  Lost in Space ", "Lost In Space Lost In Space"],
         ["Question mark", "where to? what now???", "Where To What Now"],

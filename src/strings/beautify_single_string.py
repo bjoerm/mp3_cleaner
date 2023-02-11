@@ -55,7 +55,7 @@ class StringBeautifier:
 
         # Quotation marks
         text = regex.sub('"', "'", text)
-        text = regex.sub("''", "'", text)
+        text = regex.sub("'+", "'", text)
 
         # Accents
         text = regex.sub("`", "'", text)
@@ -116,6 +116,9 @@ class StringBeautifier:
 
         # Stars
         text = text.replace("*", "-")
+
+        # ...
+        text = text.replace("…", "...")
 
         return text
 
