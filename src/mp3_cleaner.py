@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 import tomllib
+from tqdm import tqdm
 from tqdm.contrib.concurrent import thread_map
 
 from folder.foldermain import Folder
@@ -26,13 +27,19 @@ def mp3_cleaner():
 
     mp3_folders = _find_mp3_folders(input_path=config.input_path)
 
-    def worker(folder_i: int):
-        """Works on one folder at a time. Thus, can be used in parallel."""
-        Folder(folder_full_input=mp3_folders[folder_i], folder_main_input=config.input_path, folder_main_output=config.output_path, unwanted_files=config.unwanted_files)
+    if config.threads == 1:
+        for folder_i in tqdm(range(len(mp3_folders))):
+            Folder(folder_full_input=mp3_folders[folder_i], folder_main_input=config.input_path, folder_main_output=config.output_path, unwanted_files=config.unwanted_files)
 
-        gc.collect()
+    elif config.threads > 1:
 
-    thread_map(worker, range(len(mp3_folders)), desc="Folders", unit=" folders")  # Uses all cores. Number of parallel workers can be limited via max_workers.
+        def worker(folder_i: int):
+            """Works on one folder at a time. Thus, can be used in parallel."""
+            Folder(folder_full_input=mp3_folders[folder_i], folder_main_input=config.input_path, folder_main_output=config.output_path, unwanted_files=config.unwanted_files)
+
+            gc.collect()
+
+        thread_map(worker, range(len(mp3_folders)), desc="Folders", unit=" folders", max_workers=1)  # Uses all cores. Number of parallel workers can be limited via , max_workers=1.
 
 
 def _find_mp3_folders(input_path: Path) -> list[Path]:
