@@ -23,6 +23,9 @@ from strings.beautify_single_string import StringBeautifier
         ["Part", "New Song Pt. 4 pt. 5 pt 6", "New Song Part 4 Part 5 Pt 6"],
         ["Word contains capital letter - but not at beginning", "abC dEF ghi j5L", "abC dEF Ghi j5L"],
         ["&", "m&m M&m", "M&M M&m"],
+        ["Stars", "a*a", "A-A"],
+        ["Stars", "a*", "A-"],
+        ["Stars", "***", "---"],
         ["Comma and space", "abc,def", "Abc, Def"],
         ["Comma and space", "10,5", "10,5"],
         ["Comma and space", "Abc,10", "Abc, 10"],
@@ -62,6 +65,12 @@ from strings.beautify_single_string import StringBeautifier
         ["Accents", "We`re", "We're"],
         ["Hyphen", "BG-EE", "BG-EE"],
         ["None", None, None],
+        ["Special words", "gmbh", "GmbH"],
+        ["Special words", "Gmbh", "GmbH"],
+        ["Special words", "GMBH", "GmbH"],
+        ["Normal", "What's your name?", "What's Your Name"],
+        ["Normal", "What's your name", "What's Your Name"],
+        ["Normal", "What your name", "What Your Name"],
     ],
 )
 def test_string_beautification(name, input, expected_output):
@@ -231,8 +240,8 @@ def test_string_remove_leading_the(remove_leading_the, input, expected_output):
         ["", ""],
         [" Featuring ", " Feat. "],
         ["Featuring ", "Feat. "],
-        ["Featuring", "Featuring"],
-        ["(Featuring)", "(Featuring)"],
+        ["Featuring", "Featuring"],  # Is this desired?
+        ["(Featuring)", "(Featuring)"],  # Is this desired?
         ["(Featuring abc)", "(Feat. abc)"],
         [" FEATURING ", " Feat. "],
         ["Test Featuring", "Test Featuring"],
@@ -253,6 +262,11 @@ def test_string_remove_leading_the(remove_leading_the, input, expected_output):
         ["(live)", "(Live)"],
         ["LIVE", "Live"],
         ["sunlive", "sunlive"],
+        ["gmbh", "GmbH"],
+        ["Gmbh", "GmbH"],
+        ["GMBH", "GmbH"],
+        ["AC-DC", "ACDC"],
+        ["AC-DC test", "ACDC test"],
     ],
 )
 def test_string_deal_with_special_words(input, expected_output):
