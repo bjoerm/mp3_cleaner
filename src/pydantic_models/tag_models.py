@@ -29,14 +29,18 @@ class TagsImportModel(BaseModel):
     TRCK: Optional[conint(ge=1)] = Field(description="Track Number")
 
     @validator("TPOS", "TRCK", pre=True)
-    def extract_number_from_slash_format(cls, value):
+    def extract_number_from_slash_format(cls, value) -> int:
         """Some tags not only show the current track or disc number but also add to that the total track numbers.
         E.g. '4/10' for track 4 from an album that has 10 tracks in total. This removes the '/10' from that example."""
 
         if value is None:
             return value
         else:
-            value = int(regex.search(pattern=r"^[0-9]+", string=str(value))[0])
+            value = str(value)
+            if value[0] == "/":  # Some oddly formatted tags can start with a slash.
+                value = value[1:]
+
+            value = int(regex.search(pattern=r"^[0-9]+", string=value)[0])
 
         return value
 
