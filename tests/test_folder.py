@@ -12,7 +12,7 @@ from folder.foldermain import Folder
         ["Length 4", ["1", "2", "1000"], 4],
         ["All None", [None, None, None], None],
         ["One None", ["1", "2", None], None],
-        ["Max 1", ["1", "1", "1"], None],
+        ["Max 1", ["1", "1", "1"], 1],
     ],
 )
 def test_calculate_leading_zeros(name, numbers, expected_output):

@@ -76,7 +76,7 @@ class Folder:
 
     @staticmethod
     def _calculate_leading_zeros(numbers: list[Optional[str]]) -> Optional[int]:
-        """Calculates the highest disc or track number that was encountered. If any number is missing (=None) or the highest number is 1, then None will be returned."""
+        """Calculates the highest disc or track number that was encountered as long as all tracks in the folder have a number. This has to be done on the album level."""
 
         if None in numbers:
             return None
@@ -84,12 +84,9 @@ class Folder:
         else:
             numbers_as_int = [int(i) for i in numbers]
             highest_number = max(numbers_as_int)
-
-            if highest_number == 1:
-                return None
-
             highest_number = str(highest_number)
             length_string = len(highest_number)
+
             return length_string
 
     def write_tags(self):
