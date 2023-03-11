@@ -1,7 +1,7 @@
 # How-to update requirements.txt:
 # pip install pip-tools
 # pip-compile --upgrade --resolver=backtracking -o requirements.txt pyproject.toml
-# Dev: pip-compile --upgrade --extra dev --resolver=backtracking -o dev_requirements.txt pyproject.toml
+# pip-compile --upgrade --extra dev --resolver=backtracking -o dev_requirements.txt pyproject.toml
 # pip-sync requirements.txt dev_requirements.txt
 
 
@@ -16,7 +16,7 @@ version = "1.0"
 dependencies = ["mutagen", "pydantic", "regex", "tqdm"]
 
 [project.optional-dependencies]
-dev = ["black", "flake8", "isort", "pytest"]
+dev = ["black", "flake8", "isort", "pytest", "pytest-xdist"]
 
 
 [tool.black]
@@ -29,3 +29,4 @@ line_length = 200
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+addopts = "-n 4"      # Parallel testing with pytest-xdist (https://code.visualstudio.com/docs/python/testing).
