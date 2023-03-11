@@ -178,10 +178,10 @@ class MP3FileTags:
         else:
             return
 
-    def add_leading_zeros_track_and_album_number(self, leading_zeros_track: Optional[int], leading_zeros_album: Optional[int]):
+    def add_leading_zeros_track_and_album_number(self, leading_zeros_track: Optional[int], leading_zeros_disc: Optional[int]):
 
         self.tags_beautified.TRCK = self._add_leading_zeros(number_current=self.tags_beautified.TRCK, leading_zeros=leading_zeros_track)
-        self.tags_beautified.TPOS = self._add_leading_zeros(number_current=self.tags_beautified.TPOS, leading_zeros=leading_zeros_album)
+        self.tags_beautified.TPOS = self._add_leading_zeros(number_current=self.tags_beautified.TPOS, leading_zeros=leading_zeros_disc)
 
     @staticmethod
     def _add_leading_zeros(number_current: Optional[str], leading_zeros: Optional[int]) -> Optional[str]:

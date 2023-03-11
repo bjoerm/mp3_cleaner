@@ -62,18 +62,16 @@ class Folder:
             leading_zeros_track = max(2, leading_zeros_track)
 
         for file in self.mp3_files:
-            file.tags.tags_beautified.TPOS = file.tags._improve_disc_number(
-                disc_number=file.tags.tags_beautified.TPOS, foldername=self.name.folderpath_inital.name, folder_has_same_disc_number=self.description.folder_has_same_disc_number
-            )  # TODO Would this be better if _improve_disc_number saves to self instead of returning here? add_leading_zeros_track_and_album_number below for example edits the self.
+            file.tags.tags_beautified.TPOS = file.tags._improve_disc_number(disc_number=file.tags.tags_beautified.TPOS, foldername=self.name.folderpath_inital.name, folder_has_same_disc_number=self.description.folder_has_same_disc_number)
 
         self.description.has_each_file_a_disc_number = self.description._check_presence_in_all_tags(tag=[tags.tags.tags_beautified.TPOS for tags in self.mp3_files])  # Update the description after potential changes to disc number from above.
 
-        leading_zeros_album = self._calculate_leading_zeros(numbers=[file.tags.tags_beautified.TPOS for file in self.mp3_files])
+        leading_zeros_disc = self._calculate_leading_zeros(numbers=[file.tags.tags_beautified.TPOS for file in self.mp3_files])
 
         for file in self.mp3_files:
             file.tags.add_leading_zeros_track_and_album_number(
                 leading_zeros_track=leading_zeros_track,
-                leading_zeros_album=leading_zeros_album,
+                leading_zeros_disc=leading_zeros_disc,
             )
 
     @staticmethod
