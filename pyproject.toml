@@ -29,4 +29,4 @@ line_length = 200
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-addopts = "-n 4"      # Parallel testing with pytest-xdist (https://code.visualstudio.com/docs/python/testing).
+# Does not work in Github Actions. addopts = "-n 4"      # Parallel testing with pytest-xdist (https://code.visualstudio.com/docs/python/testing).
