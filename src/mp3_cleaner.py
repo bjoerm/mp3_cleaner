@@ -56,7 +56,7 @@ def clean_mp3s(mp3_folders: list[Path], input_path: Path, output_path: Path, unw
             """Works on one folder at a time. Thus, can be used in parallel."""
             Folder(folder_full_input=mp3_folders[folder_i], folder_main_input=input_path, folder_main_output=output_path, unwanted_files=unwanted_files)
 
-        thread_map(worker, range(len(mp3_folders)), desc="Folders", unit=" folders", max_workers=1)  # Uses all cores. Number of parallel workers can be limited via , max_workers=1.
+        thread_map(worker, range(len(mp3_folders)), desc="Folders", unit=" folders", max_workers=threads)  # Uses all cores. Number of parallel workers can be limited via , max_workers=1.
 
 
 if __name__ == "__main__":
