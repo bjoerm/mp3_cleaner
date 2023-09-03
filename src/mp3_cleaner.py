@@ -1,8 +1,10 @@
+# TODO Prevent copying empty subfolders.
+
 import shutil
+import tomllib
 from datetime import datetime
 from pathlib import Path
 
-import tomllib
 from tqdm import tqdm
 from tqdm.contrib.concurrent import thread_map
 
@@ -29,8 +31,12 @@ def mp3_cleaner():
 
 
 def find_mp3_folders(input_path: Path) -> list[Path]:
-
     mp3_files = [file for file in input_path.glob("**/*.mp3")]  # **/* is recursive. Each folder with mp3 files will enter a seperate Folder class.
+
+    in_input_path = [file for file in input_path.glob("*.mp3")]  # Looking for files directly in the first level of the input path.
+
+    if len(in_input_path) > 0:
+        raise ValueError(f"Please move the files from the main directory into a subfolder. Example {in_input_path[0]}")
 
     mp3_folders = []
     for file in mp3_files:
@@ -43,7 +49,6 @@ def find_mp3_folders(input_path: Path) -> list[Path]:
 
 
 def clean_mp3s(mp3_folders: list[Path], input_path: Path, output_path: Path, unwanted_files: list[str], threads: int):
-
     print(f"Start of MP3 cleaning. Input path: {input_path}. Output path: {output_path}.")
 
     if threads == 1:
