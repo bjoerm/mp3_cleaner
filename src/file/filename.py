@@ -8,6 +8,7 @@ from pydantic_models.tag_models import TagsExportModel
 class MP3FileName:
     def __init__(self, filepath: Path) -> None:
         self.filepath_inital = filepath.absolute()
+        self.filepath_temp = Path(str(filepath.absolute()) + ".tmp")
         self.filepath_beautified: Path
 
     def beautify_and_write_filename(
@@ -47,7 +48,9 @@ class MP3FileName:
         has_each_file_a_track_number: bool,
     ) -> str:
 
-        disc_track_number = cls._generate_disc_track_number(has_each_file_a_disc_number=has_each_file_a_disc_number, has_each_file_a_track_number=has_each_file_a_track_number, tag_disc=tag_disc, tag_track=tag_track)
+        disc_track_number = cls._generate_disc_track_number(
+            has_each_file_a_disc_number=has_each_file_a_disc_number, has_each_file_a_track_number=has_each_file_a_track_number, tag_disc=tag_disc, tag_track=tag_track
+        )
 
         filename_beautified = None
 
@@ -77,15 +80,11 @@ class MP3FileName:
         return disc_track_number
 
     def rename_file(self):
-        if self.filepath_inital == self.filepath_beautified:
-            logging.debug(f"File {str(self.filepath_inital)} was already beautiful. ;-)")
 
-        elif self.filepath_beautified.is_file():
-            raise ValueError(f"File {str(self.filepath_beautified)} already existed.")
-
-        elif self.filepath_beautified.is_file() is False:
-            # This is the default case: Beautified file does not yet exist.
-            self.filepath_inital.rename(self.filepath_beautified)
+        self.filepath_inital.rename(
+            self.filepath_temp
+        )  # Some operating systems are case insensitive. Meaning a.mp3 and A.mp3 would be consider the same. Thus, an itermediate step with renaming into a tmp file name.
+        self.filepath_temp.rename(self.filepath_beautified)
 
         self._log_changed_file_names()
 

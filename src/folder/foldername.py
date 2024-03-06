@@ -12,6 +12,7 @@ from pydantic_models.tag_models import TagsExportModel
 class FolderName:
     def __init__(self, folderpath: Path) -> None:
         self.folderpath_inital = folderpath.absolute()
+        self.folderpath_temp = Path(str(folderpath.absolute()) + ".tmp")
         self.folderpath_beautified: Path
 
     def beautify_and_write_foldername(self, tags_beautified: TagsExportModel, folder_description: FolderDescription):
@@ -105,17 +106,17 @@ class FolderName:
         return suffix_date
 
     def rename_folder(self):
-        if self.folderpath_inital == self.folderpath_beautified:
-            logging.debug(f"Folder {str(self.folderpath_inital)} was already beautiful. ;-)")
-
-        elif self.folderpath_beautified.is_dir():
+        if self.folderpath_beautified.is_dir():
             logging.warning(f"Folder {str(self.folderpath_beautified)} already existed. Beautified files from {str(self.folderpath_inital)} are copied into that folder.")
             shutil.copytree(src=self.folderpath_inital, dst=self.folderpath_beautified, dirs_exist_ok=True)
             shutil.rmtree(self.folderpath_inital)
 
         elif self.folderpath_beautified.is_dir() is False:
             # This is the default case: Beautified folder does not yet exist.
-            self.folderpath_inital.rename(self.folderpath_beautified)
+            self.folderpath_inital.rename(
+                self.folderpath_temp
+            )  # Some operating systems are case insensitive. Meaning a.mp3 and A.mp3 would be consider the same. Thus, an itermediate step with renaming into a tmp file name.
+            self.folderpath_temp.rename(self.folderpath_beautified)
 
         self._log_changed_folder_names()
 
