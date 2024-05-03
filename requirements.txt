@@ -12,7 +12,7 @@ pydantic==1.10.13
     # via mp3_cleaner (pyproject.toml)
 regex==2023.12.25
     # via mp3_cleaner (pyproject.toml)
-tqdm==4.66.1
+tqdm==4.66.3
     # via mp3_cleaner (pyproject.toml)
 typing-extensions==4.9.0
     # via pydantic
