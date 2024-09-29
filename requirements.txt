@@ -8,11 +8,11 @@ colorama==0.4.6
     # via tqdm
 mutagen==1.47.0
     # via mp3_cleaner (pyproject.toml)
-pydantic==1.10.13
+pydantic==1.10.18
     # via mp3_cleaner (pyproject.toml)
-regex==2023.12.25
+regex==2024.9.11
     # via mp3_cleaner (pyproject.toml)
-tqdm==4.66.1
+tqdm==4.66.5
     # via mp3_cleaner (pyproject.toml)
-typing-extensions==4.9.0
+typing-extensions==4.12.2
     # via pydantic
