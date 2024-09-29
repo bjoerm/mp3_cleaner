@@ -1,7 +1,7 @@
-input_path = "D:/Audio/!Neu/!2MP3 Cleaner Input"   # "D:/Audio/!Neu/!2MP3 Cleaner Input"   # Default: "input"
-output_path = "D:/Audio/!Neu/!3MP3 Cleaner Output" # Default: "output"
+input_path = "E:/Audio/!Neu/!2MP3 Cleaner Input"   # "D:/Audio/!Neu/!2MP3 Cleaner Input"   # Default: "input"
+output_path = "E:/Audio/!Neu/!3MP3 Cleaner Output" # Default: "output"
 
-threads = 4 # Default: 1
+threads = 16 # Default: 1
 
 do_clean_output_folder = true # Default: true
 
