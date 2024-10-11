@@ -1,4 +1,5 @@
 # TODO Prevent copying empty subfolders.
+# TODO Be fine with files from the top level of the input folder (raise ValueError(f"Please move the files from the main directory into a subfolder. Example {in_input_path[0]}"))
 
 import shutil
 import tomllib
