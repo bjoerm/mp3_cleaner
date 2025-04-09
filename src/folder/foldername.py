@@ -107,16 +107,15 @@ class FolderName:
 
     def rename_folder(self):
         if self.folderpath_beautified.is_dir():
-            logging.warning(f"Folder {str(self.folderpath_beautified)} already existed. Beautified files from {str(self.folderpath_inital)} are copied into that folder.")
+            logging.warning(
+                f"Folder {str(self.folderpath_beautified)} already existed. Beautified files from {str(self.folderpath_inital)} are copied into that folder. This can occur, if two input folders share the same beautified output folder."
+            )
             shutil.copytree(src=self.folderpath_inital, dst=self.folderpath_beautified, dirs_exist_ok=True)
             shutil.rmtree(self.folderpath_inital)
 
         elif self.folderpath_beautified.is_dir() is False:
-            # This is the default case: Beautified folder does not yet exist.
-            self.folderpath_inital.rename(
-                self.folderpath_temp
-            )  # Some operating systems are case insensitive. Meaning a.mp3 and A.mp3 would be consider the same. Thus, an itermediate step with renaming into a tmp file name.
-            self.folderpath_temp.rename(self.folderpath_beautified)
+            # Case insensitivity is also relevant for folders but not addressed here, but in the copy to the output folder stage.
+            self.folderpath_inital.rename(self.folderpath_beautified)
 
         self._log_changed_folder_names()
 
