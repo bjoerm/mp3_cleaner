@@ -250,3 +250,5 @@ class StringBeautifier:
             text,
             flags=regex.IGNORECASE,
         )
+
+        return text
