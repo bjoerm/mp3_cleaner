@@ -225,6 +225,7 @@ class StringBeautifier:
 
         # Removing unwanted info
         text = regex.sub(r"\s\(explicit\)", "", text, flags=regex.IGNORECASE)  # Removing any " (Explicit)" information.
+        text = regex.sub(r"\s\[explicit\]", "", text, flags=regex.IGNORECASE)  # Removing any " (Explicit)" information.
         text = regex.sub(r"®", "", text, flags=regex.IGNORECASE)  # Special registered trademark icon.
 
         # Special band names
@@ -242,13 +243,5 @@ class StringBeautifier:
             text,
             flags=regex.IGNORECASE,
         )  # GmbH
-
-        # Removes the "(Explicit)" suffix.
-        text = regex.sub(
-            "(explicit)",
-            "",
-            text,
-            flags=regex.IGNORECASE,
-        )
 
         return text
