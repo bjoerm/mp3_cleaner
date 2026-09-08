@@ -1,6 +1,7 @@
 # TODO Prevent copying empty subfolders.
 # TODO Be fine with files from the top level of the input folder (raise ValueError(f"Please move the files from the main directory into a subfolder. Example {in_input_path[0]}"))
 
+
 import shutil
 import tomllib
 from datetime import datetime
@@ -67,11 +68,11 @@ def clean_mp3s(mp3_folders: list[Path], input_path: Path, output_path: Path, unw
 
 if __name__ == "__main__":
     start_time = datetime.now()
-    print(f'Script started at {start_time.strftime("%H:%M:%S")}.')
+    print(f"Script started at {start_time.strftime('%H:%M:%S')}.")
 
     mp3_cleaner()
 
     finish_time = datetime.now()
-    print(f'Script finished at {finish_time.strftime("%H:%M:%S")}.\nTook {round((finish_time - start_time).total_seconds(), 1)} seconds.')
+    print(f"Script finished at {finish_time.strftime('%H:%M:%S')}.\nTook {round((finish_time - start_time).total_seconds(), 1)} seconds.")
 
     print("End of script reached.")

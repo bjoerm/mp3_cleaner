@@ -1,8 +1,12 @@
-# How-to update requirements.txt:
-# pip install pip-tools
-# pip-compile --upgrade --resolver=backtracking -o requirements.txt pyproject.toml
-# pip-compile --upgrade --extra dev --resolver=backtracking -o dev_requirements.txt pyproject.toml
-# pip-sync requirements.txt dev_requirements.txt
+# Install:
+# pip install --upgrade uv
+# uv venv --clear
+# uv sync
+
+# How-to update
+# pip install --upgrade uv
+# uv lock --upgrade
+# uv sync
 
 
 [build-system]
@@ -13,18 +17,20 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mp3_cleaner"
 version = "1.0"
+requires-python = ">=3.11, <3.12"
+
 dependencies = ["mutagen", "pydantic<2.0", "regex", "tqdm"]
 
 [project.optional-dependencies]
-dev = ["black", "flake8", "isort", "pytest", "pytest-xdist"]
+dev = ["pytest", "pytest-xdist", "ruff"]
 
-
-[tool.black]
+[tool.ruff]
 line-length = 200
+extend-include = ["*.ipynb"]
+cache-dir = ".tmp/.ruff_cache"
 
-[tool.isort]
-profile = "black"
-line_length = 200
+[tool.ruff.lint]
+select = ["PLE"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
