@@ -19,6 +19,7 @@ unwanted_files = [
     "*.log",
     "*.m3u",
     "*.m3u8",
+    "*.md5",
     "*.odt",
     "*.nfo",
     "*.pdf",

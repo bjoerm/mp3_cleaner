@@ -83,7 +83,7 @@ class MP3FileName:
 
         self.filepath_inital.rename(
             self.filepath_temp
-        )  # Some operating systems are case insensitive. Meaning a.mp3 and A.mp3 would be consider the same. Thus, an itermediate step with renaming into a tmp file name.
+        )  # Some operating systems are case insensitive. Meaning a.mp3 and A.mp3 would be considered the same. Thus, an itermediate step with renaming into a tmp file name.
         self.filepath_temp.rename(self.filepath_beautified)
 
         self._log_changed_file_names()

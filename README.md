@@ -16,10 +16,9 @@ Details:
 * Special handling of foldernames for scores and soundtracks (if their album tag ends with (Score) or (Soundtrack)).
 * Sorts suffixes like "(Feat. ...)" and (Live) uniformly.
 
-
-
 ## How-to
-1. Open the [config.toml](/src/config.toml) and adjust input and output paths.
-1. Run the [mp3_cleaner](/src/mp3_cleaner.py).
+1. Open the [config.toml](/src/config.toml) and adjust input and output paths
+1. uv run src\mp3_cleaner.py
+1. Run the [mp3_cleaner](/src/mp3_cleaner.py)
 
 A test MP3 file can be found under [data](/data/wikimedia_commons/warnsignal_train_with_some_tags.mp3). It is from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:BVG_Warnsignal_U-Bahn.mp3).
